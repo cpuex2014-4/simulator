@@ -38,19 +38,20 @@ int main (int argc, char* argv[]) {
 	unsigned int byteTemp = 0;
 	int bitCount = 0, line = 0;
 	unsigned int bitLoc = 0;	// 0<bitLoc<31
-	char textBuff[BUFF];
+	unsigned char textBuff[BUFF];
 	unsigned int byteSize;
 	unsigned int i, j, temp;
 
-	/* readBuff初期化 */
+	/* readBuff初期化 */	/* byteCode初期化 */
 	for (j=0; j<(LINE); j++) {
 		readBuff[j] = 0;
-	}
-
-	/* byteCode初期化 */
-	for (j=0; j<(LINE); j++) {
 		byteCode[j] = 0;
 	}
+	/* textBuff初期化 */
+	for (j=0; j<(BUFF); j++) {
+		textBuff[j] = 0;
+	}
+
 
 //	sleep(1);
 	do { /*EOFに到達していない*/
@@ -59,7 +60,7 @@ int main (int argc, char* argv[]) {
 /* ファイルには'[0-4294967295].'と言う形で配置されている */
 /* EOFまで読み込む */
 		readCount = read(0, readBuff, LINE);
-		printf("[ DEBUG ]\treadCount = %u\n", readCount);
+//		printf("[ DEBUG ]\treadCount = %u\n", readCount);
 		j = 0;
 		while(i<LINE) {
 			temp = i % 4;
@@ -82,18 +83,18 @@ int main (int argc, char* argv[]) {
 					break;
 				}
 				default: {
-					printf("default ");
+//					printf("default ");
 					break;
 				}
 			}
 			i++;
 		}
 //		printf("\n");
-		printf("[ DEBUG ]\tbyteCode = \n");
-		for (j=0; j<(LINE/4); j++) {
-			if(byteCode[j] != 0) printf("[%u/", byteCode[j]);
-			if(byteCode[j] != 0) printf("%x], ", byteCode[j]);
-		}
+//		printf("[ DEBUG ]\tbyteCode = \n");
+//		for (j=0; j<(LINE/4); j++) {
+//			if(byteCode[j] != 0) printf("[%u/", byteCode[j]);
+//			if(byteCode[j] != 0) printf("%x], ", byteCode[j]);
+//		}
 //		printf("\n");
 //		sleep(10);
 		bitCount = 0;
@@ -101,13 +102,13 @@ int main (int argc, char* argv[]) {
 		i = 0;
 		temp = 0;
 		while(i < LINE) {
-			if(temp<6) printf("\nbyteCode[%u] = %u", temp, byteCode[temp]);
+//			if(temp<6) printf("\nbyteCode[%u] = %u", temp, byteCode[temp]);
 			j = 0;
 			for(bitLoc = 31; bitLoc >= 0; bitLoc--) {
-				if(temp < 6) printf("\n[ DEBUG ]\ti=%d, bitLoc=%d, byteCode[temp]=%u, pow2(%d)=%u, ", i, bitLoc, byteCode[temp], j, pow2(j));
+//				if(temp < 6) printf("\n[ DEBUG ]\ti=%d, bitLoc=%d, byteCode[temp]=%u, pow2(%d)=%u, ", i, bitLoc, byteCode[temp], j, pow2(j));
 				if( (byteCode[temp] % 2) > 0 ) {
 					textBuff[(bitLoc+i)] = '1';
-					if(temp < 6) printf("textBuff[%d]=%c, temp=%d", bitLoc+i, textBuff[bitLoc+i], temp);
+//					if(temp < 6) printf("textBuff[%d]=%c, temp=%d", bitLoc+i, textBuff[bitLoc+i], temp);
 				} else {
 					textBuff[(bitLoc+i)] = '0';
 //					if (temp<6) printf("textBuff[%d]=%c, temp=%d", bitLoc+i, textBuff[bitLoc+i], temp);
@@ -119,21 +120,28 @@ int main (int argc, char* argv[]) {
 			i = i + 32;
 			temp = i / 32;
 		}
-		printf("\n[ DEBUG ]\t%s\n", textBuff);
-		printf("\n");
+//		printf("\n[ DEBUG ]\t%s\n", textBuff);
+//		printf("\n");
 
 //		printByte(byteCode);
 //		byteSize = checkSize(byteCode) * sizeof(unsigned int);
 //		printf("[ DEBUG ]\tbyteSize = %u\n", byteSize);
 /* 数字列を標準出力に書き出す */
 /* ファイルには'0011001100110011001100110011001111011101110111011101110111011101'と言う形で配置される */
-		do { // 書き終わるまで書き込む
+
+//		byteSize = sizeof(textBuff);
+
+		for(i=0;i<BUFF;i++) {
+			if(textBuff[i]!=0) byteSize = i;
+		}
+
+//		do { // 書き終わるまで書き込む
 			writeCount = write(1, textBuff, byteSize);
 			if(writeCount < 0) break;
-			byteSize = byteSize + writeCount;
-			printf("[ DEBUG ]\twriteCount = %u, ", writeCount);
-			printf("byteSize = %u\n", byteSize);
-		} while ( byteSize > 0 );
+			byteSize = byteSize - writeCount;
+//			printf("[ DEBUG ]\twriteCount = %u, ", writeCount);
+//			printf("byteSize = %u\n", byteSize);
+//		} while ( byteSize > 0 );
 		line = 0;
 	} while (readCount == BUFF);
 

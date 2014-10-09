@@ -5,24 +5,60 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#define REGSIZE 32
 #define BUFF 65536
+#define MLINE 8
+#define MROW 65536
+#define ADDU 0x21
+#define ADDIU 0x9
 
+unsigned int reg[REGSIZE];	// 32 register
+unsigned char memory[MLINE][MROW];	// 2MB=512k Word SRAM Memory
+										// MLINE=32, MROW=65536
 
+/* レジスタ内容表示器 */
+void printRegister() {
+	int i;
+	for(i=0; i<REGSIZE; i++) {
+		if( (i+1)%8 == 0 ) {
+			printf("reg[%2d]=%4x\n", i, reg[i]);
+		} else {
+			printf("reg[%2d]=%4x, ", i, reg[i]);
+		}
+	}
+}
 
-
+/* opcodeが0の時の操作を、末尾6ビットによって決める */
+unsigned int funct (unsigned int pc, unsigned int instruction) {
+	unsigned int function = 0;
+	
+	function = instruction & 0x3F;
+	printf("[function:%2x]\n", function);
+	return pc;
+}
 /* デコーダ */
 /*
 仕様
-	input	program (1line) : unsigned int
-	output	opcode	: unsigned int
+	input	operation : unsigned int
+	output	pc	: unsigned int
 	(ex)
-		opcode = encode(program)
+		pc = encode(program)
 */
-unsigned int decoder (unsigned int program) {
+unsigned int decoder (unsigned int pc, unsigned int instruction) {
 	unsigned int opcode;
 
-	opcode = program >> 26;
-	return opcode;
+	opcode = instruction >> 26;	// opcode: 6bitの整数
+	printf("[opcode:%2x]\n", opcode);
+	if(opcode == 0x0) funct(pc, instruction);
+	else if (opcode == ADDIU) {
+		;
+	}
+
+
+
+
+	pc++;
+	return pc;
 }
 
 /* コア命令セット */
@@ -123,23 +159,41 @@ unsigned int decoder (unsigned int program) {
 
 int main (int argc, char* argv[]) {
 	int fd = 0;
-	unsigned int opBuff[BUFF];
+	unsigned int opBuff[BUFF];	// ファイルから読み込む命令列
+	unsigned int operation = 0;	// その瞬間に実行する命令
+	unsigned int pc = 0;		// program counter
 
+	int i;
+	/* register init */
+	for(i=0; i<REGSIZE; i++) {
+		reg[i] = 0;
+	}
 
 	/* 引数としてファイル名をとる。それ以外は終了 */
 	if (argc != 2) {
 		return -1;
 		printf("please input file.\n");
-	}	
+	}
 
 	/* ファイルから実行命令列を読み込む */
 	fd = open(argv[1], O_RDONLY);
 	read(fd, opBuff, BUFF);
 	
-	/* 32文字(128byte)ごとに1命令実行。実行終了する度にPC++ */
+	/* 1word(32bit)ごとに1命令実行。実行終了する度にPC++ */
 	/* 当面はPCを進める度にレジスタの内容を全て書き出す */	
-
-
+	
+	while(pc<16u) {	// unsigned int
+		printf("[ProgramCounter:%u]\n", pc);
+		printRegister();
+		operation = opBuff[pc];
+		printf("[Operation:%x]\n", operation);
+		
+		pc = decoder(pc, operation);
+		
+		
+		
+	}
+	
 	close(fd);
 	return 0;
 }
