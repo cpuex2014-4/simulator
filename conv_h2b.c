@@ -95,49 +95,49 @@ int main (int argc, char* argv[]) {
 			}
 			if(textBuff[textCount] == '1') {
 				byteTemp = byteTemp + pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '2') {
 				byteTemp = byteTemp + 0x2*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '3') {
 				byteTemp = byteTemp + 0x3*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '4') {
 				byteTemp = byteTemp + 0x4*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '5') {
 				byteTemp = byteTemp + 0x5*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '6') {
 				byteTemp = byteTemp + 0x6*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '7') {
 				byteTemp = byteTemp + 0x7*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '8') {
 				byteTemp = byteTemp + 0x8*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == '9') {
 				byteTemp = byteTemp + 0x9*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == 'a') {
 				byteTemp = byteTemp + 0xA*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == 'b') {
 				byteTemp = byteTemp + 0xB*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == 'c') {
 				byteTemp = byteTemp + 0xC*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == 'd') {
 				byteTemp = byteTemp + 0xD*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == 'e') {
 				byteTemp = byteTemp + 0xE*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else if(textBuff[textCount] == 'f') {
 				byteTemp = byteTemp + 0xF*pow2(textLoc-1);
-				printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
+				// printf("[ %c:%u ] %u-> ", textBuff[textCount], line, byteTemp);
 			} else { /* printf("\n"); */ }
 			
 			textLoc--;
