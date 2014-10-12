@@ -15,6 +15,14 @@
 unsigned int reg[REGSIZE];	// 32 register
 unsigned char memory[MLINE][MROW];	// 2MB=512k Word SRAM Memory
 										// MLINE=32, MROW=65536
+unsigned int opBuff[BUFF];	// ファイルから読み込む命令列
+unsigned int operation;	// その瞬間に実行する命令
+unsigned int pc;		// program counter: jump -> reg[pc]
+unsigned int mipsStatus;	// status
+
+
+
+
 
 /* レジスタ内容表示器 */
 void printRegister() {
@@ -57,7 +65,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction) {
 
 
 
-	pc++;
+	pc = pc + 4;
 	return pc;
 }
 
@@ -159,11 +167,10 @@ unsigned int decoder (unsigned int pc, unsigned int instruction) {
 
 int main (int argc, char* argv[]) {
 	int fd = 0;
-	unsigned int opBuff[BUFF];	// ファイルから読み込む命令列
-	unsigned int operation = 0;	// その瞬間に実行する命令
-	unsigned int pc = 0;		// program counter
 
 	int i;
+
+	
 	/* register init */
 	for(i=0; i<REGSIZE; i++) {
 		reg[i] = 0;
@@ -179,7 +186,7 @@ int main (int argc, char* argv[]) {
 	fd = open(argv[1], O_RDONLY);
 	read(fd, opBuff, BUFF);
 	
-	/* 1word(32bit)ごとに1命令実行。実行終了する度にPC++ */
+	/* 1word(32bit)ごとに1命令実行。実行終了する度にPC = pc+4; */
 	/* 当面はPCを進める度にレジスタの内容を全て書き出す */	
 	
 	while(pc<16u) {	// unsigned int
