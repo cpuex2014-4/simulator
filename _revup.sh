@@ -10,5 +10,7 @@ cp Makefile -u ./backup
 
 tar -cvzf ~/backup/backup_${name}_[simulation].tar.gz backup
 
-git push https://github.com/satoshi-1115/CPUex.git
+git add -A
+git commit -a -m "message"
+#git push https://github.com/satoshi-1115/CPUex.git
 
