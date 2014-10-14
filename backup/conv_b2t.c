@@ -20,13 +20,14 @@ unsigned int pow2 (unsigned int j) {
 }
 /* 引数無し */
 int main (int argc, char* argv[]) {
-	unsigned int readCount = 0, writeCount = 0;
-	unsigned int countBuff = 0;
+	unsigned int readCount = 0;
+//	unsigned int writeCount = 0;
+//	unsigned int countBuff = 0;
 	unsigned char readBuff[BUFF] = { 0 };
 	unsigned int byteCode[LINE] = { 0u };
 	unsigned int bitLoc = 0;	// 0<bitLoc<31
 	unsigned char textBuff[BUFF];
-	unsigned int i, j, temp;
+	unsigned int i, j, temp, btemp;
 
 	/* readBuff初期化 */	/* byteCode初期化 */
 	for (j=0; j<(LINE); j++) {
@@ -43,7 +44,7 @@ int main (int argc, char* argv[]) {
 /* ファイルには'[0-4294967295].'と言う形で配置されている */
 /* EOFまで読み込む */
 		readCount = read(0, readBuff, BUFF);	// readCount [Byte=文字]だけ読み込む(最大65536bytes:unsigend int 16384文字)
-		countBuff = readCount;
+//		countBuff = readCount;
 		j = 0;
 		while(i<readCount*4) {
 			temp = i % 4;
@@ -74,18 +75,18 @@ int main (int argc, char* argv[]) {
 
 
 		i = 0;
-		temp = 0;
+		btemp = 0;
 		while(i < readCount*33/4) {
 			bitLoc = 32;
 			while(1) {
 				if(bitLoc == 32) {
 					textBuff[(bitLoc+i)] = '\n';
-				} else if( (byteCode[temp] % 2) > 0 ) {
+				} else if( (byteCode[btemp] % 2) > 0 ) {
 					textBuff[(bitLoc+i)] = '1';
 				} else {
 					textBuff[(bitLoc+i)] = '0';
 				}
-				byteCode[temp] = byteCode[temp] / 2;
+				byteCode[btemp] = byteCode[btemp] / 2;
 				if(bitLoc == 0) {
 					break;
 				}
@@ -94,7 +95,7 @@ int main (int argc, char* argv[]) {
 				bitLoc--;
 			}
 			i = i + 33;
-			temp = temp++;
+			btemp++;
 		}
 
 /* 数字列を標準出力に書き出す */

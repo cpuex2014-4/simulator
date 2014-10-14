@@ -85,7 +85,7 @@ int main (int argc, char* argv[]) {
 		do {
 			if(textBuff[textCount] == '\n') {
 				byteCode[line] = byteTemp;
-				printf("[ %u ] %u\n", line, byteTemp);
+				printf("[ %u ] 0x%8x\n", line, byteTemp);
 				line++;
 				textCount++;
 //				printf("\\n\n");
