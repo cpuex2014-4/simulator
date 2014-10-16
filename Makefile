@@ -1,4 +1,4 @@
-all: t2b h2b b2t sim
+all: t2b h2b b2t sim addu addui subu
 
 t2b: conv_t2b.c
 	gcc -Wall -o t2b conv_t2b.c
@@ -11,6 +11,12 @@ b2t: conv_b2t.c
 sim:	simulator.c
 	gcc -Wall -o sim simulator.c
 
+addu:	addu.c
+	gcc -Wall -o addu addu.c
+addui:	addui.c
+	gcc -Wall -o addui addui.c
+subu:	subu.c
+	gcc -Wall -o subu subu.c
 
 
 
