@@ -10,7 +10,7 @@
 #define BUFF 65536
 #define MLINE 8
 #define MROW 65536
-#define ADDUI 0x9
+#define ADDIU 0x9
 #define JR 0x9
 #define LUI 0x9
 #define ORI 0x9
@@ -19,6 +19,8 @@
 #define ADDU 0x21
 #define SUBU 0x13
 #define JUMP 0x2
+#define SLT 0x2A
+#define BEQ 0x4
 
 unsigned int reg[REGSIZE];	// 32 register
 unsigned int rZ, rV, rN, rCarry;	// condition register
@@ -26,61 +28,59 @@ unsigned int memoryA[MLINE][MROW];	// 2MB=512k Word SRAM Memory
 										// MLINE=32, MROW=65536
 unsigned int opBuff[BUFF];	// ファイルから読み込む命令列
 unsigned int operation;	// その瞬間に実行する命令
-unsigned int pc;		// program counter: jump -> reg[pc]
+unsigned int pc;		// program counter: jump -> memory[pc]
 int jumpFlg=0;	// pcを変更するプログラムが実行されたら1。ジャンプ後0に戻る
 
-unsigned int subu () {
-	unsigned int ret=0;
+unsigned int slt(unsigned int rs, unsigned int rt) {
+// slt rs, rt, rd
+// R-type
+// rs < rt ならばレジスタ rd に 1 を代入、そうでなければ 0 を代入。 
+	unsigned int rd;
+
+	if(rs < rt) {
+		rd = 1;
+	} else {
+		rd = 0;
+	}
+	return rd;
+}
+
+unsigned int subu (unsigned int subuA, unsigned int subuB) {
+	// R-type
+	// subu rs rt rd
+	// rd <- rs - rt
+	// subuA : rs, subuB : rt
+	unsigned int rd=0;
 	unsigned int bit=0;
 	unsigned int c=0;
 	unsigned int bitA, bitB;
 	unsigned int bitQ;
 
-	unsigned int subuA = 0x0;
-	unsigned int subuB = 0x0;
-
-	ret = subuA-subuB;
-	printf("subuA-subuB = 0x%x(%u)\n", ret, ret);
 	subuB = ~subuB;
-	printf("subuB = 0x%x\n", subuB);
 
 	/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
 	while (bit < 32) {
 		if(bit == 0) {
 			c=1;
 			bitA = ((subuA << (31-bit)) >> (31-bit)) >> bit;
-			printf("bit:%u\tbitA = %x, ", bit, bitA);
 			bitB = ((subuB << (31-bit)) >> (31-bit)) >> bit;
-			printf("bitB = %x, ", bitB);
-
 			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
 			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-	
-			printf("bitQ = %x, c=%u\n", bitQ, c);
-			ret = ret | (bitQ << bit);
+			rd = rd | (bitQ << bit);
 		} else {
 			bitA = ((subuA << (31-bit)) >> (31-bit)) >> bit;
-			printf("bit:%u\tbitA = %x, ", bit, bitA);
 			bitB = ((subuB << (31-bit)) >> (31-bit)) >> bit;
-			printf("bitB = %x, ", bitB);
-	
 			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
 			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-	
-			printf("bitQ = %x, c=%u\n", bitQ, c);
-			ret = ret | (bitQ << bit);
-
+			rd = rd | (bitQ << bit);
 		}
 		bit++;
 	}
-
-	printf("subuA-subuB = 0x%x(%u), c=%u\n", ret, ret, c);
-
-	return ret;
+	return rd;
 }
 
 unsigned int addui(unsigned int adduA, unsigned int Imm) {
-	unsigned int ret=0;
+	unsigned int rd=0;
 	unsigned int bit=0;
 	unsigned int c=0;
 	unsigned int bitA, bitB;
@@ -95,16 +95,16 @@ unsigned int addui(unsigned int adduA, unsigned int Imm) {
 		bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
 		c = (bitA&bitB) | (bitB&c) | (bitA&c);
 
-		ret = ret | (bitQ << bit);
+		rd = rd | (bitQ << bit);
 		bit++;
 	}
 	rCarry = c;
 
-	return ret;
+	return rd;
 }
 
 unsigned int addu(unsigned int adduA, unsigned int adduB){
-	unsigned int ret=0;
+	unsigned int rd=0;
 	unsigned int bit=0;
 	unsigned int c=0;
 	unsigned int bitA, bitB;
@@ -118,77 +118,83 @@ unsigned int addu(unsigned int adduA, unsigned int adduB){
 		bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
 		c = (bitA&bitB) | (bitB&c) | (bitA&c);
 
-		ret = ret | (bitQ << bit);
+		rd = rd | (bitQ << bit);
 		bit++;
 	}
 	rCarry = c;
-	return ret;
+	return rd;
 }
 
 
 /* レジスタ内容表示器 */
-void printRegister() {
+void printRegister(void) {
+// unsigned int rZ, rV, rN, rCarry;	// condition register
 	int i;
 
-	printf("[PC] = 0x%x\n\n", pc);
+	printf("R[Condition] ZVNC = %x/%x/%x/%x \n", rZ, rV, rN, rCarry);
 	for(i=0; i<REGSIZE; i++) {
-		if( (i+1)%8 == 0 ) {
-			printf("reg[%2d]=%4x\n", i, reg[i]);
+		if(i%8 == 0) 
+			printf("R[%2d->%2d] : ", i, i+8);
+		else if( (i+1)%8 == 0 ) {
+			printf("%4x\n",reg[i]);
 		} else {
-			printf("reg[%2d]=%4x, ", i, reg[i]);
+			printf("%4x ",reg[i]);
 		}
 	}
+
 }
 
 /* opcodeが0の時の操作を、末尾6ビットによって決める */
 unsigned int funct (unsigned int pc, unsigned int instruction) {
 	unsigned int function = 0;
-	unsigned int rt=0;
 	unsigned int rs=0;
+	unsigned int rt=0;
 	unsigned int rd=0;
 	unsigned int im=0;
+
+	/* [op] [rs] [rt] [rd] [shamt] [funct] */
+	/* 先頭&末尾6bitは0であることが保証済み */
+	rs = (instruction >> 21) & 0x1F;
+	rt = (instruction >> 16) & 0x1F;
+	rd = (instruction >> 11 ) & 0x1F;
 	
 	function = instruction & 0x3F;
+	printf("\t[function:%2x]\n", function);
 	switch (function) {
 		case (JR) :
-			printf("jr switch has selected.\n");
+			printf("\t<Function: JR>\n");
 			rd = instruction & 0x7c0;
 			pc = reg[rd];
 			jumpFlg = 1;
 			rd = 0;
 			break;
 		case (ADDU) :
-			printf("addu switch has selected.\n");
-			printf("=> [rd] 0x%2x(%u), [rt] 0x%2x(%u), [rs] 0x%4x(%u)\n", rd, rd, rt, rt, rs, rs);
-			rs = (instruction >> 21) & 0x1F;
-			rt = (instruction >> 16) & 0x1F;
-			rd = (instruction >> 11 ) & 0x78;
-			reg[rd] = addu(reg[rs], reg[rd]);
-			printf("=> [rd: %u] 0x%2x(%u)\n", rd, reg[rd], reg[rd]);
+			printf("\t<Function: ADDU> ");
+			printf("rs:R[%u] 0x%2x(%u), rt:R[%u] 0x%2x(%u)\n", rs, reg[rs], reg[rs], rt, reg[rt], reg[rt]);
+			reg[rd] = addu(reg[rs], reg[rt]);
+			printf("=> [rd:%u] 0x%2x(%u)\n", rd, reg[rd], reg[rd]);
 			break;
 		case (SUBU) :
-			printf("subu switch has selected.\n");
-			rs = (instruction >> 21) & 0x1F;
-			rt = (instruction >> 16) & 0x1F;
-			rd = (instruction >> 11 ) & 0x78;
-			printf("[rd] 0x%2x(%u), ", rd, rd);
-			printf("[rt] 0x%2x(%u), ", rt, rt);
-			printf("[rs] 0x%4x(%u)\n", rs, rs);
+			printf("\t<Function: SUBU>");
+			printf("rs:R[%u] 0x%2x(%u), rt:R[%u] 0x%2x(%u)\n", rs, reg[rs], reg[rs], rt, reg[rt], reg[rt]);
 			break;
+		case (SLT) :
+			printf("\t<Function: SLT> < rs < rt? > :");
+			printf("rs:R[%u] 0x%2x(%u), rt:R[%u] 0x%2x(%u)\n", rs, reg[rs], reg[rs], rt, reg[rt], reg[rt]);
+			reg[rd] = slt(reg[rs], reg[rt]);
+			if(reg[rd]) {
+				printf("\t=> rd:R[%2u] 0x%4x(%u), <TRUE>\n", rd, reg[rd], reg[rd]);
+			} else {
+				printf("\t=> rd:R[%2u] 0x%4x(%u), <FALSE>\n", rd, reg[rd], reg[rd]);
+			}
+			break;
+
 		default :
 			printf("Default switch has selected.\n");
 	}
-	printf("[function:%2x]\n", function);
 	return pc;
 }
 /* デコーダ */
-/*
-仕様
-	input	operation : unsigned int
-	output	pc	: unsigned int
-	(ex)
-		pc = encode(program)
-*/
 unsigned int decoder (unsigned int instruction) {
 	unsigned int opcode;
 	unsigned int rt=0;
@@ -197,48 +203,61 @@ unsigned int decoder (unsigned int instruction) {
 	unsigned int im=0;
 	unsigned int jump=0;
 
-	printf("[instruction: 0x%2x]\n", instruction);
+	printf("\t[instruction: 0x%2x]\n", instruction);
 	opcode = instruction >> 26;	// opcode: 6bitの整数
-	printf("[opcode:%2x]\n", opcode);
+	printf("\t[opcode:%2x]\n", opcode);
 
 	/* 適当な時にswitch文に切り替え */
 	if(opcode == 0) funct(pc, instruction);
-	else if (opcode == ADDUI) {
-		printf("[opcode] addui \n");
-		rs = (instruction >> 21) & 0x1F;		// 0x  F : 11111000000000000000000000
+	else if (opcode == ADDIU) {
+		printf("\t[opcode] ADDIU ");
+		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
 		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
-		printf("\treg[rs:%2u] 0x%2x(%u), reg[rt:%2u] 0x%2x(%u), [im: 0x%4x] \n", rs, reg[rs], reg[rs], rt, reg[rt], reg[rt], im);
+		printf("\trs:R[%2u] 0x%2x(%u), rt:R[%2u] 0x%2x(%u), [im: 0x%4x] \n", rs, reg[rs], reg[rs], rt, reg[rt], reg[rt], im);
 		reg[rt] = addui(reg[rs], im);
-		printf("=> \treg[rt:%2u] 0x%2x(%u)\n", rt, reg[rt], reg[rt]);
+		printf("=> \trt:R[%2u] 0x%2x(%u)\n", rt, reg[rt], reg[rt]);
 	}
 	else if (opcode == JUMP) {
-		printf("[opcode] j ");
+		printf("\t[opcode] J \n");
+		jumpFlg = 1;
 		jump = instruction & 0x3FFFFFF;
-		printf("[jump_to] 0x%4x(%u)\n", jump, jump);
-		pc = jump;
+		printf("\t[instruction] 0x%08x(%u)\n", instruction, instruction);
+		printf("\t<jump_to> 0x%4x(%u)\n", jump, jump);
+		pc = jump*4 + 0x400000;	// jumpはpAddr形式
 	}
-	else if (opcode == ADDUI) {
-		;
-	}
-	else if (opcode == ADDUI) {
-		;
+	else if (opcode == BEQ) { // beq I-Type: 000100 rs rt BranchAddr 	等しいなら分岐 
+		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
+		rt = (instruction >> 16) & 0x1F;	// 0x  F : 00000111110000000000000000
+		printf("\t[opcode] BEQ < rs=rt? > \n");
+		jump = instruction & 0xFFFF;
+		printf("\t[instruction] 0x%08x(%u)\n", instruction, instruction);
+		printf("\trs:R[%2u] 0x%2x(%u), rt:R[%2u] 0x%2x(%u)\n", rs, reg[rs], reg[rs], rt, reg[rt], reg[rt]);
+		if(reg[rs] == reg[rt]) {
+			printf("\t<TRUE & JUMP> -> <jump_to> 0x%4x(%u)\n", jump, jump);
+			jumpFlg = 1;
+			pc = jump*4 + 0x400000;	// jumpはpAddr形式
+		} else {
+			printf("\t<FALSE & NOP>\n");
+		}
+
 	}
 	else if (opcode == LW) {	// 0x47: lw r1, 0xaaaa(r2) : r2+0xaaaaのアドレスにr1を32ビットでロード
-		printf("[opcode] LW \n");
+		printf("\t[opcode] LW \n");
 		;
+	} else {
+		printf("[Unknown OPCODE]\n");
 	}
-	pc = pc + 4;
+
+	if(jumpFlg == 0) {
+		pc = pc + 4;
+		jumpFlg = 0;
+	} else {
+		jumpFlg = 0;
+	}
 	return 1;
 }
 
-/* コア命令セット */
-/*
-仕様
-
-
-
-*/
 /*
 構成
 		OPcode	funct	funcname			func
@@ -276,47 +295,6 @@ unsigned int decoder (unsigned int instruction) {
 */
 
 
-
-/* ALU */
-/*
-仕様
-
-
-
-*/
-/*
-構成
-	sub(a,b)	-
-	mul(a,b)	*
-	div(a,b)	/
-	cmp(a,b)	if (a == b) then 1 else 0
-	jmp(reg)	レジストリ($reg)へ飛ぶ
-
-
-*/
-
-
-
-
-
-
-/* FPU */
-/*
-仕様
-
-
-
-*/
-/*
-構成
-	fadd(a,b)	a +. b
-	fsub(a,b)	a -. b
-	fmul(a,b)	a *. b
-	fdiv(a,b)	a /. b
-	fcmp(a,b)	if (a == b) then 1 else 0
-*/
-
-
 /* MEMORY */
 /*
 仕様
@@ -348,6 +326,7 @@ int pp(unsigned int opBuff[], unsigned int* memory, unsigned int pc) {
 
 int main (int argc, char* argv[]) {
 	int fd = 0;
+	unsigned int breakCount = 0;
 	unsigned int *memory = malloc( sizeof(unsigned int) * 2 * 1024* 1024 );
 	if(memory == NULL) {
 		perror("memory allocation error\n");
@@ -375,7 +354,9 @@ int main (int argc, char* argv[]) {
 		count++;
 	}
 
+	printf("\n");
 	/* initialize */
+	reg[0] = 0x0;	// Zero register
 	/* Program Counter init */
 	pc = 0x400000;
 	pAddr = (pc - 0x400000) / 4;
@@ -383,6 +364,7 @@ int main (int argc, char* argv[]) {
 	for(i=0; i<REGSIZE; i++) {
 		reg[i] = 0;
 	}
+	printf("\n=================== Initialize ====================\n");
 
 	/* 読み込んだ内容をメモリへ書き込む */
 	/* 現時点では入力文字列を問答無用でmemoryの0x400000番地以降にコピーする */
@@ -398,25 +380,20 @@ int main (int argc, char* argv[]) {
 	/* Kernel Data Segment : [90000000] ... [90010000] */
 
 
-	while(pAddr < 8) {	// unsigned int
-		printf("[pAddr: 0x%x], ", pAddr);
+	while(pAddr < 0x10) {	// unsigned int
+		printf("[pAddr: 0x%03x], [pc: 0x%08x]\n", pAddr, pc);
 
 //		fetch();	// memory[pc]の内容をロード?
 
-
 		printRegister();	// その時の命令とレジスタの値を表示する
-		if(jumpFlg == 0) {
-			operation = opBuff[pAddr];
-			decoder(operation);
-		} else {
-			operation = opBuff[pAddr];
-			jumpFlg = 0;
-			decoder(operation);
-		}
+		operation = opBuff[pAddr];
+		decoder(operation);
 		printf("\n===================== next ========================\n");
-//		pc = pc + 4;
+//		pc = pc + 4; // 呼び出し先の関数で処理する
 		pAddr = (pc - 0x400000) / 4;
 		if(pc > 0x440000) pc = 0x400000;
+		breakCount++;
+		if (breakCount > 100) break;
 	}
 	
 	free(memory);

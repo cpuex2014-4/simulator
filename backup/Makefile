@@ -9,7 +9,7 @@ b2t: conv_b2t.c
 	gcc -Wall -o b2t conv_b2t.c
 
 sim:	simulator.c
-	gcc -Wall -o sim simulator.c
+	gcc -O3 -Wall -o sim simulator.c
 
 addu:	addu.c
 	gcc -Wall -o addu addu.c
