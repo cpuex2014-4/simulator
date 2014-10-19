@@ -1,56 +1,54 @@
-24080000, 24090001, 240a0000, 240b0000, 164602a, 100c0000, 252a0000, 1094821, 25480000, 256b0001, 8000004, 25420000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+200ff8
+opBuff succeeded to read
+24080000, 24090001, 240a0000, 240b0000, 164602a, 100c0000, 252a0000, 1094821, 25480000, 256b0001, 8000004, 25420000, 
+memory[0] = 24080000, memory[800] = 0, memory[1000] = 0, memory[1800] = 0, memory[2000] = 0, memory[2800] = 0, memory[3000] = 0, memory[3800] = 0, memory[4000] = 0, memory[4800] = 0, memory[5000] = 0, memory[5800] = 0, memory[6000] = 0, memory[6800] = 0, memory[7000] = 0, memory[7800] = 0, memory[8000] = 0, memory[8800] = 0, memory[9000] = 0, memory[9800] = 0, memory[a000] = 0, memory[a800] = 0, memory[b000] = 0, memory[b800] = 0, memory[c000] = 0, memory[c800] = 0, memory[d000] = 0, memory[d800] = 0, memory[e000] = 0, memory[e800] = 0, memory[f000] = 0, memory[f800] = 0, 
 
 =================== Initialize ====================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    0    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    0    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 0(0), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 0, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -58,74 +56,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -133,74 +125,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -208,74 +194,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -283,74 +263,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -358,74 +332,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -433,74 +401,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -508,74 +470,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -583,74 +539,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -658,74 +608,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -733,74 +677,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -808,74 +746,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -883,74 +815,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -958,74 +884,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -1033,74 +953,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -1108,74 +1022,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -1183,74 +1091,68 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================
 [pAddr: 0x005], [pc: 0x00400014]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x100c0000]
 	[opcode: 4]
-	[opcode] BEQ < rs=rt? > 
-	[instruction] 0x100c0000(269221888)
-	rs:R[ 0] 0x 0(0), rt:R[12] 0x 0(0)
-	<TRUE & JUMP> -> <jump_to> 0x   0(0)
+	[opcode] BEQ < rs=rt? -> 
+	[instruction] 0x100c0000
+	rs:R[ 0] 0x 0, rt:R[12] 0x 0
+	<TRUE & JUMP> -> <jump_to> 0x   0
 
 ===================== next ========================
 [pAddr: 0x000], [pc: 0x00400000]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24080000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 8] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[ 8] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 8] 0x 0, [im: 0x   0] 
+=> 	rt:R[ 8] 0x 0
 
 ===================== next ========================
 [pAddr: 0x001], [pc: 0x00400004]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x24090001]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[ 9] 0x 1(1), [im: 0x   1] 
-=> 	rt:R[ 9] 0x 1(1)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[ 9] 0x 1, [im: 0x   1] 
+=> 	rt:R[ 9] 0x 1
 
 ===================== next ========================
 [pAddr: 0x002], [pc: 0x00400008]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240a0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[10] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[10] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[10] 0x 0, [im: 0x   0] 
+=> 	rt:R[10] 0x 0
 
 ===================== next ========================
 [pAddr: 0x003], [pc: 0x0040000c]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
 R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x240b0000]
 	[opcode: 9]
-	[opcode] ADDIU 	rs:R[ 0] 0x 0(0), rt:R[11] 0x 0(0), [im: 0x   0] 
-=> 	rt:R[11] 0x 0(0)
+	[opcode] ADDIU(rt=rs+Imm) 	rs:R[ 0] 0x 0, rt:R[11] 0x 0, [im: 0x   0] 
+=> 	rt:R[11] 0x 0
 
 ===================== next ========================
 [pAddr: 0x004], [pc: 0x00400010]
-R[Condition] ZVNC = 0/0/0/0 
 R[ 0-> 8] :    0    0    0    0    0    0    0
 R[ 8->16] :    1    0    0    0    0    0    0
 R[16->24] :    0    0    0    0    0    0    0
@@ -1258,7 +1160,7 @@ R[24->32] :    0    0    0    0    0    0    0
 	[instruction: 0x164602a]
 	[opcode: 0]
 	[function:2a]
-	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0(0), rt:R[4] 0x 0(0)
-	=> rd:R[12] 0x   0(0), <FALSE>
+	<Function: SLT> < rs < rt? > :rs:R[11] 0x 0, rt:R[4] 0x 0
+	=> rd:R[12] 0x   0, <FALSE>
 
 ===================== next ========================

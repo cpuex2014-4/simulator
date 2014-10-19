@@ -1,0 +1,46 @@
+/*
+構成
+		OPcode	funct	funcname			func
+	0	000000	010000	add(a,b,rd)			a+b -> rd
+	8	000100			addi(a,IMM,rt)		a+IMM -> rt	//IMM = immediate
+*	9	000101			addui(a,uIMM,rt)	a+uIMM -> rt
+*	0	000000	010001	addu(a,b,rd)		a+b (unsigned) -> rd
+*	0	000000	010010	and(a,b,rd)			a&b -> rd
+	C	001100			andi(a,IMM,rt)			a&IMM -> rt
+*	4	000100			beq(a,b,)			if(a == b) then jump
+*	5	000101			bne(a,b)			if(a != b) then jump
+*	2	000001			jmp					jump
+*	3	000011			jandl				jump and link	[?]
+*	0	000000	001000	jr(rt)				jump to rt
+*	0	000000	010100	lbu(rt)				load byte unsigned -> rt
+	0	000000	010101	lhwu				load halfword unsigned -> rt
+*	F	001111			lui					load upper immediate
+*	23	010011			lw(rs,rt)			load word from M[rs] to rs
+*	0	000000	010111	nor(a,b)			
+*	0	000000	010101	or(a,b,rd)				a || b -> rd
+*	D	001101			ori(a,IMM)
+	0	000000	011010	slt					set less than
+	A	001010			slti				set less than
+	B	001011			sltiu				set less than
+	0	000000	011011	sltu				set less than
+*	0	000000	000000	sll					shift left logial
+*	0	000000	000010	srl					shift right logical
+*	28	011000			sb					store byte
+	29	011001			sh					store halfword
+	2B	011011			sw(rt,rs)			store from rt to M[rs]
+	0	000000	010010	sub(a,b,rd)			a-b
+*	0	000000	010011	subu(a,b,rd)		a-b (unsigned)
+
+*をつけた命令を優先
+*/
+
+
+/* MEMORY */
+/*
+仕様
+	Cap.	2MB = 2 * 1024 * 1024 B
+	1 unit = sizeof(unsigned int)
+	line	524288
+	store(arg, address)	memory[address]にargの内容を保存
+	load(arg, address)	memory[address]から1単位読み込み、argに代入
+*/
