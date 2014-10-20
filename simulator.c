@@ -30,9 +30,9 @@
 
 unsigned int reg[REGSIZE];	// 32 register
 unsigned int rZ, rV, rN, rCarry;	// condition register
-unsigned int opBuff[BUFF];	// ファイルから読み込む命令列
 unsigned int operation;	// その瞬間に実行する命令
 unsigned int pc;		// program counter: jump -> memory[pc]
+unsigned int HI=0, LO=0;
 int jumpFlg=0;	// pcを変更するプログラムが実行されたら1。ジャンプ後0に戻る
 
 unsigned int slt(unsigned int rs, unsigned int rt) {
@@ -50,31 +50,19 @@ unsigned int slt(unsigned int rs, unsigned int rt) {
 }
 
 unsigned int mult(unsigned int rs, unsigned int rt) {
-	unsigned int rd=0;
-	int bit=0;
+/*	int bit=0;
 	int subbit=0;
 	unsigned int bitA[32], bitB[32];
 	unsigned int bitQ[64] = { 0 };
 	unsigned int carry = 0;
-	while (bit < 32) {
-		bitA[bit] = ((rs << (31-bit)) >> (31-bit)) >> bit;
-		bitB[bit] = ((rt << (31-bit)) >> (31-bit)) >> bit;
-		bit++;
-	}
-	for(bit=0; bit < 32; bit++) {
-		for(subbit=0; subbit < 32; subbit++) {
-			bitQ[bit+subbit] = bitQ[bit+subbit] + (bitA[bit] & bitB[subbit]);
-		}
-	}
-	for(bit=0;bit<32;bit++) {
-		rd = rd | bitQ[bit] << bit;
-	}
-	for(bit=63;bit>=32;bit--) {
-		carry = carry | bitQ[bit];
-	}
-	if(carry != 0) ;
+*/
+	unsigned int rd=0;
+
+
+
 	return rd;
 }
+
 
 unsigned int or(unsigned int rs, unsigned int rt) {
 	// R-type
@@ -85,7 +73,7 @@ unsigned int or(unsigned int rs, unsigned int rt) {
 	unsigned int bitA, bitB;
 	unsigned int bitQ = 0;
 
-	/* 各ビットごとにAND演算 */
+	/* 各ビットごとにOR演算 */
 	while (bit < 32) {
 		bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
 		bitB = ((rt << (31-bit)) >> (31-bit)) >> bit;
@@ -207,15 +195,49 @@ void printRegister(void) {
 	int i;
 
 //	printf("R[Condition] ZVNC = %x/%x/%x/%x \n", rZ, rV, rN, rCarry);
-	for(i=0; i<REGSIZE; i++) {
-		if(i%8 == 0) 
-			printf("R[%2d->%2d] : ", i, i+8);
-		else if( (i+1)%8 == 0 ) {
+/*	for(i=0; i<REGSIZE; i++) {
+		if(i%16 == 0) 
+			printf("R[%2d->%2d] : ", i, i+16);
+		else if( (i+1)%16 == 0 ) {
 			printf("%4x\n",reg[i]);
 		} else {
 			printf("%4x ",reg[i]);
 		}
 	}
+*/
+	for(i=0; i<REGSIZE; i++) {
+		if(i == 0) {
+			printf("$zr=%6x, ",reg[i]);
+		} else if( i == 1 ) {
+			printf("$at=%6x, ",reg[i]);
+		} else if( i == 2 || i == 3 ) {
+			printf("$v%d=%6x, ", i-2,reg[i]);
+		} else if( i >= 4 && i < 8 ) {
+			printf("$a%d=%6x, ", i-4,reg[i]);
+		} else if( i >= 8 && i < 16 ) {
+			printf("$t%d=%6x, ", i-8, reg[i]);
+			if(i==10) printf("\n");
+		} else if( i >= 16 && i < 24 ) {
+			printf("$s%d=%6x, ", i-16, reg[i]);
+			if(i==21) printf("\n");
+		} else if( i == 24 || i == 25 ) {
+			printf("$t%d=%6x, ", i-16, reg[i]);
+		} else if( i == 26 || i == 27 ) {
+			printf("$k%d=%6x, ",i-26,reg[i]);
+		} else if( i == 28 ) {
+			printf("$gp=%6x, ",reg[i]);
+		} else if( i == 29 ) {
+			printf("$sp=%6x, ",reg[i]);
+		} else if( i == 30 ) {
+			printf("$fp=%6x, ",reg[i]);
+		} else if( i == 31 ) {
+			printf("$ra=%6x",reg[i]);
+		} else {
+			printf("N/A");
+		}
+	}
+	printf("\n");
+
 }
 
 /* opcodeが0の時の操作を、末尾6ビットによって決める */
@@ -248,35 +270,35 @@ unsigned int funct (unsigned int pc, unsigned int instruction) {
 			break;
 		case (ADDU) :	// rd=rs+rt
 			printf("\t<Function: ADDU> ");
-			printf("rs:R[%u] 0x%2x, rt:R[%u] 0x%2x\n", rs, reg[rs], rt, reg[rt]);
+			printf("$%2u(rs) 0x%2x, rt:$%2u 0x%2x ", rs, reg[rs], rt, reg[rt]);
 			reg[rd] = addu(reg[rs], reg[rt]);
 			printf("=> [rd:%u] 0x%2x\n", rd, reg[rd]);
 			break;
 		case (SUBU) :	// rd=rs-rt
 			printf("\t<Function: SUBU>");
-			printf("rs:R[%u] 0x%2x, rt:R[%u] 0x%2x\n", rs, reg[rs], rt, reg[rt]);
+			printf("$%2u(rs) 0x%2x, rt:$%2u 0x%2x ", rs, reg[rs], rt, reg[rt]);
 			reg[rd] = subu(reg[rs], reg[rt]);
 			printf("=> [rd:%u] 0x%2x\n", rd, reg[rd]);
 			break;
 		case (SLT) :
 			printf("\t<Function: SLT> < rs < rt? > :");
-			printf("rs:R[%u] 0x%2x, rt:R[%u] 0x%2x\n", rs, reg[rs], rt, reg[rt]);
+			printf("$%2u(rs) 0x%2x, rt:$%2u 0x%2x ", rs, reg[rs], rt, reg[rt]);
 			reg[rd] = slt(reg[rs], reg[rt]);
 			if(reg[rd]) {
-				printf("\t=> rd:R[%2u] 0x%4x, <TRUE>\n", rd, reg[rd]);
+				printf("\t=> rd:$%2u 0x%4x, <TRUE>\n", rd, reg[rd]);
 			} else {
-				printf("\t=> rd:R[%2u] 0x%4x, <FALSE>\n", rd, reg[rd]);
+				printf("\t=> rd:$%2u 0x%4x, <FALSE>\n", rd, reg[rd]);
 			}
 			break;
 		case (AND) :
 			printf("\t<Function: AND>");
-			printf("rs:R[%u] 0x%2x, rt:R[%u] 0x%2x\n", rs, reg[rs], rt, reg[rt]);
+			printf("$%2u(rs) 0x%2x, rt:$%2u 0x%2x ", rs, reg[rs], rt, reg[rt]);
 			reg[rd] = and(reg[rs], reg[rt]);
 			printf("=> [rd:%u] 0x%2x\n", rd, reg[rd]);
 			break;
 		case (OR) :
 			printf("\t<Function: OR>");
-			printf("rs:R[%u] 0x%2x, rt:R[%u] 0x%2x\n", rs, reg[rs], rt, reg[rt]);
+			printf("$%2u(rs) 0x%2x, rt:$%2u 0x%2x ", rs, reg[rs], rt, reg[rt]);
 			reg[rd] = or(reg[rs], reg[rt]);
 			printf("=> [rd:%u] 0x%2x\n", rd, reg[rd]);
 			break;
@@ -296,23 +318,23 @@ unsigned int decoder (unsigned int instruction) {
 
 	printf("\t[instruction: 0x%2x]\n", instruction);
 	opcode = instruction >> 26;	// opcode: 6bitの整数
-	printf("\t[opcode:%2x]\n", opcode);
+//	printf("\t[opcode:%2x]\n", opcode);
 
 	/* 適当な時にswitch文に切り替え */
-	if(opcode == 0) funct(pc, instruction);
-	else if (opcode == ADDIU) {
+	if(opcode == 0) {
+		funct(pc, instruction);
+	} else if (opcode == ADDIU) {
 		printf("\t[opcode] ADDIU(rt=rs+Imm) ");
 		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
 		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
-		printf("\trs:R[%2u] 0x%2x, rt:R[%2u] 0x%2x, [im: 0x%4x] \n", rs, reg[rs], rt, reg[rt], im);
+		printf("\t$%2u(rs) 0x%2x, rt:$%2u 0x%2x, [im: 0x%4x] ", rs, reg[rs], rt, reg[rt], im);
 		reg[rt] = addui(reg[rs], im);	// 処理部
-		printf("=> \trt:R[%2u] 0x%2x\n", rt, reg[rt]);
+		printf("=> rt:$%2u 0x%2x\n", rt, reg[rt]);
 	} else if (opcode == JUMP) {
 		printf("\t[opcode] J \n");
 		jumpFlg = 1;
 		jump = instruction & 0x3FFFFFF;
-		printf("\t[instruction] 0x%08x\n", instruction);
 		printf("\t<jump_to> 0x%4x\n", jump);
 		pc = jump*4 + PCINIT;	// jumpはpAddr形式
 	} else if (opcode == BEQ) { // beq I-Type: 000100 rs rt BranchAddr 	等しいなら分岐 
@@ -320,12 +342,11 @@ unsigned int decoder (unsigned int instruction) {
 		rt = (instruction >> 16) & 0x1F;	// 0x  F : 00000111110000000000000000
 		printf("\t[opcode] BEQ < rs=rt? -> \n");
 		jump = instruction & 0xFFFF;
-		printf("\t[instruction] 0x%08x\n", instruction);
-		printf("\trs:R[%2u] 0x%2x, rt:R[%2u] 0x%2x\n", rs, reg[rs], rt, reg[rt]);
+		printf("\t$%2u(rs) 0x%2x, rt:$%2u 0x%2x\n", rs, reg[rs], rt, reg[rt]);
 		if(reg[rs] == reg[rt]) {
 			printf("\t<TRUE & JUMP> -> <jump_to> 0x%4x\n", jump);
 			jumpFlg = 1;
-			pc = jump*4 + PCINIT;	// jumpはpAddr形式
+			pc = pc + jump*4 + 4;	// jumpはpAddr形式
 		} else {
 			printf("\t<FALSE & NOP>\n");
 		}
@@ -358,36 +379,32 @@ unsigned int decoder (unsigned int instruction) {
 int pp(unsigned int opBuff[], int memory[]) {
 	unsigned long count = 0;
 
-
-
-	while(count < MEMORYSIZE) {
+	while(count < BUFF) {
 		memory[count] = opBuff[count];
-		if(count % 0x10000lu == 0)
-			printf("memory[%lx] = %x, ", count, memory[count]);
 		count++;
 	}
-
-
 	return 0;
 }
 
 int main (int argc, char* argv[]) {
+	unsigned int opBuff[BUFF];	// ファイルから読み込む命令列
 	int fd = 0;
 	unsigned int breakCount = 0;
-	int *memory;
+	unsigned int *memory;
 	int i;
 	unsigned int pAddr = 0;
 	unsigned long count=0;
 
-
-
-	memory = (int *) calloc( MEMORYSIZE, sizeof(unsigned int) );
+	memory = (unsigned int *) calloc( MEMORYSIZE, sizeof(unsigned int) );
 	if(memory == NULL) {
 		perror("memory allocation error\n");
 		return -1;
 	}
-	printf("%x\n", malloc_usable_size(memory));
 
+	for(count=0; count<MEMORYSIZE; count++) {
+		memory[count] = 0;
+		count++;
+	}
 	/* 引数としてファイル名をとる。それ以外は終了 */
 	if (argc != 2) {
 		return -1;
@@ -398,23 +415,22 @@ int main (int argc, char* argv[]) {
 	i = read(fd, opBuff, BUFF);
 	if(i<0) {
 		perror("opBuff failed to read\n");
+		return -1;
+	} else {
+		printf("\nopBuff succeeded to read\n");
 	}
-
-	printf("opBuff succeeded to read\n");
-	while(count<100) {
-		if(opBuff[count] != 0) printf("%x, ", opBuff[count]);
+	count=0;
+	while(count<20) {
+		if(opBuff[count] != 0) printf("%2lu: %8x\n", count, opBuff[count]);
 		count++;
 	}
-	printf("\n");
 	count=0;
 	while(count < BUFF) {
 		memory[count] = opBuff[count];
-		if(count % 0x800 == 0)
-			printf("memory[%lx] = %x, ", count, memory[count]);
 		count++;
 	}
 
-	printf("\n");
+
 	/* initialize */
 	reg[0] = 0x0;	// Zero register
 	/* Program Counter init */
@@ -441,20 +457,21 @@ int main (int argc, char* argv[]) {
 
 
 	while(pAddr < 0x10) {	// unsigned int
-		printf("[pAddr: 0x%03x], [pc: 0x%08x]\n", pAddr, pc);
+		printf("[pc: 0x%08x, line: %u]\n", pc, (pc-PCINIT)/4);
 		reg[0] = 0;
 
 //		fetch();	// memory[pc]の内容をロード?
-
-		printRegister();	// その時の命令とレジスタの値を表示する
-		operation = opBuff[pAddr];
+		operation = memory[pAddr];
+		if(operation != 0) {
+			printRegister();	// その時の命令とレジスタの値を表示する
+		}
 		decoder(operation);
 		printf("\n===================== next ========================\n");
 //		pc = pc + 4; // 呼び出し先の関数で処理する
 		pAddr = (pc - PCINIT) / 4;
 		if(pc > 0x440000) pc = PCINIT;
 		breakCount++;
-		if (breakCount > 100) break;
+		if (breakCount > 1500) break;
 	}
 	
 	free(memory);

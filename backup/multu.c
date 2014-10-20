@@ -6,12 +6,9 @@ int multu(unsigned int rs, unsigned int rt) {
 	// R-type
 	// or $rs $rt $rd
 	// rd <- rs or rt
-//	unsigned int rs = 0x10F0;
-//	unsigned int rt = 0x100F;
 	unsigned int rd=0;
 	int bit=31;
 	int subbit=31;
-//	int i=0;
 	unsigned int bitA[32], bitB[32];
 	unsigned int bitQ[64] = { 0 };
 	unsigned int carry = 0;
@@ -30,11 +27,9 @@ int multu(unsigned int rs, unsigned int rt) {
 	= Q[bit]
  */
 
-//		bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-//		c = (bitA&bitB) | (bitB&c) | (bitA&c);
 	for(bit=0; bit<32; bit++) {
 		if(bitB[bit] == 0) continue;
-		else {	// bitA[subbit] == 1
+		else {	
 			for(subbit=0; subbit<32; subbit++) {
 				if(bitA[subbit]==1 && bitQ[bit+subbit]==1 && carry == 0) {
 					carry=1;
@@ -58,40 +53,15 @@ int multu(unsigned int rs, unsigned int rt) {
 			}
 		}
 	}
-	printf("\n");
 	for(bit=0;bit<32;bit++) {
 		rd = rd | bitQ[bit] << bit;
-//		if(bitQ[bit] != 0) printf("0x%x, ",rd);
 	}
 
 	for(bit=32;bit<64;bit++) {
 		if(bitQ[bit] != 0)
 			carry = 1;
 	}
-//	printf("\n");
-		for(bit=31;bit>=0;bit--) {
-//			printf("%u", bitQ[bit]);
-		}
-		printf("\n");
-	if(rd != rs*rt || carry == 1) {
-/*		printf("                                ");
-		for(bit=31;bit>=0;bit--) {
-			printf("%u", bitA[bit]);
-		}
-		printf("\n                                ");
-		for(bit=31;bit>=0;bit--) {
-			printf("%u", bitB[bit]);
-		}
-		printf("\n");
-		for(bit=63;bit>=0;bit--) {
-			printf("%u", bitQ[bit]);
-		}
-		printf("\n");
-*/
-		if(carry != 0) printf("Overflow\n");
-		printf("%u*%u = %u (ans = %u)\n", rs, rt, rd, rs*rt);
-		printf("\n======================================================\n");
-	}
+	printf("%u, %d\n", rd, carry);
 	return 0;
 }
 
@@ -100,8 +70,8 @@ int main(void) {
 
 	multu(0xFFFFFFF,0xFFFFFFF);
 
-	for(i=1; i<10; i++) {
-		for(j=1; j<10; j++) {
+	for(i=1; i<1000; i++) {
+		for(j=1; j<1000; j++) {
 			m=rand()%2000000;
 			n=rand()%300000;
 			m = multu(m, n);
