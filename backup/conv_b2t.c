@@ -78,7 +78,7 @@ int main (int argc, char* argv[]) {
 		btemp = 0;
 		while(i < readCount*33/4) {
 			bitLoc = 32;
-			while(1) {
+			while(bitLoc == 0) {
 				if(bitLoc == 32) {
 					textBuff[(bitLoc+i)] = '\n';
 				} else if( (byteCode[btemp] % 2) > 0 ) {
@@ -87,9 +87,6 @@ int main (int argc, char* argv[]) {
 					textBuff[(bitLoc+i)] = '0';
 				}
 				byteCode[btemp] = byteCode[btemp] / 2;
-				if(bitLoc == 0) {
-					break;
-				}
 
 //				printf("%u\n", bitLoc);
 				bitLoc--;

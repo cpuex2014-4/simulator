@@ -1,26 +1,26 @@
-all: t2b h2b b2t sim addu addui subu multu dec
+all: t2b h2b b2t sim addu subu multu dec addiu
 
-t2b: conv_t2b.c
-	gcc -Wall -o t2b conv_t2b.c
-h2b: conv_h2b.c
-	gcc -Wall -o h2b conv_h2b.c
+t2b: ops/conv_t2b.c
+	gcc -Wall -o t2b ops/conv_t2b.c
+h2b: ops/conv_h2b.c
+	gcc -Wall -o h2b ops/conv_h2b.c
 
-b2t: conv_b2t.c
-	gcc -Wall -o b2t conv_b2t.c
-dec: conv_dec.c
-	gcc -Wall -o dec conv_dec.c
+b2t: ops/conv_b2t.c
+	gcc -Wall -o b2t ops/conv_b2t.c
+dec: ops/conv_dec.c
+	gcc -Wall -o dec ops/conv_dec.c
 
 sim:	simulator.c
-	gcc -O3 -Wall -o sim simulator.c
+	gcc -Wall -o sim simulator.c
 
-addu:	addu.c
-	gcc -Wall -o addu addu.c
-addui:	addui.c
-	gcc -Wall -o addui addui.c
-subu:	subu.c
-	gcc -Wall -o subu subu.c
-multu:	multu.c
-	gcc -Wall -o multu multu.c
+addu:	ops/addu.c
+	gcc -Wall -o addu ops/addu.c
+addiu:	ops/addiu.c
+	gcc -Wall -o addiu ops/addiu.c
+subu:	ops/subu.c
+	gcc -Wall -o subu ops/subu.c
+multu:	ops/multu.c
+	gcc -Wall -o multu ops/multu.c
 
 
 

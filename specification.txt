@@ -33,6 +33,15 @@
 
 *をつけた命令を優先
 */
+	/* 1word(32bit)ごとに1命令実行。実行終了する度にPC = pc+4; */
+
+	/* pureMIPS */
+	/* User Text Segment : [00400000] ... [00440000] */
+	/* Kernel Text Segment : [80000000] ... [80010000] */
+	/* User data segment : [10000000] ... [10040000] */
+	/* User Stack : [7FFFF7C4] ... [80000000] */
+	/* Kernel Data Segment : [90000000] ... [90010000] */
+
 
 
 /* MEMORY */

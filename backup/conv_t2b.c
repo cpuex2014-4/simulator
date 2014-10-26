@@ -64,7 +64,7 @@ int main (int argc, char* argv[]) {
 		printf("[ ERROR ]\tFile open error: (%s)\n", argv[1]);
 		close(fd[0]);
 	}
-	if( (fd[1] = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC)) < 0 ) {
+	if( (fd[1] = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC, 0777)) < 0 ) {
 		printf("[ ERROR ]\tFile open error: (%s)\n", argv[2]);
 		close(fd[1]);
 	}
@@ -76,7 +76,7 @@ int main (int argc, char* argv[]) {
 /* ファイルには'00110011001100110011001100110011\n11011101110111011101110111011101\n'と言う形で配置されている */
 /* EOFまで読み込む */
 		if( (readCount = read(fd[0], textBuff, BUFF)) < 0 ) return -1;	// 読み取りバイトが返る
-		printf("[ DEBUG ]\treadCount = %u\n", readCount);
+		printf("[ DEBUG ]\treadCount = %u\n", readCount+1);
 
 		
 
