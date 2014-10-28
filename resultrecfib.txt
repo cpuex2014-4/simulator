@@ -1,509 +1,804 @@
 
 =================== Initialize ====================
 frec.b
-maxpc 21
-breakpoint = 500
-01(pc: 0): 24040008
-02(pc: 4): 241F0003
-03(pc: 8): 27BDFFF4
-04(pc: C): AFBF0008
-05(pc:10): AFA40004
-06(pc:14):   804821
-07(pc:18): 240A0001
-08(pc:1C):  144402A
-09(pc:20): 10080009
-10(pc:24): 2484FFFF
-11(pc:28):  C000003
-12(pc:2C): AFA20000
-13(pc:30): 8FA40004
-14(pc:34): 2484FFFE
-15(pc:38):  C000003
-16(pc:3C): 8FA90000
-17(pc:40):  1224821
-18(pc:44): 8FBF0008
-19(pc:48): 27BD000C
-20(pc:4C):  1201021
-21(pc:50):     F808
+maxpc 20
+breakpoint = 100
+serial.in
+01(pc: 0): 241DFFF4
+02(pc: 4): 27BDFFF4
+03(pc: 8): AFBF0008
+04(pc: C): AFA40004
+05(pc:10):   804821
+06(pc:14): 240A0001
+07(pc:18):  144402A
+08(pc:1C): 10080001
+09(pc:20): 2484FFFF
+10(pc:24):  C000000
+11(pc:28): AFA20000
+12(pc:2C): 8FA40004
+13(pc:30): 2484FFFE
+14(pc:34):  C000000
+15(pc:38): 8FA90000
+16(pc:3C):  1224821
+17(pc:40): 8FBF0008
+18(pc:44): 27BD000C
+19(pc:48):  1201021
+20(pc:4C):     F808
+[ DEBUG ]	241DFFF4, 0
+[ DEBUG ]	241DFFF4
+[ DEBUG ]	27BDFFF4, 1
+[ DEBUG ]	27BDFFF4
+[ DEBUG ]	AFBF0008, 2
+[ DEBUG ]	AFBF0008
+[ DEBUG ]	AFA40004, 3
+[ DEBUG ]	AFA40004
+[ DEBUG ]	00804821, 4
+[ DEBUG ]	00804821
+[ DEBUG ]	240A0001, 5
+[ DEBUG ]	240A0001
+[ DEBUG ]	0144402A, 6
+[ DEBUG ]	0144402A
+[ DEBUG ]	10080001, 7
+[ DEBUG ]	10080001
+[ DEBUG ]	2484FFFF, 8
+[ DEBUG ]	2484FFFF
+[ DEBUG ]	0C000000, 9
+[ DEBUG ]	0C000000
+[ DEBUG ]	AFA20000, 10
+[ DEBUG ]	AFA20000
+[ DEBUG ]	8FA40004, 11
+[ DEBUG ]	8FA40004
+[ DEBUG ]	2484FFFE, 12
+[ DEBUG ]	2484FFFE
+[ DEBUG ]	0C000000, 13
+[ DEBUG ]	0C000000
+[ DEBUG ]	8FA90000, 14
+[ DEBUG ]	8FA90000
+[ DEBUG ]	01224821, 15
+[ DEBUG ]	01224821
+[ DEBUG ]	8FBF0008, 16
+[ DEBUG ]	8FBF0008
+[ DEBUG ]	27BD000C, 17
+[ DEBUG ]	27BD000C
+[ DEBUG ]	01201021, 18
+[ DEBUG ]	01201021
+[ DEBUG ]	0000F808, 19
+[ DEBUG ]	0000F808
 
 ======================= next ======================
-[op-count: 0000,pc: 0x00000000, line: 1, instruction: 24040008]
-	ADDIU :	[$ 0: 0x 0] + [im: 0x   8] => [$ 4: 0x 8]
-$a0=0x8      
+[op-count: 0000,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$sp=0xFFFFFFF4 
 
 ======================= next ======================
-[op-count: 0001,pc: 0x00000004, line: 2, instruction: 241f0003]
-	ADDIU :	[$ 0: 0x 0] + [im: 0x   3] => [$31: 0x 3]
-$a0=0x8      $ra=0x3     
+[op-count: 0001,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$sp=0xFFFFFFE8 
 
 ======================= next ======================
-[op-count: 0002,pc: 0x00000008, line: 3, instruction: 27bdfff4]
-	ADDIU :	[$29: 0x 0] + [im: 0xFFF4] => [$29: 0x7FFF4]
-$a0=0x8      $sp=0x7FFF4  $ra=0x3     
+[op-count: 0002,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x 0]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$sp=0xFFFFFFE8 
 
 ======================= next ======================
-[op-count: 0003,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x 3]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x8      $sp=0x7FFF4  $ra=0x3     
+[op-count: 0003,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$sp=0xFFFFFFE8 
 
 ======================= next ======================
-[op-count: 0004,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 8]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x8      $sp=0x7FFF4  $ra=0x3     
-
-======================= next ======================
-[op-count: 0005,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0004,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 8] + [$ 0: 0x 0] => [$ 9: 0x 8]
-$a0=0x8      $t1=0x8      $sp=0x7FFF4  $ra=0x3     
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$sp=0xFFFFFFE8 
 
 ======================= next ======================
-[op-count: 0006,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0005,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x8      $t1=0x8      $t2=0x1      
-$sp=0x7FFF4  $ra=0x3     
+$t2=0x1      
+$sp=0xFFFFFFE8 
 
 ======================= next ======================
-[op-count: 0007,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0006,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0008]) 	=> [$ 8: 0x   1] <TRUE>
-$a0=0x8      $t0=0x1      $t1=0x8      $t2=0x1      
-$sp=0x7FFF4  $ra=0x3     
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 
 
 ======================= next ======================
-[op-count: 0008,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 1]) -> branch(from 0x0020 to 0x0048)
-	<FALSE & NOP>
-$a0=0x8      $t0=0x1      $t1=0x8      $t2=0x1      
-$sp=0x7FFF4  $ra=0x3     
+[op-count: 0007,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 
 
 ======================= next ======================
-[op-count: 0009,pc: 0x00000024, line: 10, instruction: 2484ffff]
-	ADDIU :	[$ 4: 0x 8] + [im: 0xFFFF] => [$ 4: 0x 7]
-$a0=0x7      $t0=0x1      $t1=0x8      $t2=0x1      
-$sp=0x7FFF4  $ra=0x3     
-
-======================= next ======================
-[op-count: 0010,pc: 0x00000028, line: 11, instruction: 0c000003]
+[op-count: 0008,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$a0=0x7      $t0=0x1      $t1=0x8      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0011,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x2C]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x7      $t0=0x1      $t1=0x8      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0009,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0012,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 7]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x7      $t0=0x1      $t1=0x8      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0010,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0013,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0011,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0012,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0013,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 7] + [$ 0: 0x 0] => [$ 9: 0x 7]
-$a0=0x7      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0014,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0014,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x7      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0015,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0015,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0007]) 	=> [$ 8: 0x   1] <TRUE>
-$a0=0x7      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0016,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 1]) -> branch(from 0x0020 to 0x0048)
-	<FALSE & NOP>
-$a0=0x7      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0016,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0017,pc: 0x00000024, line: 10, instruction: 2484ffff]
-	ADDIU :	[$ 4: 0x 7] + [im: 0xFFFF] => [$ 4: 0x 6]
-$a0=0x6      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
-
-======================= next ======================
-[op-count: 0018,pc: 0x00000028, line: 11, instruction: 0c000003]
+[op-count: 0017,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$a0=0x6      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0019,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x2C]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x6      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0018,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0020,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 6]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x6      $t0=0x1      $t1=0x7      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0019,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0021,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0020,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0021,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0022,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 6] + [$ 0: 0x 0] => [$ 9: 0x 6]
-$a0=0x6      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0022,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0023,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x6      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0023,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0024,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0006]) 	=> [$ 8: 0x   1] <TRUE>
-$a0=0x6      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0024,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 1]) -> branch(from 0x0020 to 0x0048)
-	<FALSE & NOP>
-$a0=0x6      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0025,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0025,pc: 0x00000024, line: 10, instruction: 2484ffff]
-	ADDIU :	[$ 4: 0x 6] + [im: 0xFFFF] => [$ 4: 0x 5]
-$a0=0x5      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
-
-======================= next ======================
-[op-count: 0026,pc: 0x00000028, line: 11, instruction: 0c000003]
+[op-count: 0026,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$a0=0x5      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0027,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x2C]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x5      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0027,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0028,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 5]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x5      $t0=0x1      $t1=0x6      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0028,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0029,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0029,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0030,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0031,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 5] + [$ 0: 0x 0] => [$ 9: 0x 5]
-$a0=0x5      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0030,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0032,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x5      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0031,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0033,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0005]) 	=> [$ 8: 0x   1] <TRUE>
-$a0=0x5      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0032,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 1]) -> branch(from 0x0020 to 0x0048)
-	<FALSE & NOP>
-$a0=0x5      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0034,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0033,pc: 0x00000024, line: 10, instruction: 2484ffff]
-	ADDIU :	[$ 4: 0x 5] + [im: 0xFFFF] => [$ 4: 0x 4]
-$a0=0x4      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
-
-======================= next ======================
-[op-count: 0034,pc: 0x00000028, line: 11, instruction: 0c000003]
+[op-count: 0035,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$a0=0x4      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0035,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x2C]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x4      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0036,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0036,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 4]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x4      $t0=0x1      $t1=0x5      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0037,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0037,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0038,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0039,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0040,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 4] + [$ 0: 0x 0] => [$ 9: 0x 4]
-$a0=0x4      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0038,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0041,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x4      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0039,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0042,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0004]) 	=> [$ 8: 0x   1] <TRUE>
-$a0=0x4      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0040,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 1]) -> branch(from 0x0020 to 0x0048)
-	<FALSE & NOP>
-$a0=0x4      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0043,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0041,pc: 0x00000024, line: 10, instruction: 2484ffff]
-	ADDIU :	[$ 4: 0x 4] + [im: 0xFFFF] => [$ 4: 0x 3]
-$a0=0x3      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
-
-======================= next ======================
-[op-count: 0042,pc: 0x00000028, line: 11, instruction: 0c000003]
+[op-count: 0044,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$a0=0x3      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0043,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x2C]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x3      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0045,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0044,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 3]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x3      $t0=0x1      $t1=0x4      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0046,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0045,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0047,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0048,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0049,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 3] + [$ 0: 0x 0] => [$ 9: 0x 3]
-$a0=0x3      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0046,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0050,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x3      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0047,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0051,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0003]) 	=> [$ 8: 0x   1] <TRUE>
-$a0=0x3      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0048,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 1]) -> branch(from 0x0020 to 0x0048)
-	<FALSE & NOP>
-$a0=0x3      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0052,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0049,pc: 0x00000024, line: 10, instruction: 2484ffff]
-	ADDIU :	[$ 4: 0x 3] + [im: 0xFFFF] => [$ 4: 0x 2]
-$a0=0x2      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
-
-======================= next ======================
-[op-count: 0050,pc: 0x00000028, line: 11, instruction: 0c000003]
+[op-count: 0053,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$a0=0x2      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0051,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x2C]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x2      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0054,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0052,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 2]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x2      $t0=0x1      $t1=0x3      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0055,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0053,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0056,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0057,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0058,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 2] + [$ 0: 0x 0] => [$ 9: 0x 2]
-$a0=0x2      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0054,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0059,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x2      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0055,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0060,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0002]) 	=> [$ 8: 0x   1] <TRUE>
-$a0=0x2      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0056,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 1]) -> branch(from 0x0020 to 0x0048)
-	<FALSE & NOP>
-$a0=0x2      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0061,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0057,pc: 0x00000024, line: 10, instruction: 2484ffff]
-	ADDIU :	[$ 4: 0x 2] + [im: 0xFFFF] => [$ 4: 0x 1]
-$a0=0x1      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
-
-======================= next ======================
-[op-count: 0058,pc: 0x00000028, line: 11, instruction: 0c000003]
+[op-count: 0062,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$a0=0x1      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0059,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFFC] <- [$31(rs): 0x2C]
-		memory[0x7FFFC] = 7FFF4
-$a0=0x1      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0063,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0060,pc: 0x00000010, line: 5, instruction: afa40004]
-(im:0x4)/(reg[rs]:0x7FFF4)	SW :	[address: 0x7FFF8] <- [$ 4(rs): 0x 1]
-		memory[0x7FFF8] = 7FFF4
-$a0=0x1      $t0=0x1      $t1=0x2      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0064,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0061,pc: 0x00000014, line: 6, instruction: 00804821]
+[op-count: 0065,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0066,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0067,pc: 0x00004010, line: 5, instruction: 00804821]
 	[function:21]
-	ADDU :	[$ 4: 0x 1] + [$ 0: 0x 0] => [$ 9: 0x 1]
-$a0=0x1      $t0=0x1      $t1=0x1      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0062,pc: 0x00000018, line: 7, instruction: 240a0001]
+[op-count: 0068,pc: 0x00004014, line: 6, instruction: 240a0001]
 	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
-$a0=0x1      $t0=0x1      $t1=0x1      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0063,pc: 0x0000001c, line: 8, instruction: 0144402a]
+[op-count: 0069,pc: 0x00004018, line: 7, instruction: 0144402a]
 	[function:2A]
-	SLT :	?([$10: 0x0001] < [$ 4: 0x0001]) 	=> [$ 8: 0x   0] <FALSE>
-$a0=0x1      $t1=0x1      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0064,pc: 0x00000020, line: 9, instruction: 10080009]
-	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x0020 to 0x0048)
-		<TRUE & JUMP> -> (branch_to) 0x0048
-$a0=0x1      $t1=0x1      $t2=0x1      
-$sp=0x7FFF4  $ra=0x2C    
+[op-count: 0070,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0065,pc: 0x00000048, line: 19, instruction: 27bd000c]
-	ADDIU :	[$29: 0x7FFF4] + [im: 0x   C] => [$29: 0x 0]
-$a0=0x1      $t1=0x1      $t2=0x1      
-$ra=0x2C    
-
-======================= next ======================
-[op-count: 0066,pc: 0x0000004c, line: 20, instruction: 01201021]
-	[function:21]
-	ADDU :	[$ 9: 0x 1] + [$ 0: 0x 0] => [$ 2: 0x 1]
-$v0=0x1      $a0=0x1      $t1=0x1      $t2=0x1      
-$ra=0x2C    
-
-======================= next ======================
-[op-count: 0067,pc: 0x00000050, line: 21, instruction: 0000f808]
-	[function: 8]
-	JR : $ra = 0x2C / pc -> 0x2C
-$v0=0x1      $a0=0x1      $t1=0x1      $t2=0x1      
-$ra=0x2C    
-
-======================= next ======================
-[op-count: 0068,pc: 0x0000002c, line: 12, instruction: afa20000]
-(im:0x0)/(reg[rs]:0x0)	SW :	[address: 0x 0] <- [$ 2(rs): 0x 1]
-		memory[0x   0] = 0
-$v0=0x1      $a0=0x1      $t1=0x1      $t2=0x1      
-$ra=0x2C    
-
-======================= next ======================
-[op-count: 0069,pc: 0x00000030, line: 13, instruction: 8fa40004]
-	LW :	[$29 0x 0], memory[address:0x   4]=0xAFA40004 
-		reg[rt] = 1
-$v0=0x1      $a0=0x1      $t1=0x1      $t2=0x1      
-$sp=0xAFA40004 $ra=0x2C    
-
-======================= next ======================
-[op-count: 0070,pc: 0x00000034, line: 14, instruction: 2484fffe]
-	ADDIU :	[$ 4: 0x 1] + [im: 0xFFFE] => [$ 4: 0xFFFFFFFF]
-$v0=0x1      $a0=0xFFFFFFFF $t1=0x1      $t2=0x1      
-$sp=0xAFA40004 $ra=0x2C    
-
-======================= next ======================
-[op-count: 0071,pc: 0x00000038, line: 15, instruction: 0c000003]
+[op-count: 0071,pc: 0x00004024, line: 10, instruction: 0c000000]
 	JAL 
-	(jump_to) 0x000c
-$v0=0x1      $a0=0xFFFFFFFF $t1=0x1      $t2=0x1      
-$sp=0xAFA40004 $ra=0x3C    
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
 
 ======================= next ======================
-[op-count: 0072,pc: 0x0000000c, line: 4, instruction: afbf0008]
-(im:0x8)/(reg[rs]:0xAFA40004)	SW :	[address: 0xAFA4000C] <- [$31(rs): 0x3C]
-[] Memory overflow
+[op-count: 0072,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0073,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0074,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0075,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0076,pc: 0x00004010, line: 5, instruction: 00804821]
+	[function:21]
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0077,pc: 0x00004014, line: 6, instruction: 240a0001]
+	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0078,pc: 0x00004018, line: 7, instruction: 0144402a]
+	[function:2A]
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0079,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0080,pc: 0x00004024, line: 10, instruction: 0c000000]
+	JAL 
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0081,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0082,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0083,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0084,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0085,pc: 0x00004010, line: 5, instruction: 00804821]
+	[function:21]
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0086,pc: 0x00004014, line: 6, instruction: 240a0001]
+	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0087,pc: 0x00004018, line: 7, instruction: 0144402a]
+	[function:2A]
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0088,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0089,pc: 0x00004024, line: 10, instruction: 0c000000]
+	JAL 
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0090,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0091,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0092,pc: 0x00004008, line: 3, instruction: afbf0008]
+(im:0x8)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFF0-0x1FFFF3] <- [$31(rs): 0x4028]
+	memory[address: 0x1FFFF0-0x1FFFF3] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0093,pc: 0x0000400c, line: 4, instruction: afa40004]
+(im:0x4)/(reg[rs]:0xFFFFFFE8)
+	SW :	[address: 0x1FFFEC-0x1FFFEF] <- [$ 4(rs): 0x 0]
+	memory[address: 0x1FFFEC-0x1FFFEF] : FF FF FF E8
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0094,pc: 0x00004010, line: 5, instruction: 00804821]
+	[function:21]
+	ADDU :	[$ 4: 0x 0] + [$ 0: 0x 0] => [$ 9: 0x 0]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0095,pc: 0x00004014, line: 6, instruction: 240a0001]
+	ADDIU :	[$ 0: 0x 0] + [im: 0x   1] => [$10: 0x 1]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0096,pc: 0x00004018, line: 7, instruction: 0144402a]
+	[function:2A]
+	SLT :	?([$10: 0x0001] < [$ 4: 0x0000]) 	=> [$ 8: 0x   0] <FALSE>
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0097,pc: 0x0000401c, line: 8, instruction: 10080001]
+	BEQ :	?([$ 0 0x 0]=[$ 8 0x 0]) -> branch(from 0x401c to 0x8024)
+		<TRUE & JUMP> -> (branch_to) 0x4024
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0098,pc: 0x00004024, line: 10, instruction: 0c000000]
+	JAL 
+	(jump_to) 0x0000
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0099,pc: 0x00004000, line: 1, instruction: 241dfff4]
+	ADDIU :	[$ 0: 0x 0] + [im: 0xFFF4] => [$29: 0xFFFFFFF4]
+$t2=0x1      
+$sp=0xFFFFFFF4 $ra=0x4028  
+
+======================= next ======================
+[op-count: 0100,pc: 0x00004004, line: 2, instruction: 27bdfff4]
+	ADDIU :	[$29: 0xFFFFFFF4] + [im: 0xFFF4] => [$29: 0xFFFFFFE8]
+$t2=0x1      
+$sp=0xFFFFFFE8 $ra=0x4028  
+
+[ FINISHED ]
+
+メモリダンプ
+memory[004003-004000] = 24 1D FF F4
+memory[004007-004004] = 27 BD FF F4
+memory[00400B-004008] = AF BF 00 08
+memory[00400F-00400C] = AF A4 00 04
+memory[004013-004010] = 00 80 48 21
+memory[004017-004014] = 24 0A 00 01
+memory[00401B-004018] = 01 44 40 2A
+memory[00401F-00401C] = 10 08 00 01
+memory[004023-004020] = 24 84 FF FF
+memory[004027-004024] = 0C 00 00 00
+memory[00402B-004028] = AF A2 00 00
+memory[00402F-00402C] = 8F A4 00 04
+memory[004033-004030] = 24 84 FF FE
+memory[004037-004034] = 0C 00 00 00
+memory[00403B-004038] = 8F A9 00 00
+memory[00403F-00403C] = 01 22 48 21
+memory[004043-004040] = 8F BF 00 08
+memory[004047-004044] = 27 BD 00 0C
+memory[00404B-004048] = 01 20 10 21
+memory[00404F-00404C] = 00 00 F8 08
+memory[1FFFEF-1FFFEC] = FF FF FF E8
+memory[1FFFF3-1FFFF0] = FF FF FF E8
+
+
+Total instructions: 101
+
+(OP)  : 	(Num), 	(Ratio)
+ADDIU :     35, 34.65 (%)
+LW    :      0, 0.00 (%)
+SW    :     22, 21.78 (%)
+JUMP  :      0, 0.00 (%)
+JAL   :     11, 10.89 (%)
+BEQ   :     11, 10.89 (%)
+BNE   :      0, 0.00 (%)
+NOP   :      0, 0.00 (%)
+JR    :      0, 0.00 (%)
+SUBU  :      0, 0.00 (%)
+AND   :      0, 0.00 (%)
+OR    :      0, 0.00 (%)
+ADDU  :     11, 10.89 (%)
+SLT   :     11, 10.89 (%)
+SLL   :      0, 0.00 (%)
+SRL   :      0, 0.00 (%)
+
+シリアルポート出力 :無し

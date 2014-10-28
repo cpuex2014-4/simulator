@@ -37,7 +37,7 @@ int main () {
 //	ADDIU :	[$29: 0x804821] + [im: 0xfff4] => [$29: 0x4815]
 
 	xtemp = 0x8048FF;
-	ytemp= 0x8000;		//16bit負数
+	ytemp= 0x10000;		//16bit負数
 
 	printf("0x%x-0x%x = 0x%x\n", xtemp, ytemp, xtemp-ytemp);
 	ans = addiu(xtemp, ytemp);

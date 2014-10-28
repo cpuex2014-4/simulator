@@ -53,7 +53,7 @@ int main (int argc, char* argv[]) {
 	unsigned int byteCode[LINE] = { 0 };
 	unsigned int byteTemp = 0;
 	int textCount = 0, line = 0;
-	unsigned int bitLocation = 0;	// 0<bitLocation<31
+	int bitLocation = 0;	// 0<bitLocation<31
 	unsigned int byteSize;
 	unsigned int sizeAll = 0;
 
@@ -73,7 +73,7 @@ int main (int argc, char* argv[]) {
 	do { /*EOFに到達していない*/
 
 /* 数字列をファイルから読み込んでtextBuffに書き込む */
-/* ファイルには'00110011001100110011001100110011\n11011101110111011101110111011101\n'と言う形で配置されている */
+/* ファイルには'00110011001100110011001100110011***************\n11011101110111011101110111011101*********\n'と言う形で配置されている */
 /* EOFまで読み込む */
 		if( (readCount = read(fd[0], textBuff, BUFF)) < 0 ) return -1;	// 読み取りバイトが返る
 		printf("[ DEBUG ]\treadCount = %u\n", readCount+1);
@@ -85,11 +85,15 @@ int main (int argc, char* argv[]) {
 		byteTemp = 0;
 		bitLocation = 32;
 		do {
-			if(textBuff[textCount] == '\n') {
+			if(bitLocation < 1 && textBuff[textCount] != '\n') {
+				textCount++;
+				bitLocation--;
+				continue;
+			} else if(textBuff[textCount] == '\n') {
 				byteCode[line] = byteTemp;
 				line++;
 				textCount++;
-//				printf("\\n\n");
+//				printf("[ DEBUG ]\t\\n\n");
 				bitLocation = 32;
 				byteTemp = 0;
 				continue;
@@ -99,12 +103,13 @@ int main (int argc, char* argv[]) {
 			if(textBuff[textCount] == '1') {
 				byteTemp = byteTemp + pow2(bitLocation-1);
 //				printf("byteT = %u\n", byteTemp);
-			} else { /* printf("\n"); */ }
+			} else { 
+//				printf("\n");
+			}
 			
 			
 			bitLocation--;
 			textCount++;
-//			sleep(1);
 			if(textCount == BUFF) {
 				break;
 			}
@@ -120,8 +125,8 @@ int main (int argc, char* argv[]) {
 			if(writeCount < 0) break;
 			sizeAll = sizeAll + writeCount;
 			byteSize = byteSize - writeCount;
-			printf("[ DEBUG ]\twriteCount = %u, ", writeCount);
-			printf("byteSize = %u\n", byteSize);
+//			printf("[ DEBUG ]\twriteCount = %u, ", writeCount);
+//			printf("byteSize = %u\n", byteSize);
 		} while (byteSize > 0 );
 		line = 0;
 	} while (readCount == BUFF);

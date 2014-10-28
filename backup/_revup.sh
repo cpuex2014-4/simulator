@@ -14,4 +14,5 @@ tar -cvzf ~/backup/backup_${name}_[simulation].tar.gz backup
 git add -A
 #git commit -a
 #git push https://github.com/cpuex2014-4/simlator
+#git push https://github.com/cpuex2014-4/simlator
 
