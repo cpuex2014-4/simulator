@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdint.h>
-#include "fpu/fpu.h"
+#include "fpu/C/fpu.h"
 
 /* general */
 #define PCINIT 0x4000
@@ -17,28 +17,28 @@
 #define MEMORYSIZE (1024u*1024u*2u)
 
 /* opcode */
-#define FPU 0x11
+#define JUMP  0x2
+#define JAL   0x3
+#define BEQ   0x4
+#define BNE   0x5
 #define ADDIU 0x9
-#define LW 0x23
-#define SW 0x2B
-#define JUMP 0x2
-#define JAL 0x3
-#define BEQ 0x4
-#define BNE 0x5
+#define FPU   0x11
+#define LW    0x23
+#define SW    0x2B
 #define INOUT 0x3F
-#define SERIALRCV 0x1C
-#define SERIALSND 0x1D
+#define SRCV  0x1C
+#define SSND  0x1D
 
 /* function */
-#define NOP 0x0
-#define JR 0x8
-#define SUBU 0x13
-#define AND 0x24
-#define OR 0x25
-#define ADDU 0x21
-#define SLT 0x2A
-#define SLL 0x0
-#define SRL 0x2
+#define SLL   0x0
+#define SRL   0x2
+#define JR    0x8
+#define ADDU  0x21
+#define SUBU  0x22
+#define AND   0x24
+#define OR    0x25
+#define SLT   0x2A
+#define NOP   0x7F
 
 /* fpfunction */
 #define MFC1M 0x0	// fMt
@@ -73,6 +73,7 @@ unsigned int operation;	// 実行中命令
 //unsigned int pc;		// program counter: jump -> memory[pc]
 unsigned int HI=0, LO=0;
 unsigned int opNum[128];	//各命令の実行回数 opNum[OPCODE]++ の形で使用
+unsigned int fopNum[128];	//各浮動小数点命令の実行回数 fopNum[OPCODE]++ の形で使用
 unsigned int funcNum[128];	//各命令の実行回数 funcNum[OPCODE]++ の形で使用
 int jumpFlg=0;	// pcを変更するプログラムが実行されたら1。ジャンプ後0に戻る
 int printreg=-1;
@@ -224,9 +225,9 @@ unsigned int rsb(unsigned int rt, unsigned char* serial) {
 }
 
 /* store word */
-// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm番地に書き込む
+// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm(符号拡張)番地に書き込む
 /* リトルエンディアン */
-unsigned int sw(unsigned int rt, unsigned int address, unsigned int* memory) {
+unsigned int sw(unsigned int rt, unsigned int address, unsigned int* memory, unsigned int stackPointer) {
 	unsigned int addr0;
 	unsigned int addr1;
 	unsigned int addr2;
@@ -237,13 +238,21 @@ unsigned int sw(unsigned int rt, unsigned int address, unsigned int* memory) {
 	addr1 = (rt & 0x0000FF00) >>  8;
 	addr0 = rt & 0x000000FF;
 
-	memory[address+3] = addr3;
-	memory[address+2] = addr2;
-	memory[address+1] = addr1;
-	memory[address] = addr0;
+	if (stackPointer == 31) {
+		memory[address+3] = addr3;
+		memory[address+2] = addr2;
+		memory[address+1] = addr1;
+		memory[address] = addr0;
+
+	} else {
+		memory[address+3] = addr3;
+		memory[address+2] = addr2;
+		memory[address+1] = addr1;
+		memory[address] = addr0;
+	}
 
 	if(rt != ( memory[address] | memory[address+1] << 8 | memory[address+2] << 16 | memory[address+3] << 24 )) {
-		printf("Failed to SW\n");
+		printf("\nFailed to SW\n");
 	}
 
 	return 0;
@@ -379,11 +388,13 @@ unsigned int subu (unsigned int rs, unsigned int rt) {
 	unsigned int rd=0;
 	unsigned int bit=0;
 	unsigned int c=0;
-	unsigned int bitA, bitB;
+	unsigned int bitA=0, bitB=0;
 	unsigned int bitQ=0;
 
+	printf("(rt=%ld -> ", (long)rt);
 	rt = ~rt;
-
+	printf("-rt=%ld)", (long)rt);
+	
 	/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
 	while (bit < 32) {
 		if(bit == 0) {
@@ -405,31 +416,39 @@ unsigned int subu (unsigned int rs, unsigned int rt) {
 	return rd;
 }
 
-unsigned int addiu(unsigned int rs, unsigned int Imm) {
+unsigned int addiu(unsigned int rs, unsigned int Imm, unsigned int stackPointer) {
 	unsigned int rd=0;
 	unsigned int bit=0;
 	unsigned int c=0;
 	unsigned int bitA, bitB;
 	unsigned int bitQ;
 
-	/* 符号格調 */
-	if( (Imm & 0x8000) == 0x8000 ) {
-//		printf("符号拡張:%X\n", Imm);
-		Imm = Imm | 0xFFFF0000;
-//		printf("-> %X\n", Imm);
+	if (stackPointer == 29) {
+		while (bit < 32) {
+			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
+			bitB = ((Imm << (31-bit)) >> (31-bit)) >> bit;
+	
+			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
+			c = (bitA&bitB) | (bitB&c) | (bitA&c);
+	
+			rd = rd | (bitQ << bit);
+			bit++;
+		}
+		rd = rd % MEMORYSIZE;
+	} else {
+		/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
+		while (bit < 32) {
+			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
+			bitB = ((Imm << (31-bit)) >> (31-bit)) >> bit;
+	
+			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
+			c = (bitA&bitB) | (bitB&c) | (bitA&c);
+	
+			rd = rd | (bitQ << bit);
+			bit++;
+		}
+//		rCarry = c;
 	}
-	/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
-	while (bit < 32) {
-		bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-		bitB = ((Imm << (31-bit)) >> (31-bit)) >> bit;
-
-		bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-		c = (bitA&bitB) | (bitB&c) | (bitA&c);
-
-		rd = rd | (bitQ << bit);
-		bit++;
-	}
-//	rCarry = c;
 
 	return rd;
 }
@@ -531,8 +550,8 @@ unsigned int funct (unsigned int pc, unsigned int instruction) {
 	printf("\t[function:%2X]\n", function);
 	switch (function) {
 		case (JR) :
-			printf("\tJR : $ra = 0x%X / ", reg[rd]);
-			pc = reg[rd] + PCINIT;
+			printf("\tJR : $ra(%u) = 0x%X / ", rs, reg[rs]);
+			pc = reg[rs];
 			printf("pc -> 0x%X\n", pc);
 			jumpFlg = 1;
 			funcNum[JR]++;
@@ -563,10 +582,11 @@ unsigned int funct (unsigned int pc, unsigned int instruction) {
 			funcNum[SLT]++;
 			break;
 		case (SLL) :
-			if(rs == 0 && shamt == 0)
+			if(rs == 0 && shamt == 0) {
 				printf("\tNOP\n");
 				funcNum[NOP]++;
 				break;
+			}
 			reg[rd] = sll(reg[rs], shamt);
 			printf("\tSLL :\t%u << %u -> %u\n", reg[rs], shamt, reg[rd]);
 			funcNum[SLL]++;
@@ -607,7 +627,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	unsigned int line=0;
 	unsigned int address=0;
 
-	printf("[op-count: %04u,pc: 0x%08x, line: %u, instruction: %08x]\n", breakCount, pc, ((pc-PCINIT)/4+1), instruction);
+	printf("[op-count: %04u,pc: 0x%08x, line: %u, instruction: %08x]\n", breakCount, pc, ((pc-PCINIT)/4), instruction);
 //	printf("\t[instruction: 0x%2X]\n", instruction);
 	opcode = instruction >> 26;	// opcode: 6bitの整数
 //	printf("\t[opcode:%2X]\n", opcode);
@@ -617,25 +637,28 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 
 	/* 適当な時にswitch文に切り替え */
 	if(opcode == 0) {
-		funct(pc, instruction);
+		pc = funct(pc, instruction);
 	} else if (opcode == FPU) {
 		printf("\tFPU \n");
 		fpu(pc, instruction);
-	} else if (opcode == SERIALRCV) {
-		printf("\tSerialRCV \n");
+	} else if (opcode == SRCV) {
+		printf("\tSRCV \n");
 		rt = rrb(srBuff);
-	} else if (opcode == SERIALSND) {
-		printf("\tSerialSND \n");
+	} else if (opcode == SSND) {
+		printf("\tSSND \n");
 		rt = (instruction >> 16) & 0x1F;		// 0x  1E: 00000111110000000000000000
 		rsb(reg[rt], serial);
 	} else if (opcode == ADDIU) {
 		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
 		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
-		printf("\tADDIU :\t[$%2u: 0x%2X] + [im: 0x%4X] ", rs, reg[rs], im);
-		reg[rt] = (addiu(reg[rs], im) & 0xFFFFFFFF);	// 処理部
-//		if(rt == 29) reg[rt] = reg[rt] % MEMORYSIZE;	// メモリオーバーフロー避け
-		printf("=> [$%2u: 0x%2X]\n", rt, reg[rt]);
+		if( im >= 0x8000 ) {
+			im = im | 0xFFFF0000;
+//			printf("(%X)",Imm);
+		}
+		printf("\tADDIU :\t[$%2u: 0x%4X] + [im: 0x%8X] ", rs, reg[rs], im);
+		reg[rt] = (addiu(reg[rs], im, rt) & 0xFFFFFFFF);	// 処理部
+		printf("=> [$%2u: 0x%4X]\n", rt, reg[rt]);
 		opNum[ADDIU]++;
 	} else if (opcode == JUMP) {
 		jumpFlg = 1;
@@ -647,7 +670,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		rs = (instruction >> 21) & 0x1F;	// 0x   F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x   F : 00000111110000000000000000
 		line = instruction & 0xFFFF;		// 0xFFFF : 00000000001111111111111111
-		printf("\tBEQ :\t?([$%2u 0x%2X]=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4 + PCINIT);
+		printf("\tBEQ :\t?([$%2u 0x%2X]=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4);
 		if(reg[rs] == reg[rt]) {
 			jumpFlg = 1;
 			// 0x48 = 0x20 + 4 + line*4 +0x0	<-> line*4 = 0x48-0x24 <-> line = 9
@@ -661,8 +684,8 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		rs = (instruction >> 21) & 0x1F;	// 0x   F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x   F : 00000111110000000000000000
 		line = instruction & 0xFFFF;		// 0xFFFF : 00000000001111111111111111
-		printf("\tBEQ :\t?([$%2u 0x%2X]=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4 + PCINIT);
-		if(reg[rs] == reg[rt]) {
+		printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4);
+		if(reg[rs] != reg[rt]) {
 			jumpFlg = 1;
 			// 0x48 = 0x20 + 4 + line*4 +0x0	<-> line*4 = 0x48-0x24 <-> line = 9
 			pc = pc + 4 + line*4;		// pAddr形式
@@ -677,35 +700,39 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
 
 		/* じかんがあるときにlw()内に移動する */
-		if( (im & 0x8000 ) == 0x8000 ) {	//imは16bit
+		if( im >= 0x8000 ) {	//imは16bit
 			im = im & 0x00007FFF;
 			printf("(im:0x%X)", im);
 			address = (reg[rs] + MEMORYSIZE - im);
 		} else {
 			address = (reg[rs]+im);
 		}
+		if(address > MEMORYSIZE) {
+			printf("[] Memory overflow\n");
+			exit(1);
+		}
 		address = address % MEMORYSIZE;
-		printf("\tLW :\t[$%2u 0x%2X], memory[address:0x%04X]=0x%4X \n", rs, reg[rs], address, memory[address]);
+		printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n", address, memory[address]);
 		reg[rt] = lw(address, memory);
 		opNum[LW]++;
-		printf("\t\treg[rt] = %u\n", reg[rt]);
+		printf("\t\treg[rt(%u)] = 0x%X\n", rt, reg[rt]);
 	} else if (opcode == SW) {
 		// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm番地に書き込む
 		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
 		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
 
-		if(reg[rs] > MEMORYSIZE) {
+		if(reg[rs] > MEMORYSIZE) {	/* rsがメモリサイズを越えているかどうかで分岐:この実装大丈夫か？ */
 			printf("(im:0x%X)/(reg[rs]:0x%X)\n", im, reg[rs]);
-			if( (im & 0x8000 ) == 0x8000 ) {	//imは16bit
+			if( im >= 0x8000 ) {	//符号拡張
 				im = im & 0x00007FFF;
-				address = (reg[rs] - im);
+				address = (reg[rs]%MEMORYSIZE - im);
 				
 			} else {
-				address = (reg[rs] + im);
+				address = (reg[rs]%MEMORYSIZE + im);
 			}
 		} else {
-			if( (im & 0x8000 ) == 0x8000 ) {	//imは16bit
+			if( im >= 0x8000 ) {	//符号拡張
 				im = im & 0x00007FFF;
 				address = (reg[rs] - im);
 			} else {
@@ -713,19 +740,19 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			}
 		}
 		address = address % MEMORYSIZE;
-		printf("\tSW :\t[address: 0x%04X-0x%04X] <- [$%2u(rs): 0x%2X]\n", address, address+3, rt, reg[rt]);
+		printf("\tSW :\t[address: 0x%04X-0x%04X] <- [$%2u(rt): 0x%2X]\n", address, address+3, rt, reg[rt]);
 		if(address > MEMORYSIZE) {
 			printf("[] Memory overflow\n");
 			exit(1);
 		}
-		sw(reg[rs], address, memory);
+		sw(reg[rt], address, memory, rs);
 		printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]);
 		opNum[SW]++;
 	} else if (opcode == JAL) {
-		printf("\tJAL \n");
+		printf("\tJAL:");
 		jump = instruction & 0x3FFFFFF;
 		jumpFlg = 1;
-		printf("\t(jump_to) 0x%04x\n", jump*4);
+		printf("\t0x%04x ($ra <- pc[%X])\n", jump*4, pc+4);
 		reg[31] = pc+4;
 		pc = jump*4 + PCINIT;
 		opNum[JAL]++;
@@ -764,7 +791,7 @@ int main (int argc, char* argv[]) {
 	int arg1,arg2,arg0;
 
 
-	printf("\n=================== Initialize ====================\n");
+	printf("\n====== Initialize ======\n");
 	memory = (unsigned int *) calloc( MEMORYSIZE, sizeof(unsigned int) );
 	if(memory == NULL) {
 		perror("memory allocation error\n");
@@ -797,7 +824,7 @@ int main (int argc, char* argv[]) {
 	} else {
 //		printf("opBuff succeeded to read\n");
 	}
-	printf("maxpc %u\n", maxpc/4);
+	printf("maxpc:0x%X(%uline)\n", maxpc+PCINIT, (maxpc)/4);
 
 
 	/* 引数の処理 */
@@ -826,13 +853,14 @@ int main (int argc, char* argv[]) {
 	}
 	count=0;
 	while(count<40) {
-		if(opBuff[count] != 0) printf("%02u(pc:%2X): %8X\n", count+1, (count)*4, opBuff[count]);
+		if(opBuff[count] != 0) printf("%02u(pc:%2X):\t%8X\n", count, (count)*4, opBuff[count]);
 		count++;
 	}
 	while(count<40) {
-		if(srBuff[count] != 0) printf("SR %02u: %8X\n", count+1, srBuff[count]);
+		if(srBuff[count] != 0) printf("SR %02u:\t%8X\n", count, srBuff[count]);
 		count++;
 	}
+
 
 	/* 入力文字列を問答無用でmemoryのPCINIT番地以降にコピーする */
 	count = 0;
@@ -843,11 +871,12 @@ int main (int argc, char* argv[]) {
 			memory[4*count+2+PCINIT] = (opBuff[count] & 0x00FF0000) >> 16;
 			memory[4*count+1+PCINIT] = (opBuff[count] & 0x0000FF00) >>  8;
 			memory[4*count+PCINIT] = opBuff[count] & 0x000000FF;
-			printf("[ DEBUG ]\t%08X, %u\n", opBuff[count], count);
-			printf("[ DEBUG ]\t%02X%02X%02X%02X\n", memory[4*count+PCINIT+3], memory[4*count+PCINIT+2], memory[4*count+PCINIT+1], memory[4*count+PCINIT]);
+//			printf("[ DEBUG ]\t%08X, %u\n", opBuff[count], count);
+//			printf("[ DEBUG ]\t%02X%02X%02X%02X\n", memory[4*count+PCINIT+3], memory[4*count+PCINIT+2], memory[4*count+PCINIT+1], memory[4*count+PCINIT]);
 		}
 		count++;
 	}
+
 	count=0;
 //	while((int) count < srRead) {
 //		serial[count] = srBuff[count];
@@ -866,7 +895,7 @@ int main (int argc, char* argv[]) {
 	for(i=0;i<128;i++) {
 		funcNum[i]=0;
 	}
-	reg[REGSP] = 0x1FFFEE;
+	reg[REGSP] = 0x1FFF4;
 
 	/* Program Counter init */
 	pc = PCINIT;
@@ -874,8 +903,8 @@ int main (int argc, char* argv[]) {
 
 	
 	/* シミュレータ本体 */
-	while(pAddr < 0x80000000) {	// unsigned int
-		printf("\n======================= next ======================\n");
+	while(pc < 0x80000000 && pc+1 > PCINIT) {	// unsigned int
+		printf("\n====== next: %3u ======\n", ((pc-PCINIT)/4));
 		reg[0] = 0;
 
 //		fetch();	// memory[pc]の内容をロード?
@@ -888,8 +917,8 @@ int main (int argc, char* argv[]) {
 		if(pc > 0x440000) pc = PCINIT;
 		breakCount++;
 		if (breakCount > breakpoint) break;
-		if(pc > ((maxpc+1)*4+PCINIT)) {
-			printf("pc = 0x%X, maxpc = 0x%X\n", pc, maxpc);
+		if(pc > (maxpc+PCINIT)) {
+			printf("pc = 0x%08X, maxpc = 0x%08X\n", pc, maxpc+PCINIT);
 			break;
 		}
 	}
@@ -897,34 +926,47 @@ int main (int argc, char* argv[]) {
 	snum = 0;
 	printf("\nメモリダンプ\n");
 	while(snum < MEMORYSIZE-3) {
+		if(snum >= PCINIT && snum < 0x80000000) {
+			snum++;
+			continue;
+		}
 		if ( (memory[snum] != 0 || memory[snum+1] != 0 || memory[snum+2] != 0 || memory[snum+3] != 0) ) {
 			printf("memory[%06X-%06X] = %02X %02X %02X %02X\n", snum+3, snum, memory[snum+3], memory[snum+2], memory[snum+1], memory[snum]);
 		}
 		snum = snum + 4;
+	}
+	snum = 0;
+	printf("\nレジスタ吐き出し\n");
+	printRegister();
+	while(snum < REGSIZE) {
+		if(reg[snum] != 0) printf("R[%02X] = %8X\n", snum, reg[snum]);
+		snum++;
 	}
 	free(memory);
 	memory = NULL;
 
 	printf("\n\n");
 	printf("Total instructions: %u\n", breakCount);
+	breakCount = breakCount - funcNum[NOP];
+	printf("Total instructions (except NOP): %u\n", breakCount);
 	printf("\n(OP)  : \t(Num), \t(Ratio)\n");
-	printf("ADDIU : %6u, %3.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount);
-	printf("LW    : %6u, %3.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount);
-	printf("SW    : %6u, %3.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount);
-	printf("JUMP  : %6u, %3.2f (%%)\n", opNum[JUMP], (double) 100*opNum[JUMP]/breakCount);
-	printf("JAL   : %6u, %3.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount);
-	printf("BEQ   : %6u, %3.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount);
-	printf("BNE   : %6u, %3.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount);
+	printf("ADDIU : %6u, %03.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount);
+	printf("LW    : %6u, %03.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount);
+	printf("SW    : %6u, %03.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount);
+	printf("JUMP  : %6u, %03.2f (%%)\n", opNum[JUMP], (double) 100*opNum[JUMP]/breakCount);
+	printf("JAL   : %6u, %03.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount);
+	printf("BEQ   : %6u, %03.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount);
+	printf("BNE   : %6u, %03.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount);
 
-	printf("NOP   : %6u, %3.2f (%%)\n", funcNum[NOP], (double) 100*funcNum[NOP]/breakCount);
-	printf("JR    : %6u, %3.2f (%%)\n", funcNum[JR], (double) 100*funcNum[JR]/breakCount);
-	printf("SUBU  : %6u, %3.2f (%%)\n", funcNum[SUBU], (double) 100*funcNum[SUBU]/breakCount);
-	printf("AND   : %6u, %3.2f (%%)\n", funcNum[AND], (double) 100*funcNum[AND]/breakCount);
-	printf("OR    : %6u, %3.2f (%%)\n", funcNum[OR], (double) 100*funcNum[OR]/breakCount);
-	printf("ADDU  : %6u, %3.2f (%%)\n", funcNum[ADDU], (double) 100*funcNum[ADDU]/breakCount);
-	printf("SLT   : %6u, %3.2f (%%)\n", funcNum[SLT], (double) 100*funcNum[SLT]/breakCount);
-	printf("SLL   : %6u, %3.2f (%%)\n", funcNum[SLL], (double) 100*funcNum[SLL]/breakCount);
-	printf("SRL   : %6u, %3.2f (%%)\n", funcNum[SRL], (double) 100*funcNum[SRL]/breakCount);
+	printf("JR    : %6u, %03.2f (%%)\n", funcNum[JR], (double) 100*funcNum[JR]/breakCount);
+	printf("SUBU  : %6u, %03.2f (%%)\n", funcNum[SUBU], (double) 100*funcNum[SUBU]/breakCount);
+	printf("AND   : %6u, %03.2f (%%)\n", funcNum[AND], (double) 100*funcNum[AND]/breakCount);
+	printf("OR    : %6u, %03.2f (%%)\n", funcNum[OR], (double) 100*funcNum[OR]/breakCount);
+	printf("ADDU  : %6u, %03.2f (%%)\n", funcNum[ADDU], (double) 100*funcNum[ADDU]/breakCount);
+	printf("SLT   : %6u, %03.2f (%%)\n", funcNum[SLT], (double) 100*funcNum[SLT]/breakCount);
+	printf("SLL   : %6u, %03.2f (%%)\n", funcNum[SLL], (double) 100*funcNum[SLL]/breakCount);
+	printf("SRL   : %6u, %03.2f (%%)\n", funcNum[SRL], (double) 100*funcNum[SRL]/breakCount);
+	printf("NOP   : %6u\n", funcNum[NOP]);
 
 
 

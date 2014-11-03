@@ -15,12 +15,14 @@ int main(void){
 	unsigned int bitQ;
 
 	unsigned int subuA = 0x0;
-	unsigned int subuB = 0x0;
+	unsigned int subuB = 0x30;
+	unsigned int nsubuB = 0;
 
 	ret = subuA-subuB;
 	printf("subuA-subuB = 0x%x(%u)\n", ret, ret);
 	subuB = ~subuB;
-	printf("subuB = 0x%x\n", subuB);
+	nsubuB = ~subuB;
+	printf("nsubuB = 0x%x(%d)\n", nsubuB, (int)nsubuB);
 
 	/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
 	while (bit < 32) {

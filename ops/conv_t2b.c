@@ -56,7 +56,7 @@ int main (int argc, char* argv[]) {
 	int bitLocation = 0;	// 0<bitLocation<31
 	unsigned int byteSize;
 	unsigned int sizeAll = 0;
-
+	int commentLine = 0;	// '#'で1、'\n'で0
 
 	if(argc != 3) { printf("[ ERROR ]\tCheck Arguments.\n"); return -1; }
 
@@ -91,11 +91,19 @@ int main (int argc, char* argv[]) {
 				continue;
 			} else if(textBuff[textCount] == '\n') {
 				byteCode[line] = byteTemp;
-				line++;
+				if(commentLine != 1) line++;
 				textCount++;
 //				printf("[ DEBUG ]\t\\n\n");
 				bitLocation = 32;
 				byteTemp = 0;
+				commentLine = 0;
+				continue;
+			} else if (textBuff[textCount] == ' ' || commentLine == 1) {
+				textCount++;
+				continue;
+			} else if (textBuff[textCount] == '#') {
+				commentLine = 1;
+				textCount++;
 				continue;
 			}
 //			printf("[ DEBUG ]\tbitL = %u\t", bitLocation);

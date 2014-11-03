@@ -24,7 +24,7 @@ sll:	ops/sll.c
 
 
 
-sim:	simulator.c fpu/float.o fpu/fadd.o fpu/fmul.o fpu/finv.o fpu/itof.o fpu/ftoi.o fpu/fcmp.o fpu/fpuTest.o
+sim:	simulator.c fpu/C/float.o fpu/C/fadd.o fpu/C/fmul.o fpu/C/finv.o fpu/C/itof.o fpu/C/ftoi.o fpu/C/fcmp.o fpu/C/fpuTest.o
 	gcc -Wall -g -Wextra -O0 -o sim simulator.c
 
 clean:

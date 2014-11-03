@@ -5,5 +5,10 @@
 *.b
 *.bin
 /backup/
+*.o
+.git*
+
+
+
 
 
