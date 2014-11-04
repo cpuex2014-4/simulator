@@ -47,8 +47,19 @@
 #define MTC1F 0x0
 #define MOVSM 0x16
 #define MOVSF 0x6
+
 #define ADDSM 0x16	// fMt
 #define ADDSF 0x0	// Function
+#define FSUB 0x1	// Function
+#define FMUL 0x2	// Function
+#define FDIV 0x3	// Function
+
+#define FTOIF 0x24	// Function
+#define FTOIM 0x10
+#define ITOFF 0x20	// Function
+#define ITOFM 0x14
+
+
 
 /* argument */
 #define BREAKPOINT "--break"
@@ -162,6 +173,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 	unsigned int fpfunction = 0;
 	unsigned int fmt=0;
 	unsigned int ft=0;
+	unsigned int rt=0;
 	unsigned int fs=0;
 	unsigned int fd=0;
 	unsigned int im=0;
@@ -172,6 +184,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 	/* 先頭&末尾6bitは0であることが保証済み */
 	fmt = (instruction >> 21) & 0x1F;
 	ft  = (instruction >> 16) & 0x1F;
+	rt  = (instruction >> 16) & 0x1F;
 	fs  = (instruction >> 11 ) & 0x1F;
 	fd  = (instruction >> 6 ) & 0x1F;
 	printFPRegister();
@@ -187,28 +200,54 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 	switch (fpfunction) {
 		case (0) :
 			if(fmt == MFC1M) {
+				reg[rt] = fpreg[fs];
 				printf("\tMFC1 :");
-				;
-			} else if (MTC1M) {
+			} else if (fmt == MTC1M) {
+				fpreg[fs] = reg[rt];
 				printf("\tMTC1 :");
-				;
-			} else if (ADDSM) {
-				printf("\tADDS :");
-				
-
-				fpreg[fd]=fadd(fpreg[fs], fpreg[ft]);
+			} else if (fmt == ADDSM) {
+				fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
+				printf("\tFADD :");
 			} else {
-				printf("Unknown fmt.\n");
+				printf("Unknown fmt(function '0').\n");
 			}
 			break;
-		case (MOVSF) :	//
+		case (MOVSF) :	
 			if(fmt == MOVSM) { 
+				fpreg[fd] = fpreg[fs];
 				printf("\tMOVS :");
 			}
 			break;
-		case (OR) :
-			printf("\tOR ");
+		case (FSUB) :	
+			if(fmt == 0x10) { 
+//				fpreg[fd]=fsub(fpreg[fs], fpreg[ft]);
+				printf("\tFSUB :");
+			}
 			break;
+		case (FMUL) :	
+			if(fmt == 0x10) { 
+				fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
+				printf("\tFMUL :");
+			}
+			break;
+		case (FDIV) :	
+			if(fmt == 0x10) { 
+//				fpreg[fd]=fdiv (fpreg[fs], fpreg[ft]);
+				printf("\tFDIV :");
+			}
+			break;
+		case (FTOIF) :
+			if(fmt == 0x10) {
+				fpreg[fd]=ftoi (fpreg[fs]);
+				printf("\tFDIV :");
+			}
+		case (ITOFF) :
+			if(fmt == 0x10) {
+				fpreg[fd]=itof (fpreg[fs]);
+				printf("\tFDIV :");
+			}
+
+
 
 		default :
 			printf("Default FPswitch has selected.\n");
