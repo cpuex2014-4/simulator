@@ -54,6 +54,7 @@
 #define BREAKPOINT "--break"
 #define PRINTREG "--reg"
 #define SERIALIN "--serial"
+#define HELP "--help"
 #define ARGMAX 20
 
 /* register */
@@ -93,6 +94,16 @@ RSB (RS-232C Send Byte)
 FIFOが一杯の場合、ブロッキングする。 
 */
 /* Receive byte from serial port */
+
+void printhelp(void) {
+	printf("使用法: sim [アセンブリファイル] [オプション]...\n");
+	printf("\t--break <num>\t\tブレイクポイントを指定\n");
+	printf("\t--serialin <ファイル名>\t\tシリアルポートからの入力を指定\n");
+	printf("\t--reg <num>\t\tレジスタ表示を無効化\n");
+	printf("\t--break <num>\t\tブレイクポイントを指定\n");
+	printf("\t--break <num>\t\tブレイクポイントを指定\n");
+
+}
 
 /* FPレジスタ内容表示器 */
 void printFPRegister(void) {
@@ -547,7 +558,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction) {
 	shamt = (instruction >> 6 ) & 0x1F;
 	
 	function = instruction & 0x3F;
-	printf("\t[function:%2X]\n", function);
+//	if(instruction != 0) printf("\t[function:%2X]\n", function);
 	switch (function) {
 		case (JR) :
 			printf("\tJR : $ra(%u) = 0x%X / ", rs, reg[rs]);
@@ -626,8 +637,9 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	unsigned int jump=0;
 	unsigned int line=0;
 	unsigned int address=0;
-
-	printf("[op-count: %04u,pc: 0x%08x, line: %u, instruction: %08x]\n", breakCount, pc, ((pc-PCINIT)/4), instruction);
+	if(instruction != 0) {
+		printf("[ops: %04u,pc: 0x%x]\n", breakCount, pc);
+	}
 //	printf("\t[instruction: 0x%2X]\n", instruction);
 	opcode = instruction >> 26;	// opcode: 6bitの整数
 //	printf("\t[opcode:%2X]\n", opcode);
@@ -789,9 +801,10 @@ int main (int argc, char* argv[]) {
 	unsigned int snum = 0;	// serial portに書き出したbyte数
 	int sInFlag=0;
 	int arg1,arg2,arg0;
+	int flag[32];
+	/* flag[0]:help  */
 
-
-	printf("\n====== Initialize ======\n");
+//	printf("\n\t====== Initialize ======\n");
 	memory = (unsigned int *) calloc( MEMORYSIZE, sizeof(unsigned int) );
 	if(memory == NULL) {
 		perror("memory allocation error\n");
@@ -824,11 +837,12 @@ int main (int argc, char* argv[]) {
 	} else {
 //		printf("opBuff succeeded to read\n");
 	}
-	printf("maxpc:0x%X(%uline)\n", maxpc+PCINIT, (maxpc)/4);
 
 
 	/* 引数の処理 */
 	while(i < argc) {
+		flag[0] = strcmp(argv[i], HELP);
+		if(flag[0] == 0) { printhelp(); exit(1); }
 		arg0 = strcmp(argv[i], SERIALIN);
 		if(arg0 == 0) { sInFlag = i; printf("%s\n", argv[sInFlag+1]); }
 		arg1 = strcmp(argv[i], PRINTREG);
@@ -864,6 +878,7 @@ int main (int argc, char* argv[]) {
 
 	/* 入力文字列を問答無用でmemoryのPCINIT番地以降にコピーする */
 	count = 0;
+	printf("maxpc:0x%X(%uline)\n", maxpc+PCINIT, (maxpc)/4);
 	while(count < BUFF) {
 //		memory[count*4+PCINIT] = opBuff[count];
 		if ( opBuff[count] != 0) {
@@ -903,8 +918,8 @@ int main (int argc, char* argv[]) {
 
 	
 	/* シミュレータ本体 */
-	while(pc < 0x80000000 && pc+1 > PCINIT) {	// unsigned int
-		printf("\n====== next: %3u ======\n", ((pc-PCINIT)/4));
+	while(pc > PCINIT-1) {	// unsigned int
+		printf("\n\t====== next: %u ======\n", ((pc-PCINIT)/4));
 		reg[0] = 0;
 
 //		fetch();	// memory[pc]の内容をロード?
@@ -914,7 +929,7 @@ int main (int argc, char* argv[]) {
 			printRegister();	// 命令実行後のレジスタを表示する
 		}
 		pAddr = pc;
-		if(pc > 0x440000) pc = PCINIT;
+		if(pc > PCINIT*4) pc = PCINIT;
 		breakCount++;
 		if (breakCount > breakpoint) break;
 		if(pc > (maxpc+PCINIT)) {
@@ -926,24 +941,19 @@ int main (int argc, char* argv[]) {
 	snum = 0;
 	printf("\nメモリダンプ\n");
 	while(snum < MEMORYSIZE-3) {
-		if(snum >= PCINIT && snum < 0x80000000) {
+		if(snum >= PCINIT && snum < PCINIT*0x2) {
 			snum++;
 			continue;
 		}
 		if ( (memory[snum] != 0 || memory[snum+1] != 0 || memory[snum+2] != 0 || memory[snum+3] != 0) ) {
-			printf("memory[%06X-%06X] = %02X %02X %02X %02X\n", snum+3, snum, memory[snum+3], memory[snum+2], memory[snum+1], memory[snum]);
+			printf("memory[0x%06X] = %02X %02X %02X %02X\n", snum, memory[snum+3], memory[snum+2], memory[snum+1], memory[snum]);
 		}
 		snum = snum + 4;
 	}
 	snum = 0;
 	printf("\nレジスタ吐き出し\n");
 	printRegister();
-	while(snum < REGSIZE) {
-		if(reg[snum] != 0) printf("R[%02X] = %8X\n", snum, reg[snum]);
-		snum++;
-	}
-	free(memory);
-	memory = NULL;
+
 
 	printf("\n\n");
 	printf("Total instructions: %u\n", breakCount);
@@ -984,6 +994,10 @@ int main (int argc, char* argv[]) {
 	}
 	if(sInFlag == 0) { printf(":無し\n"); }
 
+	free(memory);
+	memory = NULL;
+	free(serial);
+	serial = NULL;
 
 	close(fd1);
 	close(fd2);
