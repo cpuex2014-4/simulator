@@ -41,23 +41,23 @@
 #define NOP   0x7F
 
 /* fpfunction */
-#define MFC1M 0x0	// fMt
 #define MFC1F 0x0	// Function
-#define MTC1M 0x4
-#define MTC1F 0x0
-#define MOVSM 0x16
-#define MOVSF 0x6
+#define MTC1F 0x0	// Function
+#define MOVSF 0x6	// Function
+#define MFC1M 0x0	// fMt
+#define MTC1M 0x4	// fMt
+#define MOVSM 0x10	// fMt
 
-#define ADDSM 0x16	// fMt
+#define ADDSM 0x10	// fMt
 #define ADDSF 0x0	// Function
 #define FSUB 0x1	// Function
 #define FMUL 0x2	// Function
 #define FDIV 0x3	// Function
 
 #define FTOIF 0x24	// Function
-#define FTOIM 0x10
+#define FTOIM 0x10	// fMt
 #define ITOFF 0x20	// Function
-#define ITOFM 0x14
+#define ITOFM 0x14	// fMt
 
 
 
@@ -117,6 +117,7 @@ void printhelp(void) {
 
 }
 
+
 /* FPレジスタ内容表示器 */
 void printFPRegister(void) {
 // unsigned int rZ, rV, rN, rCarry;	// condition register
@@ -124,12 +125,14 @@ void printFPRegister(void) {
 
 //	printf("R[Condition] ZVNC = %X/%X/%X/%X \n", rZ, rV, rN, rCarry);
 	for(i=0; i<FPREGSIZE; i++) {
-		if(i%16 == 0) 
-			printf("FP[%2d->%2d] : ", i, i+16);
-		else if( (i+1)%16 == 0 ) {
-			printf("%4X\n",fpreg[i]);
+		if(i%8 == 0) {
+			printf("FP[%2d->%2d] : %8X ", i, i+7, fpreg[i]);
+		} else if( (i+1)%8 == 0 ) {
+			printf("%8X(",fpreg[i]);
+//			printFloat(fpreg[i]);
+			printf(")\n");
 		} else {
-			printf("%4X ",fpreg[i]);
+			printf("%8X ",fpreg[i]);
 		}
 	}
 
@@ -177,6 +180,8 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 	unsigned int fs=0;
 	unsigned int fd=0;
 	unsigned int im=0;
+	unsigned int itoftemp=0;
+	unsigned int ftoitemp=0;
 	if ((im == fd) || (fs == ft) || (fmt == 0) || pc == 0) {
 		;
 	}
@@ -187,7 +192,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 	rt  = (instruction >> 16) & 0x1F;
 	fs  = (instruction >> 11 ) & 0x1F;
 	fd  = (instruction >> 6 ) & 0x1F;
-	printFPRegister();
+//	printFPRegister();
 /*
 ○ 			mfc1 				010001 00000 rt 	fs 00000 000000 	rt <- fs 	FPUレジスタ → 汎用レジスタ
 ○ 			mtc1 				010001 00100 rt 	fs 00000 000000 	fs <- rt 	汎用レジスタ → FPUレジスタ
@@ -201,13 +206,13 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 		case (0) :
 			if(fmt == MFC1M) {
 				reg[rt] = fpreg[fs];
-				printf("\tMFC1 :");
+				printf("\tMFC1 :\n");
 			} else if (fmt == MTC1M) {
 				fpreg[fs] = reg[rt];
-				printf("\tMTC1 :");
+				printf("\tMTC1 :\n");
 			} else if (fmt == ADDSM) {
 				fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
-				printf("\tFADD :");
+				printf("\tFADD : (%02u)%X = (%02u)%X + (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]);
 			} else {
 				printf("Unknown fmt(function '0').\n");
 			}
@@ -215,43 +220,47 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 		case (MOVSF) :	
 			if(fmt == MOVSM) { 
 				fpreg[fd] = fpreg[fs];
-				printf("\tMOVS :");
+				printf("\tMOVS :\n");
 			}
 			break;
 		case (FSUB) :	
 			if(fmt == 0x10) { 
 //				fpreg[fd]=fsub(fpreg[fs], fpreg[ft]);
-				printf("\tFSUB :");
+				printf("\tFSUB :\n");
 			}
 			break;
 		case (FMUL) :	
 			if(fmt == 0x10) { 
 				fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
-				printf("\tFMUL :");
+				printf("\tFMUL : (%02u)%X = (%02u)%X + (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]);
 			}
 			break;
 		case (FDIV) :	
 			if(fmt == 0x10) { 
 //				fpreg[fd]=fdiv (fpreg[fs], fpreg[ft]);
-				printf("\tFDIV :");
+				printf("\tFDIV :\n");
 			}
 			break;
 		case (FTOIF) :
-			if(fmt == 0x10) {
+			if(fmt == FTOIM) {
+				ftoitemp = fpreg[fs];
 				fpreg[fd]=ftoi (fpreg[fs]);
-				printf("\tFDIV :");
+				printf("\tFTOI :(fp%02u)%X -> (fp%02u)%X\n", fs, ftoitemp, fd, fpreg[fd]);
 			}
+			break;
 		case (ITOFF) :
-			if(fmt == 0x10) {
+			if(fmt == ITOFM) {
+				itoftemp = fpreg[fs];
 				fpreg[fd]=itof (fpreg[fs]);
-				printf("\tFDIV :");
+				printf("\tITOF : (fp%02u)%X -> (fp%02u)%X\n", fs, itoftemp, fd, fpreg[fd]);
 			}
-
+			break;
 
 
 		default :
 			printf("Default FPswitch has selected.\n");
 	}
+	printFPRegister();
 	return 0;
 }
 
