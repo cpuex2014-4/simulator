@@ -67,6 +67,7 @@
 #define SERIALIN "--serial"
 #define HELP "--help"
 #define HIDE "--hide"
+#define SEQUENTIAL "--sequential"
 #define ARGMAX 20
 
 /* register */
@@ -108,12 +109,13 @@ FIFOが一杯の場合、ブロッキングする。
 /* Receive byte from serial port */
 
 void printhelp(void) {
-	printf("使用法: sim [アセンブリファイル] [オプション]...\n");
+	printf("使用法: sim [実行コード] [オプション]...\n");
+	printf("\t--help\t\tヘルプを表示する\n");	// 0
+	printf("\t--hide\t\t各命令実行時の詳細データを表示しない\n");	// 1
 	printf("\t--break <num>\t\tブレイクポイントを指定\n");
+	printf("\t--reg <num>\t\tレジスタ表示を有効化\n");
 	printf("\t--serialin <ファイル名>\t\tシリアルポートからの入力を指定\n");
-	printf("\t--reg <num>\t\tレジスタ表示を無効化\n");
-	printf("\t-- <num>\t\t逐次実行\n");
-	printf("\t--hide <num>\t\t各命令実行時の詳細データを表示しない\n");
+	printf("\t--sequential\t\t逐次実行\n");		// 5
 
 }
 
@@ -555,6 +557,7 @@ void printRegister(void) {
 */
 
 	for(i=0; i<REGSIZE; i++) {
+		if(i==0) printf("\t");
 		if(reg[i] == 0) continue;
 		if(i == 0) {
 			printf("$zr=0x%-6X ",reg[i]);
@@ -607,7 +610,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag) {
 	shamt = (instruction >> 6 ) & 0x1F;
 	
 	function = instruction & 0x3F;
-//	if(instruction != 0) printf("\t[function:%2X]\n", function);
+	if(instruction != 0) printf("\t[function:%2X]\n", function);
 	switch (function) {
 		case (JR) :
 			pc = reg[rs];
@@ -681,9 +684,9 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	if(instruction != 0 && flag[1] != 1) {
 		printf("[ops: %04u,pc: 0x%x]\n", breakCount, pc);
 	}
-//	printf("\t[instruction: 0x%2X]\n", instruction);
+	printf("\t[instruction: 0x%2X]\n", instruction);
 	opcode = instruction >> 26;	// opcode: 6bitの整数
-//	printf("\t[opcode:%2X]\n", opcode);
+	printf("\t[opcode:%2X]\n", opcode);
 		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
 		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
@@ -732,14 +735,13 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			if(flag[1] != 1) printf("\t<FALSE & NOP>\n");
 		}
 		opNum[BEQ]++;
-	} else if (opcode == BNE) { // beq I-Type: 000100 rs rt BranchAddr 	等しいなら分岐 
+	} else if (opcode == BNE) { // bne I-Type: 000100 rs rt BranchAddr 	等しくないなら分岐 
 		rs = (instruction >> 21) & 0x1F;	// 0x   F : 11111000000000000000000000
 		rt = (instruction >> 16) & 0x1F;	// 0x   F : 00000111110000000000000000
 		line = instruction & 0xFFFF;		// 0xFFFF : 00000000001111111111111111
 		if(flag[1] != 1) printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4);
 		if(reg[rs] != reg[rt]) {
 			jumpFlg = 1;
-			// 0x48 = 0x20 + 4 + line*4 +0x0	<-> line*4 = 0x48-0x24 <-> line = 9
 			pc = pc + 4 + line*4;		// pAddr形式
 			if(flag[1] != 1) printf("\t\t<TRUE & JUMP> -> (branch_to) 0x%04x\n", pc);
 		} else {
@@ -841,7 +843,8 @@ int main (int argc, char* argv[]) {
 	int sInFlag=0;
 	int arg1,arg2,arg0;
 	int flag[32];
-	/* flag[0]:help flag[1]:hide  */
+	int orderNum;
+	/* flag[0]:help flag[1]:hide flag[5]:sequential  */
 
 //	printf("\n\t====== Initialize ======\n");
 	memory = (unsigned int *) calloc( MEMORYSIZE, sizeof(unsigned int) );
@@ -889,7 +892,9 @@ int main (int argc, char* argv[]) {
 		arg1 = strcmp(argv[i], PRINTREG);
 		if(arg1 == 0) { printreg = 1; }
 		arg2 = strcmp(argv[i], BREAKPOINT);
-		if(arg2 == 0 && argc >= i) { breakpoint = (unsigned int) atoi(argv[i+1]); printf("breakpoint = %u\n", breakpoint); }
+		if(arg2 == 0 && argc >= i+1) { breakpoint = (unsigned int) atoi(argv[i+1]); printf("breakpoint = %u\n", breakpoint); }
+		flag[5] = strcmp(argv[i],SEQUENTIAL);
+		if(flag[5] == 0) { flag[5] = 1; } else { flag[5] = 0; }
 		i++;
 	}
 	i=0;
@@ -924,10 +929,10 @@ int main (int argc, char* argv[]) {
 	while(count < BUFF) {
 //		memory[count*4+PCINIT] = opBuff[count];
 		if ( opBuff[count] != 0) {
-			memory[4*count+3+PCINIT] = (opBuff[count] & 0xFF000000) >> 24;
-			memory[4*count+2+PCINIT] = (opBuff[count] & 0x00FF0000) >> 16;
-			memory[4*count+1+PCINIT] = (opBuff[count] & 0x0000FF00) >>  8;
-			memory[4*count+PCINIT] = opBuff[count] & 0x000000FF;
+			memory[4*count+3+PCINIT] = opBuff[count] & 0xFF;
+			memory[4*count+2+PCINIT] = (opBuff[count] >> 8) & 0xFF;
+			memory[4*count+1+PCINIT] = (opBuff[count] >> 16) & 0xFF;
+			memory[4*count+PCINIT] = opBuff[count] >> 24;
 //			printf("[ DEBUG ]\t%08X, %u\n", opBuff[count], count);
 //			printf("[ DEBUG ]\t%02X%02X%02X%02X\n", memory[4*count+PCINIT+3], memory[4*count+PCINIT+2], memory[4*count+PCINIT+1], memory[4*count+PCINIT]);
 		}
@@ -958,8 +963,6 @@ int main (int argc, char* argv[]) {
 	while(pc > PCINIT-1) {	// unsigned int
 		if(flag[1] != 1) printf("\n\t====== next: %u ======\n", ((pc-PCINIT)/4));
 		reg[0] = 0;
-
-//		fetch();	// memory[pc]の内容をロード?
 		operation = memory[pAddr] | memory[pAddr+1] << 8 | memory[pAddr+2] << 16 | memory[pAddr+3] << 24;
 		pc = decoder(pc, operation, memory, srBuff, serial, breakCount, flag);
 		if(operation != 0 && printreg != 1) {
@@ -973,6 +976,8 @@ int main (int argc, char* argv[]) {
 			printf("pc = 0x%08X, maxpc = 0x%08X\n", pc, maxpc+PCINIT);
 			break;
 		}
+//		if(flag[5] == 1) { ;}
+//			fgets();
 	}
 	if(flag[1] != 0) printf("\n[ FINISHED ]\n");
 	snum = 0;
