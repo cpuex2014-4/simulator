@@ -7,7 +7,7 @@
 /backup/
 *.o
 .git*
-t2b h2b b2t addu subu multu dec addiu sll ssum sim
+t2b h2b b2t addu subu multu dec addiu sll ssum sim printFloat
 
 
 
