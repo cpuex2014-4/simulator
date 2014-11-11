@@ -7,9 +7,27 @@
 /backup/
 *.o
 .git*
-t2b h2b b2t addu subu multu dec addiu sll ssum sim printFloat
+temp
+
+
+sum.c
+t2b h2b b2t addu subu multu dec addiu sll ssum sim printFloa
 serial.in
 serial.out
 *.py
 sim
+qkasm-master
+simulator_oldendian.c
+
+
+
+
+
+
+
+
+
+
+
+
 

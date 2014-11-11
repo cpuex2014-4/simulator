@@ -4,8 +4,6 @@
 #include "const.h"
 #include "alu.h"
 
-
-
 unsigned int sll(unsigned int rs, unsigned int shamt) {
 	unsigned int rd;
 	unsigned int i;

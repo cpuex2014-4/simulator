@@ -50,17 +50,16 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 	unsigned int im=0;
 	unsigned int itoftemp=0;
 	unsigned int ftoitemp=0;
-	if ((im == fd) || (fs == ft) || (fmt == 0) || pc == 0) {
-		;
-	}
-	/* [op] [rs] [rt] [rd] [shamt] [funct] */
-	/* 先頭&末尾6bitは0であることが保証済み */
+	/* [op:6] [fmt:5] [ft:5] [fs:5] [fd:5] [funct:6] */
+	/* [op:6] [fmt:5] [ft:5] [im:16] */
+	/* 先頭6bitは0であることが保証済み */
 	fmt = (instruction >> 21) & 0x1F;
 	ft  = (instruction >> 16) & 0x1F;
 	rt  = (instruction >> 16) & 0x1F;
 	fs  = (instruction >> 11 ) & 0x1F;
 	fd  = (instruction >> 6 ) & 0x1F;
-//	printFPRegister(reg);
+
+	if(0) { pc=pc; }
 /*
 ○ 			mfc1 				010001 00000 rt 	fs 00000 000000 	rt <- fs 	FPUレジスタ → 汎用レジスタ
 ○ 			mtc1 				010001 00100 rt 	fs 00000 000000 	fs <- rt 	汎用レジスタ → FPUレジスタ
@@ -202,6 +201,7 @@ unsigned int lw(unsigned int address, unsigned int* memory) {
 unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsigned int* reg) {
 	unsigned int function = 0;
 	unsigned int rs=0;
+	unsigned int rs_original;
 	unsigned int rt=0;
 	unsigned int rd=0;
 	unsigned int shamt=0;
@@ -225,13 +225,15 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 			funcNum[JR]++;
 			break;
 		case (ADDU) :	// rd=rs+rt
+			rs_original = reg[rs];
 			reg[rd] = addu(reg[rs], reg[rt]);
-			if(flag[1] != 1) printf("\tADDU :\t[$%2u: 0x%2X] + [$%2u: 0x%2X] => [$%2u: 0x%2X]\n", rs, reg[rs], rt, reg[rt], rd, reg[rd]);
+			if(flag[1] != 1) printf("\tADDU :\t[$%2u: 0x%2X] + [$%2u: 0x%2X] => [$%2u: 0x%2X]\n", rs, rs_original, rt, reg[rt], rd, reg[rd]);
 			funcNum[ADDU]++;
 			break;
 		case (SUBU) :	// rd=rs-rt
+			rs_original = reg[rs];
 			reg[rd] = subu(reg[rs], reg[rt]);
-			if(flag[1] != 1) printf("\tSUBU :\t[$%2u 0x%2X], [$%2u 0x%2X] => [rd:%u] 0x%2X\n", rs, reg[rs], rt, reg[rt], rd, reg[rd]);
+			if(flag[1] != 1) printf("\tSUBU :\t[$%2u 0x%2X], [$%2u 0x%2X] => [rd:%u] 0x%2X\n", rs, rs_original, rt, reg[rt], rd, reg[rd]);
 			funcNum[SUBU]++;
 			break;
 		case (SLT) :
@@ -279,23 +281,24 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 	return pc;
 }
 /* デコーダ */
-unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* srBuff, unsigned char* serial, unsigned int breakCount, int* flag, unsigned int* reg, unsigned int* fpreg) {
+unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* srBuff, unsigned char* serial, unsigned long long breakCount, int* flag, unsigned int* reg, unsigned int* fpreg) {
 	unsigned int opcode=0;
 	unsigned int rt=0;
 	unsigned int rs=0;
+	unsigned int rs_original;
 	unsigned int im=0;
 	unsigned int jump=0;
 	unsigned int line=0;
 	unsigned int address=0;
 	if(instruction != 0 && flag[1] != 1) {
-		printf("[ops: %04u,pc: 0x%x]\n", breakCount, pc);
+		printf("\t[ops: %06llu,pc: 0x%x]\n", breakCount, pc);
 	}
 	printf("\t[instruction: 0x%2X]\n", instruction);
 	opcode = instruction >> 26;	// opcode: 6bitの整数
 	printf("\t[opcode:%2X]\n", opcode);
-		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
-		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
-		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
+		rs = (instruction >> 21) & 0x1F;
+		rt = (instruction >> 16) & 0x1F;
+		im = instruction & 0x0000FFFF;
 
 	/* 適当な時にswitch文に切り替え */
 	if(opcode == 0) {
@@ -308,18 +311,19 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		rt = rrb(srBuff);
 	} else if (opcode == SSND) {
 		if(flag[1] != 1) printf("\tSSND \n");
-		rt = (instruction >> 16) & 0x1F;		// 0x  1E: 00000111110000000000000000
+		rt = (instruction >> 16) & 0x1F;
 		rsb(reg[rt], serial);
 	} else if (opcode == ADDIU) {
-		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
-		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
-		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
+		rs = (instruction >> 21) & 0x1F;
+		rt = (instruction >> 16) & 0x1F;
+		im = instruction & 0x0000FFFF;
 		if( im >= 0x8000 ) {
 			im = im | 0xFFFF0000;
 //			printf("(%X)",Imm);
 		}
+		rs_original = reg[rs];
 		reg[rt] = (addiu(reg[rs], im, rt) & 0xFFFFFFFF);	// 処理部
-		if(flag[1] != 1) printf("\tADDIU :\t[$%2u: 0x%4X] + [im: 0x%8X] => [$%2u: 0x%4X]\n", rs, reg[rs], im, rt, reg[rt]);
+		if(flag[1] != 1) printf("\tADDIU :\t[$%2u: 0x%4X] + [im: 0x%8X] => [$%2u: 0x%4X]\n", rs, rs_original, im, rt, reg[rt]);
 		opNum[ADDIU]++;
 	} else if (opcode == JUMP) {
 		jumpFlg = 1;
@@ -328,9 +332,9 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		pc = jump*4 + PCINIT;	// jumpはpAddr形式
 		opNum[JUMP]++;
 	} else if (opcode == BEQ) { // beq I-Type: 000100 rs rt BranchAddr 	等しいなら分岐 
-		rs = (instruction >> 21) & 0x1F;	// 0x   F : 11111000000000000000000000
-		rt = (instruction >> 16) & 0x1F;	// 0x   F : 00000111110000000000000000
-		line = instruction & 0xFFFF;		// 0xFFFF : 00000000001111111111111111
+		rs = (instruction >> 21) & 0x1F;
+		rt = (instruction >> 16) & 0x1F;
+		line = instruction & 0xFFFF;	
 		if(flag[1] != 1) printf("\tBEQ :\t?([$%2u 0x%2X]=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4);
 		if(reg[rs] == reg[rt]) {
 			jumpFlg = 1;
@@ -342,9 +346,9 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		}
 		opNum[BEQ]++;
 	} else if (opcode == BNE) { // bne I-Type: 000100 rs rt BranchAddr 	等しくないなら分岐 
-		rs = (instruction >> 21) & 0x1F;	// 0x   F : 11111000000000000000000000
-		rt = (instruction >> 16) & 0x1F;	// 0x   F : 00000111110000000000000000
-		line = instruction & 0xFFFF;		// 0xFFFF : 00000000001111111111111111
+		rs = (instruction >> 21) & 0x1F;
+		rt = (instruction >> 16) & 0x1F;
+		line = instruction & 0xFFFF;	
 		if(flag[1] != 1) printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4);
 		if(reg[rs] != reg[rt]) {
 			jumpFlg = 1;
@@ -355,9 +359,9 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		}
 		opNum[BNE]++;
 	} else if (opcode == LW) {	// 0x47: lw r1, 0xaaaa(r2) : r2+0xaaaaのアドレスにr1を32ビットでロード
-		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
-		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
-		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
+		rs = (instruction >> 21) & 0x1F;
+		rt = (instruction >> 16) & 0x1F;
+		im = instruction & 0x0000FFFF;
 
 		/* じかんがあるときにlw()内に移動する */
 		if( im >= 0x8000 ) {	//imは16bit
@@ -378,9 +382,9 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		if(flag[1] != 1) printf("\t\treg[rt(%u)] = 0x%X\n", rt, reg[rt]);
 	} else if (opcode == SW) {
 		// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm番地に書き込む
-		rs = (instruction >> 21) & 0x1F;	// 0x  F : 11111000000000000000000000
-		rt = (instruction >> 16) & 0x1F;	// 0x  1E: 00000111110000000000000000
-		im = instruction & 0x0000FFFF;		// 0xFFFF: 00000000001111111111111111
+		rs = (instruction >> 21) & 0x1F;
+		rt = (instruction >> 16) & 0x1F;
+		im = instruction & 0x0000FFFF;
 
 		if(reg[rs] > MEMORYSIZE) {	/* rsがメモリサイズを越えているかどうかで分岐:この実装大丈夫か？ */
 			if(flag[1] != 1) printf("(im:0x%X)/(reg[rs]:0x%X)\n", im, reg[rs]);
@@ -437,8 +441,8 @@ int main (int argc, char* argv[]) {
 	int srRead=0;
 	int fd1 = 0, fd2 = 0;
 	unsigned int maxpc;
-	unsigned int breakCount = 0;
-	unsigned int breakpoint = 0x80;
+	unsigned long long breakCount = 0;
+	unsigned long long breakpoint = 0x800000;
 	unsigned int pc = 0;
 	unsigned int *memory;
 	unsigned char *serial;
@@ -508,7 +512,7 @@ int main (int argc, char* argv[]) {
 		if(flag[3] == 0) { printreg = 1; }
 		/* breakpoint */
 		flag[4] = strcmp(argv[i], BREAKPOINT);
-		if(flag[4] == 0 && argc >= i+1) { breakpoint = (unsigned int) atoi(argv[i+1]); printf("breakpoint = %u\n", breakpoint); }
+		if(flag[4] == 0 && argc >= i+1) { breakpoint = (unsigned long long) atoi(argv[i+1]); printf("breakpoint = %llu\n", breakpoint); }
 		/* sequential */
 		flag[5] = strcmp(argv[i],SEQUENTIAL);
 		if(flag[5] == 0) { flag[5] = 1; } else { flag[5] = 0; }
@@ -632,9 +636,9 @@ int main (int argc, char* argv[]) {
 
 
 	printf("\n\n");
-	printf("Total instructions: %u\n", breakCount);
+	printf("Total instructions: %llu\n", breakCount);
 	breakCount = breakCount - funcNum[NOP];
-	printf("Total instructions (except NOP): %u\n", breakCount);
+	printf("Total instructions (except NOP): %llu\n", breakCount);
 	printf("\n(OP)  : \t(Num), \t(Ratio)\n");
 	printf("ADDIU : %6u, %03.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount);
 	printf("LW    : %6u, %03.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount);
