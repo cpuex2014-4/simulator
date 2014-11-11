@@ -38,39 +38,6 @@ void printFPRegister(unsigned int* fpreg) {
 		}
 	}
 
-/*
-	for(i=0; i<FPREGSIZE; i++) {
-		if(i == 0) {
-			printf("$zr= 0x%-6X ",reg[i]);
-		} else if( i == 1 ) {
-			printf("$at= 0x%-6X ",reg[i]);
-		} else if( i == 2 || i == 3 ) {
-			printf("$v%d= 0x%-6X ", i-2,reg[i]);
-		} else if( i >= 4 && i < 8 ) {
-			printf("$a%d= 0x%-6X ", i-4,reg[i]);
-		} else if( i >= 8 && i < 16 ) {
-			printf("$t%d= 0x%-6X ", i-8, reg[i]);
-			if(i==10) printf("\n");
-		} else if( i >= 16 && i < 24 ) {
-			printf("$s%d= 0x%-6X ", i-16, reg[i]);
-			if(i==21) printf("\n");
-		} else if( i == 24 || i == 25 ) {
-			printf("$t%d= 0x%-6X ", i-16, reg[i]);
-		} else if( i == 26 || i == 27 ) {
-			printf("$k%d= 0x%-6X ",i-26,reg[i]);
-		} else if( i == 28 ) {
-			printf("$gp= 0x%-6X ",reg[i]);
-		} else if( i == 29 ) {
-			printf("$sp= 0x%-6X ",reg[i]);
-		} else if( i == 30 ) {
-			printf("$fp= 0x%-6X ",reg[i]);
-		} else if( i == 31 ) {
-			printf("$ra= 0x%-6X",reg[i]);
-		} else {
-			printf("N/A");
-		}
-	}
-*/
 	printf("\n");
 }
 
