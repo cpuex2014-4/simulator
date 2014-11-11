@@ -64,10 +64,13 @@
 /* argument */
 #define BREAKPOINT "--break"
 #define PRINTREG "--reg"
-#define SERIALIN "--serial"
+#define SERIALIN "--serialin"
 #define HELP "--help"
 #define HIDE "--hide"
 #define SEQUENTIAL "--sequential"
+#define PRINTMEM "--memory"
+#define FPUNATIVE "--native"
+#define SERIALOUT "--serialout"
 #define ARGMAX 20
 
 /* register */
@@ -109,13 +112,16 @@ FIFOが一杯の場合、ブロッキングする。
 /* Receive byte from serial port */
 
 void printhelp(void) {
-	printf("使用法: sim [実行コード] [オプション]...\n");
+	printf("使用法: sim [実行コードファイル] [オプション1] [オプション2]...\n");
 	printf("\t--help\t\tヘルプを表示する\n");	// 0
 	printf("\t--hide\t\t各命令実行時の詳細データを表示しない\n");	// 1
-	printf("\t--break <num>\t\tブレイクポイントを指定\n");
-	printf("\t--reg <num>\t\tレジスタ表示を有効化\n");
-	printf("\t--serialin <ファイル名>\t\tシリアルポートからの入力を指定\n");
-	printf("\t--sequential\t\t逐次実行\n");		// 5
+	printf("\t--break <num>\t\tブレイクポイントを指定\n");		// 2
+	printf("\t--reg <num>\t\tレジスタ表示を有効化\n");			// 3
+//	printf("\t--serialin <ファイル名>\t\tシリアルポートからの入力を指定\n");	// 4
+//	printf("\t--sequential\t\t逐次実行\n");		// 5
+//	printf("\t--memory <num1> <num2>\t\t<num1>番地から<num2>番地までのメモリ内容を最後に表示\n");		// 6
+//	printf("\t--native\t\tFPUをx86ネイティブで実行する\n");		// 7
+//	printf("\t--serialout <ファイル名>\t\tシリアルポートからの出力先を指定\n");	// 4
 
 }
 
@@ -841,8 +847,8 @@ int main (int argc, char* argv[]) {
 	unsigned int count = 0;
 	unsigned int snum = 0;	// serial portに書き出したbyte数
 	int sInFlag=0;
-	int arg1,arg2,arg0;
 	int flag[32];
+	unsigned int mstart = 0, mfinish = 0xFFFFFFFF;
 	int orderNum;
 	/* flag[0]:help flag[1]:hide flag[5]:sequential  */
 
@@ -864,8 +870,9 @@ int main (int argc, char* argv[]) {
 		count++;
 	}
 
-	/* 引数として<ファイル:メモリ><ファイル:シリアルポート入力>をとる。それ以外は終了 */
+	/* 引数として<ファイル:メモリ>をとる。なければ強制終了 */
 	if (argc < 2) {
+		printhelp();
 		return -1;
 		printf("please input file.\n");
 	}
@@ -883,22 +890,41 @@ int main (int argc, char* argv[]) {
 
 	/* 引数の処理 */
 	while(i < argc) {
+		/* help */
 		flag[0] = strcmp(argv[i], HELP);
 		if(flag[0] == 0) { printhelp(); exit(1); }
+		/* hide */
 		flag[1] = strcmp(argv[i], HIDE);
 		if(flag[1] == 0) { flag[1] = 1; } else { flag[1] = 0; }
-		arg0 = strcmp(argv[i], SERIALIN);
-		if(arg0 == 0) { sInFlag = i; printf("%s\n", argv[sInFlag+1]); }
-		arg1 = strcmp(argv[i], PRINTREG);
-		if(arg1 == 0) { printreg = 1; }
-		arg2 = strcmp(argv[i], BREAKPOINT);
-		if(arg2 == 0 && argc >= i+1) { breakpoint = (unsigned int) atoi(argv[i+1]); printf("breakpoint = %u\n", breakpoint); }
+		/* serialin */
+		flag[2] = strcmp(argv[i], SERIALIN);
+		if(flag[2] == 0) { sInFlag = i; printf("%s\n", argv[sInFlag+1]); }
+		/* printreg */
+		flag[3] = strcmp(argv[i], PRINTREG);
+		if(flag[3] == 0) { printreg = 1; }
+		/* breakpoint */
+		flag[4] = strcmp(argv[i], BREAKPOINT);
+		if(flag[4] == 0 && argc >= i+1) { breakpoint = (unsigned int) atoi(argv[i+1]); printf("breakpoint = %u\n", breakpoint); }
+		/* sequential */
 		flag[5] = strcmp(argv[i],SEQUENTIAL);
 		if(flag[5] == 0) { flag[5] = 1; } else { flag[5] = 0; }
+		/* printmem */
+		flag[6] = strcmp(argv[i],PRINTMEM);
+		if((flag[6] == 0) && (argc > (i+2))) { 
+			flag[6] = 1;
+			mstart = (unsigned int) atoi(argv[i+1]);
+			mfinish = (unsigned int) atoi(argv[i+2]); 
+		} else { flag[6] = 0; }
+		/* native */
+		flag[7] = strcmp(argv[i],FPUNATIVE);
+		if((flag[7] == 0)) { flag[7] = 1; } else { flag[7] = 0; }
+		/* serialout */
+		flag[8] = strcmp(argv[i],SERIALOUT);
+		if((flag[8] == 0) && (argc > (i+2))) { flag[8] = 1; } else { flag[8] = 0; }
 		i++;
 	}
 	i=0;
-	/* ファイルからシリアルポート経由で入力するデータ列を読み込む */
+	/* ファイルからシリアルポート経由で入力するデータ列(レイトレ元データ)を読み込む */
 	if(sInFlag != 0) {	// 比較条件は後で変える
 		fd2 = open(argv[sInFlag+1], O_RDONLY);
 		if(fd2 < 0) { perror("Unknown error\n"); return 0; }
@@ -1034,7 +1060,7 @@ int main (int argc, char* argv[]) {
 		}
 		snum++;
 	}
-	if(sInFlag == 0) { printf(":無し\n"); }
+//	if(sInFlag == 0) { printf(":無し\n"); }
 
 	free(memory);
 	memory = NULL;
