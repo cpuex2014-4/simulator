@@ -1,7 +1,7 @@
 CC = gcc
-CFLAGS = -lm -Wall -Wextra -g -std=c11
+CFLAGS = -lm -Wall -Wextra -g
 TARGET = sim
-SIM = simulator.o
+SIM = simulator.o print.o alu.o
 FPU = fpu/C/float.o fpu/C/fadd.o fpu/C/fmul.o fpu/C/finv.o fpu/C/itof.o fpu/C/ftoi.o fpu/C/fcmp.o
 
 all: $(TARGET)

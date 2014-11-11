@@ -7,93 +7,21 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdint.h>
+#include "const.h"
 #include "fpu/C/fpu.h"
-
-/* general */
-#define PCINIT 0x4000
-#define REGSIZE 32
-#define FPREGSIZE 32
-#define BUFF 65536
-#define MEMORYSIZE (1024u*1024u*2u)
-
-/* opcode */
-#define JUMP  0x2
-#define JAL   0x3
-#define BEQ   0x4
-#define BNE   0x5
-#define ADDIU 0x9
-#define FPU   0x11
-#define LW    0x23
-#define SW    0x2B
-#define INOUT 0x3F
-#define SRCV  0x1C
-#define SSND  0x1D
-
-/* function */
-#define SLL   0x0
-#define SRL   0x2
-#define JR    0x8
-#define ADDU  0x21
-#define SUBU  0x22
-#define AND   0x24
-#define OR    0x25
-#define SLT   0x2A
-#define NOP   0x7F
-
-/* fpfunction */
-#define MFC1F 0x0	// Function
-#define MTC1F 0x0	// Function
-#define MOVSF 0x6	// Function
-#define MFC1M 0x0	// fMt
-#define MTC1M 0x4	// fMt
-#define MOVSM 0x10	// fMt
-
-#define ADDSM 0x10	// fMt
-#define ADDSF 0x0	// Function
-#define FSUB 0x1	// Function
-#define FMUL 0x2	// Function
-#define FDIV 0x3	// Function
-
-#define FTOIF 0x24	// Function
-#define FTOIM 0x10	// fMt
-#define ITOFF 0x20	// Function
-#define ITOFM 0x14	// fMt
+#include "print.h"
+#include "alu.h"
 
 
 
-/* argument */
-#define BREAKPOINT "--break"
-#define PRINTREG "--reg"
-#define SERIALIN "--serialin"
-#define HELP "--help"
-#define HIDE "--hide"
-#define SEQUENTIAL "--sequential"
-#define PRINTMEM "--memory"
-#define FPUNATIVE "--native"
-#define SERIALOUT "--serialout"
-#define ARGMAX 20
 
-/* register */
-#define REGAT 1
-#define REGGP 28
-#define REGSP 29
-#define REGFP 30
-#define REGRA 31
-
-
-
-unsigned int reg[REGSIZE];	// 32 register
-unsigned int regold[REGSIZE];	// 32 register
-unsigned int fpreg[REGSIZE];	// 32 fpregister
 //unsigned int rZ, rV, rN, rCarry;	// condition register
-unsigned int operation;	// 実行中命令
 //unsigned int pc;		// program counter: jump -> memory[pc]
-unsigned int HI=0, LO=0;
 unsigned int opNum[128];	//各命令の実行回数 opNum[OPCODE]++ の形で使用
 unsigned int fopNum[128];	//各浮動小数点命令の実行回数 fopNum[OPCODE]++ の形で使用
 unsigned int funcNum[128];	//各命令の実行回数 funcNum[OPCODE]++ の形で使用
-int jumpFlg=0;	// pcを変更するプログラムが実行されたら1。ジャンプ後0に戻る
 int printreg=-1;
+int jumpFlg;
 
 /*
 RRB (RS-232C Receive Byte)
@@ -111,76 +39,8 @@ FIFOが一杯の場合、ブロッキングする。
 */
 /* Receive byte from serial port */
 
-void printhelp(void) {
-	printf("使用法: sim [実行コードファイル] [オプション1] [オプション2]...\n");
-	printf("\t--help\t\tヘルプを表示する\n");	// 0
-	printf("\t--hide\t\t各命令実行時の詳細データを表示しない\n");	// 1
-	printf("\t--break <num>\t\tブレイクポイントを指定\n");		// 2
-	printf("\t--reg <num>\t\tレジスタ表示を有効化\n");			// 3
-//	printf("\t--serialin <ファイル名>\t\tシリアルポートからの入力を指定\n");	// 4
-//	printf("\t--sequential\t\t逐次実行\n");		// 5
-//	printf("\t--memory <num1> <num2>\t\t<num1>番地から<num2>番地までのメモリ内容を最後に表示\n");		// 6
-//	printf("\t--native\t\tFPUをx86ネイティブで実行する\n");		// 7
-//	printf("\t--serialout <ファイル名>\t\tシリアルポートからの出力先を指定\n");	// 4
 
-}
-
-
-/* FPレジスタ内容表示器 */
-void printFPRegister(void) {
-// unsigned int rZ, rV, rN, rCarry;	// condition register
-	int i;
-
-//	printf("R[Condition] ZVNC = %X/%X/%X/%X \n", rZ, rV, rN, rCarry);
-	for(i=0; i<FPREGSIZE; i++) {
-		if(i%8 == 0) {
-			printf("FP[%2d->%2d] : %8X ", i, i+7, fpreg[i]);
-		} else if( (i+1)%8 == 0 ) {
-			printf("%8X(",fpreg[i]);
-//			printFloat(fpreg[i]);
-			printf(")\n");
-		} else {
-			printf("%8X ",fpreg[i]);
-		}
-	}
-
-/*
-	for(i=0; i<FPREGSIZE; i++) {
-		if(i == 0) {
-			printf("$zr= 0x%-6X ",reg[i]);
-		} else if( i == 1 ) {
-			printf("$at= 0x%-6X ",reg[i]);
-		} else if( i == 2 || i == 3 ) {
-			printf("$v%d= 0x%-6X ", i-2,reg[i]);
-		} else if( i >= 4 && i < 8 ) {
-			printf("$a%d= 0x%-6X ", i-4,reg[i]);
-		} else if( i >= 8 && i < 16 ) {
-			printf("$t%d= 0x%-6X ", i-8, reg[i]);
-			if(i==10) printf("\n");
-		} else if( i >= 16 && i < 24 ) {
-			printf("$s%d= 0x%-6X ", i-16, reg[i]);
-			if(i==21) printf("\n");
-		} else if( i == 24 || i == 25 ) {
-			printf("$t%d= 0x%-6X ", i-16, reg[i]);
-		} else if( i == 26 || i == 27 ) {
-			printf("$k%d= 0x%-6X ",i-26,reg[i]);
-		} else if( i == 28 ) {
-			printf("$gp= 0x%-6X ",reg[i]);
-		} else if( i == 29 ) {
-			printf("$sp= 0x%-6X ",reg[i]);
-		} else if( i == 30 ) {
-			printf("$fp= 0x%-6X ",reg[i]);
-		} else if( i == 31 ) {
-			printf("$ra= 0x%-6X",reg[i]);
-		} else {
-			printf("N/A");
-		}
-	}
-*/
-	printf("\n");
-}
-
-unsigned int fpu(unsigned int pc, unsigned int instruction) {
+unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg) {
 	unsigned int fpfunction = 0;
 	unsigned int fmt=0;
 	unsigned int ft=0;
@@ -200,7 +60,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 	rt  = (instruction >> 16) & 0x1F;
 	fs  = (instruction >> 11 ) & 0x1F;
 	fd  = (instruction >> 6 ) & 0x1F;
-//	printFPRegister();
+//	printFPRegister(reg);
 /*
 ○ 			mfc1 				010001 00000 rt 	fs 00000 000000 	rt <- fs 	FPUレジスタ → 汎用レジスタ
 ○ 			mtc1 				010001 00100 rt 	fs 00000 000000 	fs <- rt 	汎用レジスタ → FPUレジスタ
@@ -268,7 +128,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction) {
 		default :
 			printf("Default FPswitch has selected.\n");
 	}
-	printFPRegister();
+	printFPRegister(reg);
 	return 0;
 }
 
@@ -335,271 +195,11 @@ unsigned int lw(unsigned int address, unsigned int* memory) {
 	return rt;
 }
 
-unsigned int sll(unsigned int rs, unsigned int shamt) {
-	unsigned int rd;
-	unsigned int i;
-
-	for(i=0;i<shamt;i++) {
-		rs = rs << 1;
-	}
-	rd = rs;
-	return rd;
-}
-unsigned int srl(unsigned int rs, unsigned int shamt) {
-	unsigned int rd;
-	unsigned int i;
-
-	for(i=0;i<shamt;i++) {
-		rs = rs >> 1;
-	}
-	rd = rs;
-	return rd;
-}
-unsigned int slt(unsigned int rs, unsigned int rt) {
-// slt rs, rt, rd
-// R-type
-// rs < rt ならばレジスタ rd に 1 を代入、そうでなければ 0 を代入。 
-// $rsと$rtの値を符号付き整数として比較し、$s が小さければ $d に1を、そうでなければ0を格納
-	unsigned int rd;
-
-	unsigned int urs, urt;
-	unsigned int trs, trt;
-
-	if(rs||rt) { ; }
-
-	urs = rs & 0x80000000;
-	urt = rt & 0x80000000;
-	trs = rs & 0x7FFFFFFF;
-	trt = rt & 0x7FFFFFFF;
-
-	if(urs == 0 && urt == 0) {
-		if(trs < trt) {
-			rd = 1;
-		} else {
-			rd = 0;
-		}
-	} else if (urs == 0 && urt != 0) {
-		return 0;
-	} else if (urs != 0 && urt == 0) {
-		return 1;
-	} else {
-		if(trs < trt) {
-			rd = 0;
-		} else {
-			rd = 1;
-		}
-	}
-
-	return rd;
-}
-
-unsigned int mult(unsigned int rs, unsigned int rt) {
-/*	int bit=0;
-	int subbit=0;
-	unsigned int bitA[32], bitB[32];
-	unsigned int bitQ[64] = { 0 };
-	unsigned int carry = 0;
-*/
-	unsigned int rd=0;
-	if(rs||rt) { ; }
 
 
-
-	return rd;
-}
-
-
-unsigned int or(unsigned int rs, unsigned int rt) {
-	// R-type
-	// or $rs $rt $rd
-	// rd <- rs or rt
-	unsigned int rd=0;
-	unsigned int bit=0;
-	unsigned int bitA, bitB;
-	unsigned int bitQ = 0;
-
-	/* 各ビットごとにOR演算 */
-	while (bit < 32) {
-		bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-		bitB = ((rt << (31-bit)) >> (31-bit)) >> bit;
-		bitQ = bitA | bitB;
-		rd = rd | (bitQ << bit);
-		bit++;
-	}
-	return rd;
-}
-
-unsigned int and(unsigned int rs, unsigned int rt) {
-	// R-type
-	// and $rs $rt $rd
-	// rd <- rs & rt
-	unsigned int rd=0;
-	unsigned int bit=0;
-	unsigned int bitA, bitB;
-	unsigned int bitQ = 0;
-
-	/* 各ビットごとにAND演算 */
-	while (bit < 32) {
-		bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-		bitB = ((rt << (31-bit)) >> (31-bit)) >> bit;
-		bitQ = bitA&bitB;
-		rd = rd | (bitQ << bit);
-		bit++;
-	}
-	return rd;
-}
-
-unsigned int subu (unsigned int rs, unsigned int rt) {
-	// R-type
-	// subu $rs $rt $rd
-	// rd <- rs - rt
-	unsigned int rd=0;
-	unsigned int bit=0;
-	unsigned int c=0;
-	unsigned int bitA=0, bitB=0;
-	unsigned int bitQ=0;
-
-//	printf("(rt=%ld -> ", (long)rt);
-	rt = ~rt;
-//	printf("-rt=%ld)", (long)rt);
-	
-	/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
-	while (bit < 32) {
-		if(bit == 0) {
-			c=1;
-			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-			bitB = ((rt << (31-bit)) >> (31-bit)) >> bit;
-			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-			rd = rd | (bitQ << bit);
-		} else {
-			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-			bitB = ((rt << (31-bit)) >> (31-bit)) >> bit;
-			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-			rd = rd | (bitQ << bit);
-		}
-		bit++;
-	}
-	return rd;
-}
-
-unsigned int addiu(unsigned int rs, unsigned int Imm, unsigned int stackPointer) {
-	unsigned int rd=0;
-	unsigned int bit=0;
-	unsigned int c=0;
-	unsigned int bitA, bitB;
-	unsigned int bitQ;
-
-	if (stackPointer == 29) {
-		while (bit < 32) {
-			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-			bitB = ((Imm << (31-bit)) >> (31-bit)) >> bit;
-	
-			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-	
-			rd = rd | (bitQ << bit);
-			bit++;
-		}
-		rd = rd % MEMORYSIZE;
-	} else {
-		/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
-		while (bit < 32) {
-			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-			bitB = ((Imm << (31-bit)) >> (31-bit)) >> bit;
-	
-			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-	
-			rd = rd | (bitQ << bit);
-			bit++;
-		}
-//		rCarry = c;
-	}
-
-	return rd;
-}
-
-unsigned int addu(unsigned int adduA, unsigned int adduB){
-	unsigned int rd=0;
-	unsigned int bit=0;
-	unsigned int c=0;
-	unsigned int bitA, bitB;
-	unsigned int bitQ=0;
-
-	/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
-	while (bit < 32) {
-		bitA = ((adduA << (31-bit)) >> (31-bit)) >> bit;
-		bitB = ((adduB << (31-bit)) >> (31-bit)) >> bit;
-
-		bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-		c = (bitA&bitB) | (bitB&c) | (bitA&c);
-
-		rd = rd | (bitQ << bit);
-		bit++;
-	}
-//	rCarry = c;
-	return rd;
-}
-
-
-
-/* レジスタ内容表示器 */
-void printRegister(void) {
-// unsigned int rZ, rV, rN, rCarry;	// condition register
-	int i;
-
-//	printf("R[Condition] ZVNC = %X/%X/%X/%X \n", rZ, rV, rN, rCarry);
-/*	for(i=0; i<REGSIZE; i++) {
-		if(i%16 == 0) 
-			printf("R[%2d->%2d] : ", i, i+16);
-		else if( (i+1)%16 == 0 ) {
-			printf("%4X\n",reg[i]);
-		} else {
-			printf("%4X ",reg[i]);
-		}
-	}
-*/
-
-	for(i=0; i<REGSIZE; i++) {
-		if(i==0) printf("\t");
-		if(reg[i] == 0) continue;
-		if(i == 0) {
-			printf("$zr=0x%-6X ",reg[i]);
-		} else if( i == 1 ) {
-			printf("$at=0x%-6X ",reg[i]);
-		} else if( i == 2 || i == 3 ) {
-			printf("$v%d=0x%-6X ", i-2,reg[i]);
-		} else if( i >= 4 && i < 8 ) {
-			printf("$a%d=0x%-6X ", i-4,reg[i]);
-		} else if( i >= 8 && i < 16 ) {
-			printf("$t%d=0x%-6X ", i-8, reg[i]);
-			if(i==10) printf("\n");
-		} else if( i >= 16 && i < 24 ) {
-			printf("$s%d=0x%-6X ", i-16, reg[i]);
-			if(i==21) printf("\n");
-		} else if( i == 24 || i == 25 ) {
-			printf("$t%d=0x%-6X ", i-16, reg[i]);
-		} else if( i == 26 || i == 27 ) {
-			printf("$k%d=0x%-6X ",i-26,reg[i]);
-		} else if( i == 28 ) {
-			printf("$gp=0x%-6X ",reg[i]);
-		} else if( i == 29 ) {
-			printf("$sp=0x%-6X ",reg[i]);
-		} else if( i == 30 ) {
-			printf("$fp=0x%-6X ",reg[i]);
-		} else if( i == 31 ) {
-			printf("$ra=0x%-6X",reg[i]);
-		} else {
-			printf("N/A");
-		}
-	}
-	printf("\n");
-}
 
 /* opcodeが0の時の操作を、末尾6ビットによって決める */
-unsigned int funct (unsigned int pc, unsigned int instruction, int* flag) {
+unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsigned int* reg) {
 	unsigned int function = 0;
 	unsigned int rs=0;
 	unsigned int rt=0;
@@ -679,7 +279,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag) {
 	return pc;
 }
 /* デコーダ */
-unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* srBuff, unsigned char* serial, unsigned int breakCount, int* flag) {
+unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* srBuff, unsigned char* serial, unsigned int breakCount, int* flag, unsigned int* reg, unsigned int* fpreg) {
 	unsigned int opcode=0;
 	unsigned int rt=0;
 	unsigned int rs=0;
@@ -699,10 +299,10 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 
 	/* 適当な時にswitch文に切り替え */
 	if(opcode == 0) {
-		pc = funct(pc, instruction, flag);
+		pc = funct(pc, instruction, flag, reg);
 	} else if (opcode == FPU) {
 		if(flag[1] != 1) printf("\tFPU \n");
-		fpu(pc, instruction);
+		fpu(pc, instruction, reg, fpreg);
 	} else if (opcode == SRCV) {
 		if(flag[1] != 1) printf("\tSRCV \n");
 		rt = rrb(srBuff);
@@ -842,6 +442,10 @@ int main (int argc, char* argv[]) {
 	unsigned int pc = 0;
 	unsigned int *memory;
 	unsigned char *serial;
+	unsigned int operation;	// 実行中命令
+
+	unsigned int reg[REGSIZE];	// 32 register
+	unsigned int fpreg[REGSIZE];	// 32 fpregister
 	int i=0;
 	unsigned int pAddr = 0;
 	unsigned int count = 0;
@@ -990,9 +594,9 @@ int main (int argc, char* argv[]) {
 		if(flag[1] != 1) printf("\n\t====== next: %u ======\n", ((pc-PCINIT)/4));
 		reg[0] = 0;
 		operation = memory[pAddr] | memory[pAddr+1] << 8 | memory[pAddr+2] << 16 | memory[pAddr+3] << 24;
-		pc = decoder(pc, operation, memory, srBuff, serial, breakCount, flag);
+		pc = decoder(pc, operation, memory, srBuff, serial, breakCount, flag, reg, fpreg);
 		if(operation != 0 && printreg != 1) {
-			if(flag[1] != 1)  printRegister();	// 命令実行後のレジスタを表示する
+			if(flag[1] != 1)  printRegister(reg);	// 命令実行後のレジスタを表示する
 		}
 		pAddr = pc;
 		if(pc > PCINIT*4) pc = PCINIT;
@@ -1006,13 +610,17 @@ int main (int argc, char* argv[]) {
 //			fgets();
 	}
 	if(flag[1] != 0) printf("\n[ FINISHED ]\n");
-	snum = 0;
+	snum = mstart;
+	while(snum%4 != 0) {
+		snum++;
+	}
+
 	printf("\nメモリダンプ\n");
-	while(snum < MEMORYSIZE-3) {
-		if(snum >= PCINIT && snum < PCINIT*0x2) {
-			snum++;
-			continue;
-		}
+	while((snum < MEMORYSIZE-3) && (snum < mfinish)) {
+//		if(snum >= PCINIT && snum < PCINIT*0x2) {
+//			snum++;
+//			continue;
+//		}
 		if ( (memory[snum] != 0 || memory[snum+1] != 0 || memory[snum+2] != 0 || memory[snum+3] != 0) ) {
 			printf("memory[0x%06X] = %02X %02X %02X %02X\n", snum, memory[snum+3], memory[snum+2], memory[snum+1], memory[snum]);
 		}
@@ -1020,7 +628,7 @@ int main (int argc, char* argv[]) {
 	}
 	snum = 0;
 	printf("\nレジスタ吐き出し\n");
-	printRegister();
+	printRegister(reg);
 
 
 	printf("\n\n");
