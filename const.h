@@ -56,7 +56,6 @@
 #define COLE	0x36
 
 
-
 /* argument */
 #define BREAKPOINT "--break"
 #define PRINTREG "--reg"

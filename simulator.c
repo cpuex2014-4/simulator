@@ -60,6 +60,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 //	unsigned int im=0;
 	unsigned int itoftemp=0;
 	unsigned int ftoitemp=0;
+	unsigned int fpualutemp=0;
 	/* [op:6] [fmt:5] [ft:5] [fs:5] [fd:5] [funct:6] */
 	/* [op:6] [fmt:5] [ft:5] [im:16] */
 	/* 先頭6bitは0であることが保証済み */
@@ -87,9 +88,17 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			} else if (fmt == MTC1M) {
 				fpreg[fs] = reg[rt];
 				printf("\tMTC1 :\n");
-			} else if (fmt == ADDSM) {
+			} else if (fmt == 0x10) {
+				if (fd == fs)
+					fpualutemp = fpreg[fs];
+				else if (fd == ft)
+					fpualutemp = fpreg[ft];
 				fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
-				printf("\tFADD : (%02u)%X = (%02u)%X + (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]);
+				if (fd == fs)
+					printf("\tFADD : (%02u)%X = (%02u)%X + (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpualutemp);
+				else if (fd == ft)
+					printf("\tFADD : (%02u)%X = (%02u)%X + (%02u)%X\n", fd, fpreg[fd], ft, fpualutemp, fs, fpreg[fs]);
+
 			} else {
 				printf("Unknown fmt(function '0').\n");
 			}
@@ -102,20 +111,34 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			break;
 		case (FSUB) :	
 			if(fmt == 0x10) { 
-//				fpreg[fd]=fsub(fpreg[fs], fpreg[ft]);
-				printf("\tFSUB :\n");
+				if (fd == fs)
+					fpualutemp = fpreg[fs];
+				else if (fd == ft)
+					fpualutemp = fpreg[ft];
+				fpreg[fd]=fsub (fpreg[fs], fpreg[ft]);
+				if (fd == fs)
+					printf("\tFSUB : (%02u)%X = (%02u)%X - (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpualutemp);
+				else if (fd == ft)
+					printf("\tFSUB : (%02u)%X = (%02u)%X - (%02u)%X\n", fd, fpreg[fd], ft, fpualutemp, fs, fpreg[fs]);
 			}
 			break;
 		case (FMUL) :	
 			if(fmt == 0x10) { 
 				fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
-				printf("\tFMUL : (%02u)%X = (%02u)%X + (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]);
+				printf("\tFMUL : (%02u)%X = (%02u)%X * (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]);
 			}
 			break;
 		case (FDIV) :	
 			if(fmt == 0x10) { 
-//				fpreg[fd]=fdiv (fpreg[fs], fpreg[ft]);
-				printf("\tFDIV :\n");
+				if (fd == fs)
+					fpualutemp = fpreg[fs];
+				else if (fd == ft)
+					fpualutemp = fpreg[ft];
+				fpreg[fd]=fdiv (fpreg[fs], fpreg[ft]);
+				if (fd == fs)
+					printf("\tFDIV : (%02u)%X = (%02u)%X / (%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpualutemp);
+				else if (fd == ft)
+					printf("\tFDIV : (%02u)%X = (%02u)%X / (%02u)%X\n", fd, fpreg[fd], ft, fpualutemp, fs, fpreg[fs]);
 			}
 			break;
 		case (FTOIF) :
@@ -674,6 +697,12 @@ int main (int argc, char* argv[]) {
 	breakCount = breakCount - funcNum[NOP];
 	printf("Total instructions (except NOP): %llu\n", breakCount);
 	printf("\n(OP)  : \t(Num), \t(Ratio)\n");
+/* ops */
+/*
+define INOUT 0x3F
+define SRCV  0x1C
+define SSND  0x1D
+*/
 	printf("ADDIU : %6u, %03.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount);
 	printf("LW    : %6u, %03.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount);
 	printf("SW    : %6u, %03.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount);
@@ -681,17 +710,17 @@ int main (int argc, char* argv[]) {
 	printf("JAL   : %6u, %03.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount);
 	printf("BEQ   : %6u, %03.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount);
 	printf("BNE   : %6u, %03.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount);
-
+/* function */
 	printf("JR    : %6u, %03.2f (%%)\n", funcNum[JR], (double) 100*funcNum[JR]/breakCount);
-	printf("SUBU  : %6u, %03.2f (%%)\n", funcNum[SUBU], (double) 100*funcNum[SUBU]/breakCount);
 	printf("AND   : %6u, %03.2f (%%)\n", funcNum[AND], (double) 100*funcNum[AND]/breakCount);
 	printf("OR    : %6u, %03.2f (%%)\n", funcNum[OR], (double) 100*funcNum[OR]/breakCount);
 	printf("ADDU  : %6u, %03.2f (%%)\n", funcNum[ADDU], (double) 100*funcNum[ADDU]/breakCount);
+	printf("SUBU  : %6u, %03.2f (%%)\n", funcNum[SUBU], (double) 100*funcNum[SUBU]/breakCount);
 	printf("SLT   : %6u, %03.2f (%%)\n", funcNum[SLT], (double) 100*funcNum[SLT]/breakCount);
 	printf("SLL   : %6u, %03.2f (%%)\n", funcNum[SLL], (double) 100*funcNum[SLL]/breakCount);
 	printf("SRL   : %6u, %03.2f (%%)\n", funcNum[SRL], (double) 100*funcNum[SRL]/breakCount);
 	printf("NOP   : %6u\n", funcNum[NOP]);
-
+/* fpu */
 
 
 
