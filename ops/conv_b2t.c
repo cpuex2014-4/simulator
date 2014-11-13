@@ -52,19 +52,19 @@ int main (int argc, char* argv[]) {
 			temp = i % 4;
 			switch (temp) {
 				case 0: {
-					byteCode[j] =  byteCode[j] | readBuff[i];	// byteCode:32bit, readBuff:8bit
+					byteCode[j] =  byteCode[j] | (readBuff[i] << 24);	// byteCode:32bit, readBuff:8bit
 					break;
 				}
 				case 1: {
-					byteCode[j] =  byteCode[j] | (readBuff[i] << 8 );
-					break;
-				}
-				case 2: {
 					byteCode[j] =  byteCode[j] | (readBuff[i] << 16 );
 					break;
 				}
+				case 2: {
+					byteCode[j] =  byteCode[j] | (readBuff[i] << 8 );
+					break;
+				}
 				case 3: {
-					byteCode[j] =  byteCode[j] | (readBuff[i] << 24);
+					byteCode[j] =  byteCode[j] | (readBuff[i]);
 //					printf("%08u ", byteCode[j]);
 					j++;
 					break;
@@ -85,9 +85,9 @@ int main (int argc, char* argv[]) {
 			}
 			i++;
 		}
-		printf("\nreadCount = %lu\n", readCount);
-		printf("==================================================\n");
-		printf("j=%d, readCount=%ld\n", j, readCount);
+//		printf("\nreadCount = %lu\n", readCount);
+//		printf("==================================================\n");
+//		printf("j=%d, readCount=%ld\n", j, readCount);
 
 		i = 0;
 		j++;

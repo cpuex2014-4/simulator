@@ -40,6 +40,16 @@ FIFOが一杯の場合、ブロッキングする。
 /* Receive byte from serial port */
 
 
+
+
+/*
+#define CEQ		0x32
+#define COLT	0x34
+#define COLE	0x36
+c.eq.s fs, ft 	010001 10000 ft fs 0000011 0010 	cc0 <- (fs == ft) 	浮動小数比較 (C.cond.fmt)
+c.olt.s fs, ft　010001 10000 ft fs 0000011 0100 	cc0 <- (fs < ft) 	浮動小数比較
+c.ole.s fs, ft 	010001 10000 ft fs 0000011 0110 	cc0 <- (fs <= ft) 	浮動小数比較 
+*/
 unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg) {
 	unsigned int fpfunction = 0;
 	unsigned int fmt=0;
@@ -47,7 +57,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 	unsigned int rt=0;
 	unsigned int fs=0;
 	unsigned int fd=0;
-	unsigned int im=0;
+//	unsigned int im=0;
 	unsigned int itoftemp=0;
 	unsigned int ftoitemp=0;
 	/* [op:6] [fmt:5] [ft:5] [fs:5] [fd:5] [funct:6] */
@@ -120,6 +130,30 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				itoftemp = fpreg[fs];
 				fpreg[fd]=itof (fpreg[fs]);
 				printf("\tITOF : (fp%02u)%X -> (fp%02u)%X\n", fs, itoftemp, fd, fpreg[fd]);
+			}
+			break;
+/*
+int feq  (uint32_t, uint32_t);
+int flt  (uint32_t, uint32_t);
+int fle (uint32_t, uint32_t);
+*/
+		case (CEQ) :
+			if(fmt == 0x10) {
+				
+				fpreg[23]=feq (fpreg[fs], fpreg[ft]);
+				printf("\tC.EQ : ?((fp%02u)%X == (fp%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+			}
+			break;
+		case (COLT) :
+			if(fmt == 0x10) {
+				fpreg[23]=flt (fpreg[fs], fpreg[ft]);
+				printf("\tC.OLT : ?((fp%02u)%X < (fp%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+			}
+			break;
+		case (COLE) :
+			if(fmt == 0x10) {
+				fpreg[23]=fle (fpreg[fs], fpreg[ft]);
+				printf("\tC.OLE : ?((fp%02u)%X <= (fp%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
 			}
 			break;
 
@@ -457,7 +491,7 @@ int main (int argc, char* argv[]) {
 	int sInFlag=0;
 	int flag[32];
 	unsigned int mstart = 0, mfinish = 0xFFFFFFFF;
-	int orderNum;
+//	int orderNum;
 	/* flag[0]:help flag[1]:hide flag[5]:sequential  */
 
 //	printf("\n\t====== Initialize ======\n");

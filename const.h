@@ -51,6 +51,10 @@
 #define ITOFF 0x20	// Function
 #define ITOFM 0x14	// fMt
 
+#define CEQ		0x32
+#define COLT	0x34
+#define COLE	0x36
+
 
 
 /* argument */
