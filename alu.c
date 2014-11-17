@@ -214,4 +214,14 @@ unsigned int addu(unsigned int adduA, unsigned int adduB){
 	return rd;
 }
 
+unsigned int ori(unsigned int rs, unsigned int im) {
+	unsigned int rt;
+
+	rt = rs | im;
+
+
+	return rt;
+}
+
+
 

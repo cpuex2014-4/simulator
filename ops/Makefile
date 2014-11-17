@@ -3,7 +3,7 @@ TARGETS = t2b h2b b2t dec
 all: $(TARGETS)
 
 t2b: conv_t2b.c
-	gcc -Wall -o t2b conv_t2b.c
+	gcc -Wall -o ../t2b conv_t2b.c
 h2b: conv_h2b.c
 	gcc -Wall -o h2b conv_h2b.c
 b2t: conv_b2t.c

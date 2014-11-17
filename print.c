@@ -6,16 +6,18 @@
 
 
 void printhelp(void) {
-	printf("使用法: sim [実行コードファイル] [オプション1] [オプション2]...\n");
-	printf("\t--help\t\tヘルプを表示する\n");	// 0
-	printf("\t--hide\t\t各命令実行時の詳細データを表示しない\n");	// 1
-	printf("\t--break <num>\t\tブレイクポイントを指定\n");		// 2
-	printf("\t--reg <num>\t\tレジスタ表示を有効化\n");			// 3
+	printf("使用法: sim [入力ファイル] [オプション1] <num> [オプション2] <num1> <num2>...\n");
+	printf("\t--help\t\t\t\tヘルプを表示する\n");	// 0
+	printf("\t--hide\t\t\t\t各命令実行時の詳細データを表示しない\n");	// 1
+	printf("\t--break <num>\t\t\tブレイクポイントを指定\n");		// 2
+	printf("\t--reg <num>\t\t\tレジスタ表示を有効化\n");			// 3
 //	printf("\t--serialin <ファイル名>\t\tシリアルポートからの入力を指定\n");	// 4
-//	printf("\t--sequential\t\t逐次実行\n");		// 5
+	printf("\t--sequential\t\t\t逐次実行 (未実装)\n");		// 5
 	printf("\t--memory <num1> <num2>\t\t<num1>番地から<num2>番地までのメモリ内容を最後に表示\n");		// 6
-//	printf("\t--native\t\tFPUをx86ネイティブで実行する\n");		// 7
-//	printf("\t--serialout <ファイル名>\t\tシリアルポートからの出力先を指定\n");	// 4
+	printf("\t--native\t\t\tFPUをx86ネイティブで実行する (未実装)\n");		// 7
+	printf("\t--serialout <ファイル名>\tシリアルポートからの出力先を指定 (未実装)\n");	// 8
+	printf("\t--label\t\t\t\tシリアルポートからの出力先を指定 (未実装)\n");	// 8
+
 
 }
 
@@ -28,7 +30,7 @@ void printFPRegister(unsigned int* fpreg) {
 //	printf("R[Condition] ZVNC = %X/%X/%X/%X \n", rZ, rV, rN, rCarry);
 	for(i=0; i<FPREGSIZE; i++) {
 		if(i%8 == 0) {
-			printf("FP[%2d->%2d] : %8X ", i, i+7, fpreg[i]);
+			printf("\tFP[%2d->%2d] : %8X ", i, i+7, fpreg[i]);
 		} else if( (i+1)%8 == 0 ) {
 			printf("%8X(",fpreg[i]);
 //			printFloat(fpreg[i]);

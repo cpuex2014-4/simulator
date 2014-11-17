@@ -7,6 +7,7 @@
 #define FPREGSIZE 32
 #define BUFF 65536
 #define MEMORYSIZE (1024u*1024u*2u)
+#define DATAOFFSET 0xFFFFFF
 
 /* opcode */
 #define JUMP  0x2
@@ -14,6 +15,8 @@
 #define BEQ   0x4
 #define BNE   0x5
 #define ADDIU 0x9
+#define ORI   0xD
+#define LUI   0xF
 #define FPU   0x11
 #define LW    0x23
 #define SW    0x2B
@@ -33,27 +36,28 @@
 #define NOP   0x7F
 
 /* fpfunction */
-#define MFC1F 0x0	// Function
-#define MTC1F 0x0	// Function
+//#define MFC1F 0x0	// Function
+//#define MTC1F 0x0	// Function
+
+#define FADDS 0x0	// Function
+#define FSUBS 0x1	// Function
+#define FMULS 0x2	// Function
+#define FDIVS 0x3	// Function
+#define SQRT  0x4	// Function
 #define MOVSF 0x6	// Function
-#define MFC1M 0x0	// fMt
-#define MTC1M 0x4	// fMt
-#define MOVSM 0x10	// fMt
-
-#define ADDSM 0x10	// fMt
-#define ADDSF 0x0	// Function
-#define FSUB 0x1	// Function
-#define FMUL 0x2	// Function
-#define FDIV 0x3	// Function
-
 #define FTOIF 0x24	// Function
-#define FTOIM 0x10	// fMt
 #define ITOFF 0x20	// Function
-#define ITOFM 0x14	// fMt
 
 #define CEQ		0x32
 #define COLT	0x34
 #define COLE	0x36
+
+/* fpmt */
+#define MFC1M 0x0	// fMt
+#define MTC1M 0x4	// fMt
+#define FTOIM 0x10	// fMt
+#define ITOFM 0x14	// fMt
+
 
 
 /* argument */
