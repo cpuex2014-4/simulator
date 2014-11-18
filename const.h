@@ -37,9 +37,6 @@
 #define NOP   0x7F
 
 /* fpfunction */
-//#define MFC1F 0x0	// Function
-//#define MTC1F 0x0	// Function
-
 #define FADDS 0x0	// Function
 #define FSUBS 0x1	// Function
 #define FMULS 0x2	// Function
@@ -48,23 +45,24 @@
 #define MOVSF 0x6	// Function
 #define FTOIF 0x24	// Function
 #define ITOFF 0x20	// Function
-
 #define CEQ		0x32
 #define COLT	0x34
 #define COLE	0x36
 
 /* fpmt */
-#define MFC1M 0x0	// fMt
-#define MTC1M 0x4	// fMt
-#define FTOIM 0x10	// fMt
-#define ITOFM 0x14	// fMt
+#define MFC1M	0x0	// fMt
+#define MTC1M	0x4	// fMt
+#define FTOIM	0x10	// fMt
+#define ITOFM	0x14	// fMt
+#define BC1		0x8	//fMt
 
 /* fpopNum */
-#define FMFC 0x0
-#define FMTC 0x0
-#define BC1F 0x0
-#define BC1T 0x0
-
+#define FMFC 0x80
+#define FMTC 0x81
+#define BC1F 0xFE
+#define BC1T 0xFF
+#define FTOI 0x24
+#define ITOF 0x20
 
 /* argument */
 #define BREAKPOINT "--break"

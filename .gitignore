@@ -13,7 +13,7 @@ temp
 sum.c
 
 
-ops/t2b ops/h2b ops/b2t addu subu multu dec addiu sll ssum sim printFloat
+ops/t2b ops/h2b ops/b2t addu subu multu dec addiu sll ssum sim printFloat b2t t2b
 serial.in
 serial.out
 *.py

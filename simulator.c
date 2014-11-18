@@ -20,16 +20,15 @@
 //unsigned int opNum[128+OPNUM];	//各命令の実行回数 opNum[128+OPCODE]++ の形で使用
 int jumpFlg;
 
+unsigned int signExt(unsigned int argument) {
+	if(argument > 0x10000) return argument;
+	if(argument & 0x8000) {
+		argument = argument | 0xFFFF8000;
+	}
+	return argument;
+}
 
-/*
-#define CEQ		0x32
-#define COLT	0x34
-#define COLE	0x36
-c.eq.s fs, ft 	010001 10000 ft fs 0000011 0010 	cc0 <- (fs == ft) 	浮動小数比較 (C.cond.fmt)
-c.olt.s fs, ft　010001 10000 ft fs 0000011 0100 	cc0 <- (fs < ft) 	浮動小数比較
-c.ole.s fs, ft 	010001 10000 ft fs 0000011 0110 	cc0 <- (fs <= ft) 	浮動小数比較 
-*/
-unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag) {
+unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned int* fpuNum) {
 	unsigned int fpfunction = 0;
 	unsigned int fmt=0;
 	unsigned int ft=0;
@@ -39,10 +38,10 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 //	unsigned int im=0;
 	unsigned int itoftemp=0;
 	unsigned int ftoitemp=0;
-	unsigned int fpualutemp=0;
+	unsigned int fputemp=0;
+	unsigned int target = 0;
 	/* [op:6] [fmt:5] [ft:5] [fs:5] [fd:5] [funct:6] */
 	/* [op:6] [fmt:5] [ft:5] [im:16] */
-	/* 先頭6bitは0であることが保証済み */
 	fmt = (instruction >> 21) & 0x1F;
 	ft  = (instruction >> 16) & 0x1F;
 	rt  = (instruction >> 16) & 0x1F;
@@ -60,118 +59,160 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 	if(instruction != 0 && flag[1] != 1) {
 		printf("\t[fpfunction:%2X]\n", fpfunction);
 	}
-
-	switch (fpfunction) {
-		case (0) :
-			if(fmt == MFC1M) {
-				reg[rt] = fpreg[fs];
-				if(flag[1] != 1) printf("\tMFC1 : $%02u <- $FP%02u\n", rt, fs);
-			} else if (fmt == MTC1M) {
-				fpreg[fs] = reg[rt];
-				if(flag[1] != 1) printf("\tMTC1 : $FP%02u <- $%02u\n", fs, rt);
-			} else if (fmt == 0x10) {
-				if (fd == fs)
-					fpualutemp = fpreg[fs];
-				else if (fd == ft)
-					fpualutemp = fpreg[ft];
-				fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
-				if(flag[1] != 1) {
+	if (fmt == BC1) {
+		target = instruction & 0xFFFF;
+		if (ft == 0) {		// falseで分岐
+			if(flag[1] != 1)  printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs);
+			fputemp = fpreg[23] & 0x800000;
+			if(fputemp == 0) {
+				pc = pc + 4 + signExt(target);
+			}
+			fpuNum[BC1F]++;
+		} else if(ft == 1) {	// Trueで分岐
+			fputemp = fpreg[23] & 0x800000;
+			if(fputemp == 0x800000) {
+				pc = pc + 4 + signExt(target);
+			}
+			fpuNum[BC1T]++;
+		} else {
+			printf("\t[ ERROR ]\tUnknown BC1 option(fmt == 0 && (ft != 0 || ft != 1))\n");
+		}		
+	} else {
+		switch (fpfunction) {
+			case (0) :
+				if(fmt == MFC1M) {
+					reg[rt] = fpreg[fs];
+					if(flag[1] != 1) printf("\tMFC1 : $%02u <- $FP%02u\n", rt, fs);
+					fpuNum[FMFC]++;
+				} else if (fmt == MTC1M) {
+					fpreg[fs] = reg[rt];
+					if(flag[1] != 1) printf("\tMTC1 : $FP%02u <- $%02u\n", fs, rt);
+					fpuNum[FMTC]++;
+				} else if (fmt == 0x10) {
 					if (fd == fs)
-						printf("\tFADD : ($FP%02u)%X = ($FP%02u)%X + ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpualutemp);
+						fputemp = fpreg[fs];
 					else if (fd == ft)
-						printf("\tFADD : ($FP%02u)%X = ($FP%02u)%X + ($FP%02u)%X\n", fd, fpreg[fd], ft, fpualutemp, fs, fpreg[fs]);
-				}
-			} else {
-				printf("Unknown fmt(function '0').\n");
-			}
-			break;
-		case (MOVSF) :	
-			if(fmt == 0x10) { 
-				fpreg[fd] = fpreg[fs];
-				if(flag[1] != 1)  printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs);
-			}
-			break;
-		case (SQRT) :
-			/* fd <- sqrt(fs) 	fsqrt  */
-			if(fmt == 0x10) { 
-				fpreg[fd] = fsqrt(fpreg[fs]);
-				if(flag[1] != 1) printf("\tSQRT : ($FP%02u)%X <- SQRT(%02u:%X)\n", fd, fpreg[fd], fs, fpreg[fs]);
-			}
-			break;
-		case (FSUBS) :
-			if(fmt == 0x10) { 
-				if (fd == fs) {
-					fpualutemp = fpreg[fs];
+						fputemp = fpreg[ft];
+					fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
+					if(flag[1] != 1) {
+						if (fd == fs)
+							printf("\tFADD : ($FP%02u)%X = ($FP%02u)%X + ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fputemp);
+						else if (fd == ft)
+							printf("\tFADD : ($FP%02u)%X = ($FP%02u)%X + ($FP%02u)%X\n", fd, fpreg[fd], ft, fputemp, fs, fpreg[fs]);
+					}
+					fpuNum[FADDS]++;
 				} else {
-					fpualutemp = fpreg[ft];
+					printf("Unknown fmt(function '0').\n");
 				}
-				fpreg[fd]=fsub (fpreg[fs], fpreg[ft]);
-				if(flag[1] != 1) {
+				break;
+			case (MOVSF) :	
+				if(fmt == 0x10) { 
+					fpreg[fd] = fpreg[fs];
+					if(flag[1] != 1)  printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs);
+					fpuNum[MOVSF]++;
+				}
+				break;
+			case (SQRT) :
+				/* fd <- sqrt(fs) 	fsqrt  */
+				if(fmt == 0x10) { 
+					fpreg[fd] = fsqrt(fpreg[fs]);
+					if(flag[1] != 1) printf("\tSQRT : ($FP%02u)%X <- SQRT(%02u:%X)\n", fd, fpreg[fd], fs, fpreg[fs]);
+					fpuNum[SQRT]++;
+				}
+				break;
+			case (FSUBS) :
+				if(fmt == 0x10) { 
+					if (fd == fs) {
+						fputemp = fpreg[fs];
+					} else {
+						fputemp = fpreg[ft];
+					}
+					fpreg[fd]=fsub (fpreg[fs], fpreg[ft]);
+					if(flag[1] != 1) {
+						if (fd == fs)
+							printf("\tFSUB : ($FP%02u)%X = ($FP%02u)%X - ($FP%02u)%X\n", fd, fpreg[fd], fs, fputemp, ft, fpreg[ft]);
+						else
+							printf("\tFSUB : ($FP%02u)%X = ($FP%02u)%X - ($FP%02u)%X\n", fd, fpreg[fd], fs, fpreg[fs], ft, fputemp);
+					}
+					fpuNum[FSUBS]++;
+				}
+				break;
+			case (FMULS) :	
+				if(fmt == 0x10) { 
+					fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
+					if(flag[1] != 1) printf("\tFMUL : ($FP%02u)%X = ($FP%02u)%X * ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]);
+					fpuNum[FMULS]++;
+				}
+				break;
+			case (FDIVS) :	
+				if(fmt == 0x10) { 
 					if (fd == fs)
-						printf("\tFSUB : ($FP%02u)%X = ($FP%02u)%X - ($FP%02u)%X\n", fd, fpreg[fd], fs, fpualutemp, ft, fpreg[ft]);
+						fputemp = fpreg[fs];
 					else
-						printf("\tFSUB : ($FP%02u)%X = ($FP%02u)%X - ($FP%02u)%X\n", fd, fpreg[fd], fs, fpreg[fs], ft, fpualutemp);
+						fputemp = fpreg[ft];
+					fpreg[fd]=fdiv (fpreg[fs], fpreg[ft]);
+					if (fd == fs)
+						printf("\tFDIV : ($FP%02u)%X = ($FP%02u)%X / ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fputemp);
+					else
+						printf("\tFDIV : ($FP%02u)%X = ($FP%02u)%X / ($FP%02u)%X\n", fd, fpreg[fd], ft, fputemp, fs, fpreg[fs]);
+					fpuNum[FDIVS]++;
 				}
-			}
-			break;
-		case (FMULS) :	
-			if(fmt == 0x10) { 
-				fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
-				if(flag[1] != 1) printf("\tFMUL : ($FP%02u)%X = ($FP%02u)%X * ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]);
-			}
-			break;
-		case (FDIVS) :	
-			if(fmt == 0x10) { 
-				if (fd == fs)
-					fpualutemp = fpreg[fs];
-				else
-					fpualutemp = fpreg[ft];
-				fpreg[fd]=fdiv (fpreg[fs], fpreg[ft]);
-				if (fd == fs)
-					printf("\tFDIV : ($FP%02u)%X = ($FP%02u)%X / ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpualutemp);
-				else
-					printf("\tFDIV : ($FP%02u)%X = ($FP%02u)%X / ($FP%02u)%X\n", fd, fpreg[fd], ft, fpualutemp, fs, fpreg[fs]);
-			}
-			break;
-		case (FTOIF) :
-			if(fmt == FTOIM) {
-				ftoitemp = fpreg[fs];
-				fpreg[fd]=ftoi (fpreg[fs]);
-				if(flag[1] != 1) printf("\tFTOI :($FP%02u)%X -> ($FP%02u)%X\n", fs, ftoitemp, fd, fpreg[fd]);
-			}
-			break;
-		case (ITOFF) :
-			if(fmt == ITOFM) {
-				itoftemp = fpreg[fs];
-				fpreg[fd]=itof (fpreg[fs]);
-				if(flag[1] != 1) printf("\tITOF : ($FP%02u)%X -> ($FP%02u)%X\n", fs, itoftemp, fd, fpreg[fd]);
-			}
-			break;
-		case (CEQ) :
-			if(fmt == 0x10) {
-				fpreg[23]=feq (fpreg[fs], fpreg[ft]);
-				if(flag[1] != 1) printf("\tC.EQ : ?(($FP%02u)%X == ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
-			}
-			break;
-		case (COLT) :
-			if(fmt == 0x10) {
-				fpreg[23]=flt (fpreg[fs], fpreg[ft]);
-				if(flag[1] != 1) printf("\tC.OLT : ?(($FP%02u)%X < ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
-			}
-			break;
-		case (COLE) :
-			if(fmt == 0x10) {
-				fpreg[23]=fle (fpreg[fs], fpreg[ft]);
-				if(flag[1] != 1) printf("\tC.OLE : ?(($FP%02u)%X <= ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
-			}
-			break;
-
-
-		default :
-			printf("Default FPswitch has selected.\n");
+				break;
+			case (FTOIF) :
+				if(fmt == FTOIM) {
+					ftoitemp = fpreg[fs];
+					fpreg[fd]=ftoi (fpreg[fs]);
+					if(flag[1] != 1) printf("\tFTOI :($FP%02u)%X -> ($FP%02u)%X\n", fs, ftoitemp, fd, fpreg[fd]);
+					fpuNum[FTOI]++;
+				}
+				break;
+			case (ITOFF) :
+				if(fmt == ITOFM) {
+					itoftemp = fpreg[fs];
+					fpreg[fd]=itof (fpreg[fs]);
+					if(flag[1] != 1) printf("\tITOF : ($FP%02u)%X -> ($FP%02u)%X\n", fs, itoftemp, fd, fpreg[fd]);
+					fpuNum[ITOF]++;
+				}
+				break;
+			case (CEQ) :
+				if(fmt == 0x10) {
+					if(feq (fpreg[fs], fpreg[ft])) {
+						fpreg[23] = fpreg[23] | 0x800000;
+					} else {
+						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
+					}
+					if(flag[1] != 1) printf("\tC.EQ : ?(($FP%02u)%X == ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+					fpuNum[CEQ]++;
+				}
+				break;
+			case (COLT) :
+				if(fmt == 0x10) {
+					if(flt (fpreg[fs], fpreg[ft])) {
+						fpreg[23] = fpreg[23] | 0x800000;
+					} else {
+						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
+					}
+					if(flag[1] != 1) printf("\tC.OLT : ?(($FP%02u)%X < ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+					fpuNum[COLT]++;
+				}
+				break;
+			case (COLE) :
+				if(fmt == 0x10) {
+					if(fle (fpreg[fs], fpreg[ft])) {
+						fpreg[23] = fpreg[23] | 0x800000;
+					} else {
+						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
+					}
+					if(flag[1] != 1) printf("\tC.OLE : ?(($FP%02u)%X <= ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+					fpuNum[COLE]++;
+				}
+				break;
+			default :
+				printf("Default FPswitch has selected.\n");
+		}
 	}
-	if(flag[1] != 1) printFPRegister(fpreg);
-	return 0;
+	if(flag[1] != 1 || flag[3] != 1) printFPRegister(fpreg);
+	return pc;
 }
 
 /*
@@ -207,7 +248,7 @@ unsigned int rsb(unsigned int rt, unsigned char* serial) {
 }
 
 /* store word */
-// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm(符号拡張)番地に書き込む
+// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm(符号拡張)番地に書き込む ☆sw()呼び出し時点で拡張済み
 /* リトルエンディアン */
 unsigned int sw(unsigned int rt, unsigned int address, unsigned int* memory, unsigned int stackPointer) {
 	unsigned int addr0;
@@ -262,6 +303,10 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 	rt = (instruction >> 16) & 0x1F;
 	rd = (instruction >> 11 ) & 0x1F;
 	shamt = (instruction >> 6 ) & 0x1F;
+
+	if(instruction != 0 && flag[1] != 1) {
+		printf("\t[OPERAND] rs:%08X rt:%08X rd:%08X shamt:%08X \n", rs,rt,rd,shamt);
+	}
 	
 	function = instruction & 0x3F;
 	if(instruction != 0) printf("\t[function:%2X]\n", function);
@@ -315,12 +360,12 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 			break;
 		case (AND) :
 			reg[rd] = and(reg[rs], reg[rt]);
-			if(flag[1] != 1) printf("\t[$%2u:0x%4X] AND? [$%2u:0x%4X] \t=> [rd:%u] 0x%2X\n", rs, reg[rs], rt, reg[rt], rd, reg[rd]);
+			if(flag[1] != 1) printf("\t[$%2u:0x%4X] AND? [$%2u:0x%4X] => [rd:%u] 0x%2X\n", rs, reg[rs], rt, reg[rt], rd, reg[rd]);
 			opNum[128+AND]++;
 			break;
 		case (OR) :
 			reg[rd] = or(reg[rs], reg[rt]);
-			if(flag[1] != 1) printf("\t[$%2u:0x%4X] OR? [$%2u:0x%4X] \t=> [rd:%u] 0x%2X\n", rs, reg[rs], rt, reg[rt], rd, reg[rd]);
+			if(flag[1] != 1) printf("\t[$%2u:0x%4X] OR? [$%2u:0x%4X] => [rd:%u] 0x%2X\n", rs, reg[rs], rt, reg[rt], rd, reg[rd]);
 			opNum[128+OR]++;
 			break;
 		default :
@@ -329,7 +374,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 	return pc;
 }
 /* デコーダ */
-unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* serialin, unsigned char* serial, unsigned long long breakCount, int* flag, unsigned int* reg, unsigned int* fpreg, unsigned int* opNum) {
+unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* serialin, unsigned char* serial, unsigned long long breakCount, int* flag, unsigned int* reg, unsigned int* fpreg, unsigned int* opNum, unsigned int* fpuNum) {
 	unsigned int opcode=0;
 	unsigned int rt=0;
 	unsigned int rs=0;
@@ -338,30 +383,34 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	unsigned int jump=0;
 	unsigned int line=0;
 	unsigned int address=0;
+	unsigned int alutemp=0;
 
 	opcode = instruction >> 26;	// opcode: 6bitの整数
+	rs = (instruction >> 21) & 0x1F;
+	rt = (instruction >> 16) & 0x1F;
+	im = instruction & 0xFFFF;
+
 	if(instruction != 0 && flag[1] != 1) {
 		printf("[ops: %06llu,pc: 0x%x]\n", breakCount, pc);
 		printf("[instruction: 0x%2X]\n", instruction);
 		printf("\t[opcode:%2X]\n", opcode);
 	}
-		rs = (instruction >> 21) & 0x1F;
-		rt = (instruction >> 16) & 0x1F;
-		im = instruction & 0x0000FFFF;
 
 	/* 適当な時にswitch文に切り替え */
 	if(opcode == 0) {
 		pc = funct(pc, instruction, flag, reg, opNum);
 	} else if (opcode == FPU) {
 		if(flag[1] != 1) printf("\tFPU \n");
-		fpu(pc, instruction, reg, fpreg, flag);
+		pc = fpu(pc, instruction, reg, fpreg, flag, fpuNum);
 	} else if (opcode == SRCV) {
 		reg[rt] = rrb(serialin);
 		if(flag[1] != 1) printf("\tSRCV(rrb):\t reg[%u]:%02X  \n",rt,reg[rt]);
+		opNum[SRCV]++;
 	} else if (opcode == SSND) {
 		if(flag[1] != 1) printf("\tSSND(rsb):\t \n");
 		rt = (instruction >> 16) & 0x1F;
 		rsb(reg[rt], serial);
+		opNum[SSND]++;
 	} else if (opcode == ADDIU) {
 		if( im >= 0x8000 ) {
 			im = im | 0xFFFF0000;
@@ -425,7 +474,6 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			if( im >= 0x8000 ) {	//符号拡張
 				im = im & 0x00007FFF;
 				address = (reg[rs]%MEMORYSIZE - im);
-				
 			} else {
 				address = (reg[rs]%MEMORYSIZE + im);
 			}
@@ -453,7 +501,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			Syntax:		lui $t, imm 
 		*/
 		reg[rt] = im << 16;
-		if(flag[1] != 1) printf("\tLUI :\tReg[0x%02X] <- [0x%2X00 (imm)]\n", rt, im);
+		if(flag[1] != 1) printf("\tLUI :\tReg[0x%02X] <- [0x%4X (imm)]\n", rt, im);
 		opNum[LUI]++;
 	} else if (opcode == JAL) {
 		jump = instruction & 0x3FFFFFF;
@@ -463,12 +511,10 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		pc = jump*4 + PCINIT;
 		opNum[JAL]++;
 	} else if (opcode == ORI) {
+		alutemp = reg[rs];
 		reg[rt] = ori(reg[rs], im);
-		if(flag[1] != 1) printf("\t[$%2u:0x%4X] OR? [imm:0x%4X] \t=> [rd:%u] 0x%2X\n", rs, reg[rs], im, rt, reg[rt]);
+		if(flag[1] != 1) printf("\t[reg($%02u):0x%4X] OR? [imm:0x%4X] => [reg(%02u)] 0x%2X\n", rs, alutemp, im, rt, reg[rt]);
 		opNum[OR]++;
-	} else if (opcode == INOUT) {		// シリアルポートから読み込み
-		if(flag[1] != 1) printf("\tIN/OUT \n");
-//		inout();
 	} else {
 		printf("[Unknown OPCODE]\n");
 	}
@@ -683,7 +729,7 @@ int main (int argc, char* argv[]) {
 		if(flag[1] != 1) printf("\n====== next: %u ======\n", ((pc-PCINIT)/4));
 		reg[0] = 0;
 		operation = memory[pAddr] | memory[pAddr+1] << 8 | memory[pAddr+2] << 16 | memory[pAddr+3] << 24;
-		pc = decoder(pc, operation, memory, serialin, serial, breakCount, flag, reg, fpreg, opNum);
+		pc = decoder(pc, operation, memory, serialin, serial, breakCount, flag, reg, fpreg, opNum, fpuNum);
 		if(operation != 0 && flag[3] != 1) {
 			if(flag[1] != 1)  printRegister(reg);	// 命令実行後のレジスタを表示する
 		}
@@ -700,11 +746,14 @@ int main (int argc, char* argv[]) {
 	}
 	if(flag[1] != 0) printf("\n[ FINISHED ]\n");
 	snum = mstart;
-	while(snum%4 != 0) {
-		snum++;
-	}
 
-	printf("\nメモリダンプ\n");
+	
+	if ((mfinish - mstart) > 0) {
+		printf("\nメモリダンプ\n");
+		while(snum%4 != 0) {
+			snum++;
+		}
+	}
 	while((snum < MEMORYSIZE-3) && (snum < mfinish)) {
 //		if(snum >= PCINIT && snum < PCINIT*0x2) {
 //			snum++;
@@ -719,59 +768,48 @@ int main (int argc, char* argv[]) {
 	printf("\nレジスタ吐き出し\n");
 	printRegister(reg);
 
-
 	printf("\n\n");
 	printf("Total instructions: \n\t%llu\n", breakCount);
 	printf("Total instructions (except NOP): \n\t%llu\n", breakCount - opNum[128+NOP]);
 	printf("\n(OP)\t: \t(Num), \t(Ratio)\n");
-	printf("NOP		: %6u, %3.2f (%%)\n", opNum[128+NOP], (double) 100*opNum[ADDIU]/breakCount);
+	if(opNum[128+NOP] != 0) printf("NOP 	: %6u, %05.2f (%%)\n", opNum[128+NOP], (double) 100*opNum[ADDIU]/breakCount);
 //	breakCount = breakCount - opNum[128+NOP];
 /* ops & function */
-	printf("ADDU	: %6u, %3.2f (%%)\n", opNum[128+ADDU], (double) 100*opNum[128+ADDU]/breakCount);
-	printf("ADDIU	: %6u, %3.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount);
-	printf("SUBU	: %6u, %3.2f (%%)\n", opNum[128+SUBU], (double) 100*opNum[128+SUBU]/breakCount);
-	printf("AND 	: %6u, %3.2f (%%)\n", opNum[128+AND], (double) 100*opNum[128+AND]/breakCount);
-	printf("OR  	: %6u, %3.2f (%%)\n", opNum[128+OR], (double) 100*opNum[128+OR]/breakCount);
-	printf("SLL 	: %6u, %3.2f (%%)\n", opNum[128+SLL], (double) 100*opNum[128+SLL]/breakCount);
-	printf("SRL 	: %6u, %3.2f (%%)\n", opNum[128+SRL], (double) 100*opNum[128+SRL]/breakCount);
-	printf("LW  	: %6u, %3.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount);
-	printf("SW  	: %6u, %3.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount);
-	printf("JUMP	: %6u, %3.2f (%%)\n", opNum[JUMP], (double) 100*opNum[JUMP]/breakCount);
-	printf("JAL 	: %6u, %3.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount);
-	printf("JR  	: %6u, %3.2f (%%)\n", opNum[128+JR], (double) 100*opNum[128+JR]/breakCount);
-	printf("BEQ 	: %6u, %3.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount);
-	printf("BNE 	: %6u, %3.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount);
-	printf("SLT 	: %6u, %3.2f (%%)\n", opNum[128+SLT], (double) 100*opNum[128+SLT]/breakCount);
+	printf("ADDU	: %6u, %05.2f (%%)\n", opNum[128+ADDU], (double) 100*opNum[128+ADDU]/breakCount);
+	printf("ADDIU	: %6u, %05.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount);
+	printf("SUBU	: %6u, %05.2f (%%)\n", opNum[128+SUBU], (double) 100*opNum[128+SUBU]/breakCount);
+	printf("AND 	: %6u, %05.2f (%%)\n", opNum[128+AND], (double) 100*opNum[128+AND]/breakCount);
+	printf("OR  	: %6u, %05.2f (%%)\n", opNum[128+OR], (double) 100*opNum[128+OR]/breakCount);
+	printf("SLL 	: %6u, %05.2f (%%)\n", opNum[128+SLL], (double) 100*opNum[128+SLL]/breakCount);
+	printf("SRL 	: %6u, %05.2f (%%)\n", opNum[128+SRL], (double) 100*opNum[128+SRL]/breakCount);
+	printf("LW  	: %6u, %05.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount);
+	printf("SW  	: %6u, %05.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount);
+	printf("JUMP	: %6u, %05.2f (%%)\n", opNum[JUMP], (double) 100*opNum[JUMP]/breakCount);
+	printf("JAL 	: %6u, %05.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount);
+	printf("JR  	: %6u, %05.2f (%%)\n", opNum[128+JR], (double) 100*opNum[128+JR]/breakCount);
+	printf("BEQ 	: %6u, %05.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount);
+	printf("BNE 	: %6u, %05.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount);
+	printf("SLT 	: %6u, %05.2f (%%)\n", opNum[128+SLT], (double) 100*opNum[128+SLT]/breakCount);
+	printf("RRB 	: %6u, %05.2f (%%)\n", opNum[SRCV], (double) 100*opNum[SRCV]/breakCount);
+	printf("RSB 	: %6u, %05.2f (%%)\n", opNum[SSND], (double) 100*opNum[SSND]/breakCount);
 	printf("\n");
-/*
-○ 	○ 	sll 	R-Type: 000000 00000 rt rd sa 000000 	rd <- rt sll sa 	論理左シフト (兼nop)
-○ 	○ 	srl 	R-Type: 000000 00000 rt rd sa 000010 	rd <- rt srl sa 	論理右シフト
-○ 	○ 	lw 	I-Type: 100011 base rt offset 	rt <- M[base+signext(offset)] 	ロード
-○ 	○ 	sw 	I-Type: 101011 base rt offset 	M[base+signext(offset)] <- rt 	ストア
-○ 	○ 	j 	J-Type: 000010 target 	pc <- concat(upper 4 bit of pc, target, 00) 	targetへのジャンプ
-○ 	○ 	jal 	J-Type: 000011 target 	$ra <- pc + 4; pc <- concat(upper 4 bit of pc, target, 00) 	targetへのジャンプ＆リンク
-○ 	○ 	jr 	R-Type: 000000 rs 000000000000000 001000 	pc <- rs 	レジスタの格納値へのジャンプ
-○ 	○ 	beq 	I-Type: 000100 rs rt BranchAddr 	if(rs==rt) pc <- pc + 4 + signext(BranchAddr) 	等しいなら分岐
-○ 	○ 	bne 	I-Type: 000101 rs rt BranchAddr 	if(rs!=rt) pc <- pc + 4 + signext(BranchAddr) 	等しくないなら分岐
-○ 	○ 	slt 	R-Type: 000000 rs rt rd 00000 101010 	rd <- rs < rt ? 1 : 0 	比較 
-*/
 
 /* fpu */
-	printf("BC1F	: %6u, %3.2f (%%)\n", fpuNum[BC1F], (double) 100*fpuNum[BC1F]/breakCount);
-	printf("BC1T	: %6u, %3.2f (%%)\n", fpuNum[BC1T], (double) 100*fpuNum[BC1T]/breakCount);
-	printf("FMFC	: %6u, %3.2f (%%)\n", fpuNum[FMFC], (double) 100*fpuNum[FMFC]/breakCount);
-	printf("FMTC	: %6u, %3.2f (%%)\n", fpuNum[FMTC], (double) 100*fpuNum[FMTC]/breakCount);
-	printf("MOVSF	: %6u, %3.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
-	printf("FADD.S	: %6u, %3.2f (%%)\n", fpuNum[FADDS], (double) 100*fpuNum[FADDS]/breakCount);
-	printf("FSUB.S	: %6u, %3.2f (%%)\n", fpuNum[FSUBS], (double) 100*fpuNum[FSUBS]/breakCount);
-	printf("FMUL.S	: %6u, %3.2f (%%)\n", fpuNum[FMULS], (double) 100*fpuNum[FMULS]/breakCount);
-	printf("FDIV.S	: %6u, %3.2f (%%)\n", fpuNum[FDIVS], (double) 100*fpuNum[FDIVS]/breakCount);
-	printf("CEQ		: %6u, %3.2f (%%)\n", fpuNum[CEQ], (double) 100*fpuNum[CEQ]/breakCount);
-	printf("COLT	: %6u, %3.2f (%%)\n", fpuNum[COLT], (double) 100*fpuNum[COLT]/breakCount);
-	printf("COLE	: %6u, %3.2f (%%)\n", fpuNum[COLE], (double) 100*fpuNum[COLE]/breakCount);
-	printf("FTOI	: %6u, %3.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
-	printf("ITOF	: %6u, %3.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
-
+	printf("BC1F	: %6u, %05.2f (%%)\n", fpuNum[BC1F], (double) 100*fpuNum[BC1F]/breakCount);
+	printf("BC1T	: %6u, %05.2f (%%)\n", fpuNum[BC1T], (double) 100*fpuNum[BC1T]/breakCount);
+	printf("FMFC	: %6u, %05.2f (%%)\n", fpuNum[FMFC], (double) 100*fpuNum[FMFC]/breakCount);
+	printf("FMTC	: %6u, %05.2f (%%)\n", fpuNum[FMTC], (double) 100*fpuNum[FMTC]/breakCount);
+	printf("MOVSF	: %6u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
+	printf("FADD.S	: %6u, %05.2f (%%)\n", fpuNum[FADDS], (double) 100*fpuNum[FADDS]/breakCount);
+	printf("FSUB.S	: %6u, %05.2f (%%)\n", fpuNum[FSUBS], (double) 100*fpuNum[FSUBS]/breakCount);
+	printf("FMUL.S	: %6u, %05.2f (%%)\n", fpuNum[FMULS], (double) 100*fpuNum[FMULS]/breakCount);
+	printf("FDIV.S	: %6u, %05.2f (%%)\n", fpuNum[FDIVS], (double) 100*fpuNum[FDIVS]/breakCount);
+	printf("CEQ 	: %6u, %05.2f (%%)\n", fpuNum[CEQ], (double) 100*fpuNum[CEQ]/breakCount);
+	printf("COLT	: %6u, %05.2f (%%)\n", fpuNum[COLT], (double) 100*fpuNum[COLT]/breakCount);
+	printf("COLE	: %6u, %05.2f (%%)\n", fpuNum[COLE], (double) 100*fpuNum[COLE]/breakCount);
+	printf("FTOI	: %6u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
+	printf("ITOF	: %6u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
+	printf("FSQRT	: %6u, %05.2f (%%)\n", fpuNum[SQRT], (double) 100*fpuNum[SQRT]/breakCount);
 
 /*
 #define FTOIF 0x24	// Function
