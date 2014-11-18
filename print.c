@@ -28,9 +28,9 @@ void printFPRegister(unsigned int* fpreg) {
 
 //	printf("R[Condition] ZVNC = %X/%X/%X/%X \n", rZ, rV, rN, rCarry);
 	for(i=0; i<FPREGSIZE; i++) {
-		if(i%8 == 0) {
-			printf("\tFP[%2d->%2d] : %8X ", i, i+7, fpreg[i]);
-		} else if( (i+1)%8 == 0 ) {
+		if(i%4 == 0) {
+			printf("\tFP[%2d->%2d] : %8X ", i, i+3, fpreg[i]);
+		} else if( (i+1)%4 == 0 ) {
 			printf("%8X(",fpreg[i]);
 //			printFloat(fpreg[i]);
 			printf(")\n");

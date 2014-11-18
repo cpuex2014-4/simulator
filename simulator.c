@@ -65,13 +65,14 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			if(flag[1] != 1)  printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs);
 			fputemp = fpreg[23] & 0x800000;
 			if(fputemp == 0) {
-				pc = pc + 4 + signExt(target);
+				pc = pc + 4 + signExt(target)*4;
 			}
 			fpuNum[BC1F]++;
 		} else if(ft == 1) {	// Trueで分岐
 			fputemp = fpreg[23] & 0x800000;
 			if(fputemp == 0x800000) {
-				pc = pc + 4 + signExt(target);
+				pc = pc + 4 + signExt(target)*4;
+				if(flag[1] != 1) printf("\tBC1T : jump -> 0x%X\n", pc);
 			}
 			fpuNum[BC1T]++;
 		} else {
@@ -208,7 +209,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				}
 				break;
 			default :
-				printf("Default FPswitch has selected.\n");
+				printf("Unknown FPswitch has selected.\n");
 		}
 	}
 	if(flag[1] != 1 || flag[3] != 1) printFPRegister(fpreg);
@@ -242,7 +243,7 @@ unsigned int rrb(unsigned char* serialin) {
 unsigned int rsb(unsigned int rt, unsigned char* serial) {
 	static unsigned int numout = 0;
 	serial[numout] = (unsigned char) (rt & 0xFF);
-	printf("\t[ DEBUG ]\tSERIALOUT rt[%u](%02X):%02X\n", numout, rt, serial[numout]);
+	printf("\t[ DEBUG ]\tSERIALOUT(%04u) rt(%02X):%02X\n", numout, rt, serial[numout]);
 	numout++;
 	return 0;
 }
@@ -369,7 +370,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 			opNum[128+OR]++;
 			break;
 		default :
-			printf("Default switch has selected.\n");
+			printf("Unknown switch has selected.\n");
 	}
 	return pc;
 }
@@ -408,7 +409,6 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		opNum[SRCV]++;
 	} else if (opcode == SSND) {
 		if(flag[1] != 1) printf("\tSSND(rsb):\t \n");
-		rt = (instruction >> 16) & 0x1F;
 		rsb(reg[rt], serial);
 		opNum[SSND]++;
 	} else if (opcode == ADDIU) {
@@ -578,12 +578,6 @@ int main (int argc, char* argv[]) {
 		return -1;
 	}
 
-/*	for(count=0; count<MEMORYSIZE; count++) {
-		memory[count] = 0;
-		if(memory[count] != 0) printf("memory\n");
-		count++;
-	}
-*/
 	/* 引数として<ファイル:メモリ>をとる。なければ強制終了 */
 	if (argc < 2) {
 		printhelp();
@@ -644,10 +638,6 @@ int main (int argc, char* argv[]) {
 /*	if(flag[1] != 1) {
 		while(count<40) {
 			if(opBuff[count] != 0) printf("%02u(pc:%2X):\t%8X\n", count, (count)*4, opBuff[count]);
-			count++;
-		}
-		while(count<40) {
-			if(srBuff[count] != 0) printf("SR %02u:\t%8X\n", count, srBuff[count]);
 			count++;
 		}
 	}
