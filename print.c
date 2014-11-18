@@ -48,7 +48,7 @@ void printFPRegister(unsigned int* fpreg) {
 			printf("%12X\n",fpreg[i]);
 			for(j=i-3;j<i+1;j++) {
 				if(j%4 == 0) {
-					printf("\t\t\t\t %12.3f ", printFloat(fpreg[j]));
+					printf("\t             %12.3f ", printFloat(fpreg[j]));
 				} else if( (j+1)%4 == 0 ) {
 					printf("%12.3f\n",printFloat(fpreg[j]));
 					break;
