@@ -29,30 +29,38 @@ void printhelp(void) {
 
 }
 
-void printFloat(unsigned int fpreg) {
+float printFloat(unsigned int fpreg) {
 	uni temp;
-	float ret;
 	temp.u = fpreg;
-	ret = temp.f;
-	printf("%f", ret);
+	return temp.f;
 }
 
 /* FPレジスタ内容表示器 */
 void printFPRegister(unsigned int* fpreg) {
 // unsigned int rZ, rV, rN, rCarry;	// condition register
-	int i;
+	int i=0,j=0;
 
 //	printf("R[Condition] ZVNC = %X/%X/%X/%X \n", rZ, rV, rN, rCarry);
 	for(i=0; i<FPREGSIZE; i++) {
 		if(i%4 == 0) {
-			printf("\tFP[%2d->%2d] : %8X ", i, i+3, fpreg[i]);
+			printf("\tFP[%2d->%2d] : %12X ", i, i+3, fpreg[i]);
 		} else if( (i+1)%4 == 0 ) {
-			printf("%8X(",fpreg[i]);
-//			printFloat(fpreg[i]);
-			printf(")\n");
+			printf("%12X\n",fpreg[i]);
+			for(j=i-3;j<i+1;j++) {
+				if(j%4 == 0) {
+					printf("\t\t\t\t %12.3f ", printFloat(fpreg[j]));
+				} else if( (j+1)%4 == 0 ) {
+					printf("%12.3f\n",printFloat(fpreg[j]));
+					break;
+				} else {
+					printf("%12.3f ",printFloat(fpreg[j]));
+				}
+			}
 		} else {
-			printf("%8X ",fpreg[i]);
+			printf("%12X ",fpreg[i]);
 		}
+
+
 	}
 
 	printf("\n");

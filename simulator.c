@@ -48,13 +48,6 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 	fs  = (instruction >> 11 ) & 0x1F;
 	fd  = (instruction >> 6 ) & 0x1F;
 
-	if(0) { pc=pc; }
-/*
-○ 			mfc1 				010001 00000 rt 	fs 00000 000000 	rt <- fs 	FPUレジスタ → 汎用レジスタ
-○ 			mtc1 				010001 00100 rt 	fs 00000 000000 	fs <- rt 	汎用レジスタ → FPUレジスタ
-○ 			mov.s 				010001 10000 00000 	fs fd 000110 	fd <- fs 	FPUレジスタ移動
-○ 			add.s fd, fs, ft 	010001 10000 ft 	fs fd 000000 
-*/
 	fpfunction = instruction & 0x3F;
 	if (fmt == BC1) {
 		target = instruction & 0xFFFF;
@@ -63,18 +56,20 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			fputemp = fpreg[23] & 0x800000;
 			if(fputemp == 0) {
 				pc = pc + 4 + signExt(target)*4;
+				jumpFlg = 1;
 				if(flag[1] != 1) printf("\tBC1F : jump -> 0x%X\n", pc);
 			} else {
-				if(flag[1] != 1) printf("\tBC1F : NOP\n");
+				if(flag[1] != 1) printf("\tBC1F : <NOP>\n");
 			}
 			fpuNum[BC1F]++;
 		} else if(ft == 1) {	// Trueで分岐
 			fputemp = fpreg[23] & 0x800000;
 			if(fputemp == 0x800000) {
 				pc = pc + 4 + signExt(target)*4;
+				jumpFlg = 1;
 				if(flag[1] != 1) printf("\tBC1T : jump -> 0x%X\n", pc);
 			} else {
-				if(flag[1] != 1) printf("\tBC1T : NOP\n");
+				if(flag[1] != 1) printf("\tBC1T : <NOP>\n");
 			}
 			fpuNum[BC1T]++;
 		} else {
@@ -88,11 +83,11 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			case (0) :
 				if(fmt == MFC1M) {
 					reg[rt] = fpreg[fs];
-					if(flag[1] != 1) printf("\tMFC1 : $%02u <- $FP%02u\n", rt, fs);
+					if(flag[1] != 1) printf("\tMFC1 : $%02u <- $FP%02u(%08X)\n", rt, fs, fpreg[fs]);
 					fpuNum[FMFC]++;
 				} else if (fmt == MTC1M) {
 					fpreg[fs] = reg[rt];
-					if(flag[1] != 1) printf("\tMTC1 : $FP%02u <- $%02u\n", fs, rt);
+					if(flag[1] != 1) printf("\tMTC1 : $FP%02u <- $%02u(%08X)\n", fs, rt, reg[rt]);
 					fpuNum[FMTC]++;
 				} else if (fmt == 0x10) {
 					if (fd == fs)
@@ -188,7 +183,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					} else {
 						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
 					}
-					if(flag[1] != 1) printf("\tC.EQ : ?(($FP%02u)%X == ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+					if(flag[1] != 1) printf("\tC.EQ : ?( ($FP%02u)%X == ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
 					fpuNum[CEQ]++;
 				}
 				break;
@@ -199,7 +194,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					} else {
 						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
 					}
-					if(flag[1] != 1) printf("\tC.OLT : ?(($FP%02u)%X < ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+					if(flag[1] != 1) printf("\tC.OLT : ?( ($FP%02u)%X < ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
 					fpuNum[COLT]++;
 				}
 				break;
@@ -210,7 +205,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					} else {
 						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
 					}
-					if(flag[1] != 1) printf("\tC.OLE : ?(($FP%02u)%X <= ($FP%02u)%X) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
+					if(flag[1] != 1) printf("\tC.OLE : ?( ($FP%02u)%X <= ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]);
 					fpuNum[COLE]++;
 				}
 				break;
@@ -519,7 +514,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	} else if (opcode == ORI) {
 		alutemp = reg[rs];
 		reg[rt] = ori(reg[rs], im);
-		if(flag[1] != 1) printf("\t[reg($%02u):0x%4X] OR? [imm:0x%4X] => [reg(%02u)] 0x%2X\n", rs, alutemp, im, rt, reg[rt]);
+		if(flag[1] != 1) printf("\t[reg($%02u):0x%4X] OR? [imm:0x%4X] => [reg($%02u)] 0x%2X\n", rs, alutemp, im, rt, reg[rt]);
 		opNum[OR]++;
 	} else {
 		printf("[Unknown OPCODE]\n");
