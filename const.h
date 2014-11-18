@@ -8,6 +8,7 @@
 #define BUFF 65536
 #define MEMORYSIZE (1024u*1024u*2u)
 #define DATAOFFSET 0xFFFFFF
+#define OPNUM	256
 
 /* opcode */
 #define JUMP  0x2
@@ -58,6 +59,11 @@
 #define FTOIM 0x10	// fMt
 #define ITOFM 0x14	// fMt
 
+/* fpopNum */
+#define FMFC 0x0
+#define FMTC 0x0
+#define BC1F 0x0
+#define BC1T 0x0
 
 
 /* argument */
