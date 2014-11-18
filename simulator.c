@@ -56,9 +56,6 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 ○ 			add.s fd, fs, ft 	010001 10000 ft 	fs fd 000000 
 */
 	fpfunction = instruction & 0x3F;
-	if(instruction != 0 && flag[1] != 1) {
-		printf("\t[fpfunction:%2X]\n", fpfunction);
-	}
 	if (fmt == BC1) {
 		target = instruction & 0xFFFF;
 		if (ft == 0) {		// falseで分岐
@@ -66,6 +63,9 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			fputemp = fpreg[23] & 0x800000;
 			if(fputemp == 0) {
 				pc = pc + 4 + signExt(target)*4;
+				if(flag[1] != 1) printf("\tBC1F : jump -> 0x%X\n", pc);
+			} else {
+				if(flag[1] != 1) printf("\tBC1F : NOP\n");
 			}
 			fpuNum[BC1F]++;
 		} else if(ft == 1) {	// Trueで分岐
@@ -73,12 +73,17 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			if(fputemp == 0x800000) {
 				pc = pc + 4 + signExt(target)*4;
 				if(flag[1] != 1) printf("\tBC1T : jump -> 0x%X\n", pc);
+			} else {
+				if(flag[1] != 1) printf("\tBC1T : NOP\n");
 			}
 			fpuNum[BC1T]++;
 		} else {
 			printf("\t[ ERROR ]\tUnknown BC1 option(fmt == 0 && (ft != 0 || ft != 1))\n");
 		}		
 	} else {
+		if(instruction != 0 && flag[1] != 1) {
+			printf("\t[fpfunction:%2X]\n", fpfunction);
+		}
 		switch (fpfunction) {
 			case (0) :
 				if(fmt == MFC1M) {
@@ -92,14 +97,15 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				} else if (fmt == 0x10) {
 					if (fd == fs)
 						fputemp = fpreg[fs];
-					else if (fd == ft)
+					else
 						fputemp = fpreg[ft];
 					fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
 					if(flag[1] != 1) {
 						if (fd == fs)
 							printf("\tFADD : ($FP%02u)%X = ($FP%02u)%X + ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fputemp);
-						else if (fd == ft)
+						else {
 							printf("\tFADD : ($FP%02u)%X = ($FP%02u)%X + ($FP%02u)%X\n", fd, fpreg[fd], ft, fputemp, fs, fpreg[fs]);
+						}
 					}
 					fpuNum[FADDS]++;
 				} else {

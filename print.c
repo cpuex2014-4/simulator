@@ -4,6 +4,15 @@
 #include "const.h"
 #include "print.h"
 
+typedef union {
+  struct {
+    uint32_t frac: 23;
+    uint32_t exp: 8;
+    uint32_t sign: 1;
+  } Float;
+  float f;
+  uint32_t u;
+} uni;
 
 void printhelp(void) {
 	printf("使用法: sim [入力ファイル] [オプション1] <num> [オプション2] <num1> <num2>...\n");
@@ -20,6 +29,13 @@ void printhelp(void) {
 
 }
 
+void printFloat(unsigned int fpreg) {
+	uni temp;
+	float ret;
+	temp.u = fpreg;
+	ret = temp.f;
+	printf("%f", ret);
+}
 
 /* FPレジスタ内容表示器 */
 void printFPRegister(unsigned int* fpreg) {
