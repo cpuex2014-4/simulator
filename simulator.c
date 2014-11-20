@@ -397,6 +397,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	rs = (instruction >> 21) & 0x1F;
 	rt = (instruction >> 16) & 0x1F;
 	im = instruction & 0xFFFF;
+	line = im;
 
 	if(instruction != 0 && flag[1] != 1) {
 		printf("[ops: %06llu,pc: 0x%x]\n", breakCount, pc);
