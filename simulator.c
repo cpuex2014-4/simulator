@@ -353,8 +353,8 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 				opNum[128+NOP]++;
 				break;
 			}
-			reg[rd] = sll(reg[rs], shamt);
-			if(flag[1] != 1) printf("\tSLL :\t%u << %u -> %u\n", reg[rs], shamt, reg[rd]);
+			reg[rd] = sll(reg[rt], shamt);
+			if(flag[1] != 1) printf("\tSLL :\t%u << %u -> %u\n", reg[rt], shamt, reg[rd]);
 			opNum[128+SLL]++;
 			break;
 		case (SRL) :
@@ -362,8 +362,8 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 				printf("\tNOP\n");
 				opNum[128+NOP]++;
 				break;
-			reg[rd] = srl(reg[rs], shamt);
-			if(flag[1] != 1) printf("\tSRL :\t%u << %u -> %u\n", reg[rs], shamt, reg[rd]);
+			reg[rd] = srl(reg[rt], shamt);
+			if(flag[1] != 1) printf("\tSRL :\t%u << %u -> %u\n", reg[rt], shamt, reg[rd]);
 			opNum[128+SRL]++;
 			break;
 		case (AND) :
@@ -387,9 +387,8 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	unsigned int rt=0;
 	unsigned int rs=0;
 	unsigned int rs_original;
-	unsigned int im=0;
+	int im=0;
 	unsigned int jump=0;
-	unsigned int line=0;
 	unsigned int address=0;
 	unsigned int alutemp=0;
 
@@ -397,14 +396,12 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	rs = (instruction >> 21) & 0x1F;
 	rt = (instruction >> 16) & 0x1F;
 	im = instruction & 0xFFFF;
-	line = im;
 
 	if(instruction != 0 && flag[1] != 1) {
 		printf("[ops: %06llu,pc: 0x%x]\n", breakCount, pc);
 		printf("[instruction: 0x%2X]\n", instruction);
 		printf("\t[opcode:%2X]\n", opcode);
 	}
-
 	/* 適当な時にswitch文に切り替え */
 	if(opcode == 0) {
 		pc = funct(pc, instruction, flag, reg, opNum, labelRec);
@@ -437,11 +434,13 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		printf("\t\tlabelRec(%04X):%u\n", (pc-PCINIT)/4, labelRec[pc]);
 		opNum[JUMP]++;
 	} else if (opcode == BEQ) { // beq I-Type: 000100 rs rt BranchAddr 	等しいなら分岐 
-		if(flag[1] != 1) printf("\tBEQ :\t?([$%2u 0x%2X]=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4);
+	  int temp = instruction & 0xFFFF;
+	  int diff = (temp >= (1<<15)) ? temp-(1<<16) : temp; //diff はtempの符号拡張
+		if(flag[1] != 1) printf("\tBEQ :\t?([$%2u 0x%2X]=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4);
 		if(reg[rs] == reg[rt]) {
 			jumpFlg = 1;
-			// 0x48 = 0x20 + 4 + line*4 +0x0	<-> line*4 = 0x48-0x24 <-> line = 9
-			pc = pc + 4 + line*4;		// pAddr形式
+			// 0x48 = 0x20 + 4 + diff*4 +0x0	<-> diff*4 = 0x48-0x24 <-> diff = 9
+			pc = pc + 4 + diff*4;		// pAddr形式
 			labelRec[pc]++;
 		printf("\t\tlabelRec(%04X):%u\n", (pc-PCINIT)/4, labelRec[pc]);
 			if(flag[1] != 1) printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc);
@@ -449,16 +448,22 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			if(flag[1] != 1) printf("\t<FALSE & NOP>\n");
 		}
 		opNum[BEQ]++;
-	} else if (opcode == BNE) { // bne I-Type: 000100 rs rt BranchAddr 	等しくないなら分岐 
-		if(flag[1] != 1) printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + line*4);
+	} else if (opcode == BNE) { // bne I-Type: 000101 rs rt BranchAddr 	等しくないなら分岐 
+	  int temp = instruction & 0xFFFF;
+	  int diff = (temp >= (1<<15)) ? temp-(1<<16) : temp; //diff はtempの符号拡張
+	  if(flag[1] != 1) printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4);
 		if(reg[rs] != reg[rt]) {
-			jumpFlg = 1;
-			pc = pc + 4 + line*4;		// pAddr形式
-			labelRec[pc]++;
-		printf("\t\tlabelRec(%04X):%u\n", (pc-PCINIT)/4, labelRec[pc]);
-			if(flag[1] != 1) printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc);
+		  jumpFlg = 1;
+		  pc = pc + 4 + diff*4;		// pAddr形式
+		  labelRec[pc]++;
+		  printf("\t\tlabelRec(%04X):%u\n", (pc-PCINIT)/4, labelRec[pc]);
+		  if(flag[1] != 1) {
+			printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc);
+		  }
 		} else {
-			if(flag[1] != 1) printf("\t<FALSE & NOP>\n");
+		  if(flag[1] != 1) {
+			printf("\t<FALSE & NOP>\n");
+		  }
 		}
 		opNum[BNE]++;
 	} else if (opcode == LW) {	// 0x47: lw r1, 0xaaaa(r2) : r2+0xaaaaのアドレスにr1を32ビットでロード
