@@ -358,10 +358,11 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 			opNum[128+SLL]++;
 			break;
 		case (SRL) :
-			if(rs == 0 && shamt == 0)
+			if(rs == 0 && shamt == 0) {
 				printf("\tNOP\n");
 				opNum[128+NOP]++;
 				break;
+			}
 			reg[rd] = srl(reg[rt], shamt);
 			if(flag[1] != 1) printf("\tSRL :\t%u << %u -> %u\n", reg[rt], shamt, reg[rd]);
 			opNum[128+SRL]++;
