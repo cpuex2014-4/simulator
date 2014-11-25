@@ -2,13 +2,14 @@
 #define CONST_H
 
 /* general */
-#define PCINIT 0x4000
-#define REGSIZE 32
-#define FPREGSIZE 32
-#define BUFF 65536
-#define MEMORYSIZE (1024u*1024u*2u)
-#define DATAOFFSET 0xFFFFFF
-#define OPNUM	256
+#define PCINIT		0x0
+#define REGSIZE		32
+#define FPREGSIZE	32
+#define BUFF		65536
+#define MEMORYSIZE	(1024u*1024u*2u)
+#define DATAOFFSET	0xFFFFFF
+#define OPNUM		256
+#define FLAGSIZAE	32
 
 /* opcode */
 #define JUMP  0x2
@@ -82,6 +83,11 @@
 #define REGSP 29
 #define REGFP 30
 #define REGRA 31
+
+/* flags */
+#define HIDEIND	1
+#define PRINTREGIND	3
+#define JUMPFLAG 30
 
 
 #endif
