@@ -120,4 +120,45 @@ void printRegister(unsigned int* reg) {
 	printf("\n");
 }
 
+void printOpsCount(unsigned int opNum[], unsigned int fpuNum[], unsigned long long breakCount) {
+/* ops & function */
+	printf("ADDU	: %6u, %05.2f (%%)\n", opNum[128+ADDU], (double) 100*opNum[128+ADDU]/breakCount);
+	printf("ADDIU	: %6u, %05.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount);
+	printf("SUBU	: %6u, %05.2f (%%)\n", opNum[128+SUBU], (double) 100*opNum[128+SUBU]/breakCount);
+	printf("AND 	: %6u, %05.2f (%%)\n", opNum[128+AND], (double) 100*opNum[128+AND]/breakCount);
+	printf("AND 	: %6u, %05.2f (%%)\n", opNum[ANDI], (double) 100*opNum[ANDI]/breakCount);
+	printf("OR  	: %6u, %05.2f (%%)\n", opNum[128+OR], (double) 100*opNum[128+OR]/breakCount);
+	printf("SLL 	: %6u, %05.2f (%%)\n", opNum[128+SLL], (double) 100*opNum[128+SLL]/breakCount);
+	printf("SRL 	: %6u, %05.2f (%%)\n", opNum[128+SRL], (double) 100*opNum[128+SRL]/breakCount);
+	printf("LW  	: %6u, %05.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount);
+	printf("SW  	: %6u, %05.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount);
+	printf("JUMP	: %6u, %05.2f (%%)\n", opNum[JUMP], (double) 100*opNum[JUMP]/breakCount);
+	printf("JAL 	: %6u, %05.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount);
+	printf("JR  	: %6u, %05.2f (%%)\n", opNum[128+JR], (double) 100*opNum[128+JR]/breakCount);
+	printf("BEQ 	: %6u, %05.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount);
+	printf("BNE 	: %6u, %05.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount);
+	printf("SLT 	: %6u, %05.2f (%%)\n", opNum[128+SLT], (double) 100*opNum[128+SLT]/breakCount);
+	printf("RRB 	: %6u, %05.2f (%%)\n", opNum[SRCV], (double) 100*opNum[SRCV]/breakCount);
+	printf("RSB 	: %6u, %05.2f (%%)\n", opNum[SSND], (double) 100*opNum[SSND]/breakCount);
+	printf("\n");
+
+/* fpu */
+	printf("BC1F	: %6u, %05.2f (%%)\n", fpuNum[BC1F], (double) 100*fpuNum[BC1F]/breakCount);
+	printf("BC1T	: %6u, %05.2f (%%)\n", fpuNum[BC1T], (double) 100*fpuNum[BC1T]/breakCount);
+	printf("FMFC	: %6u, %05.2f (%%)\n", fpuNum[FMFC], (double) 100*fpuNum[FMFC]/breakCount);
+	printf("FMTC	: %6u, %05.2f (%%)\n", fpuNum[FMTC], (double) 100*fpuNum[FMTC]/breakCount);
+	printf("MOVSF	: %6u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
+	printf("FADD.S	: %6u, %05.2f (%%)\n", fpuNum[FADDS], (double) 100*fpuNum[FADDS]/breakCount);
+	printf("FSUB.S	: %6u, %05.2f (%%)\n", fpuNum[FSUBS], (double) 100*fpuNum[FSUBS]/breakCount);
+	printf("FMUL.S	: %6u, %05.2f (%%)\n", fpuNum[FMULS], (double) 100*fpuNum[FMULS]/breakCount);
+	printf("FDIV.S	: %6u, %05.2f (%%)\n", fpuNum[FDIVS], (double) 100*fpuNum[FDIVS]/breakCount);
+	printf("CEQ 	: %6u, %05.2f (%%)\n", fpuNum[CEQ], (double) 100*fpuNum[CEQ]/breakCount);
+	printf("COLT	: %6u, %05.2f (%%)\n", fpuNum[COLT], (double) 100*fpuNum[COLT]/breakCount);
+	printf("COLE	: %6u, %05.2f (%%)\n", fpuNum[COLE], (double) 100*fpuNum[COLE]/breakCount);
+	printf("FTOI	: %6u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
+	printf("ITOF	: %6u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount);
+	printf("FSQRT	: %6u, %05.2f (%%)\n", fpuNum[SQRT], (double) 100*fpuNum[SQRT]/breakCount);
+
+}
+
 

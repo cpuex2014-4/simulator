@@ -6,10 +6,13 @@
 #define REGSIZE		32
 #define FPREGSIZE	32
 #define BUFF		65536
+#define FILESIZE	0xFFFFFFu
 #define MEMORYSIZE	(1024u*1024u*2u)
 #define DATAOFFSET	0xFFFFFF
 #define OPNUM		256
 #define FLAGSIZAE	32
+#define BLOCKRAM	0x00007FFF
+#define LINE		512
 
 /* opcode */
 #define JUMP  0x2
@@ -17,6 +20,7 @@
 #define BEQ   0x4
 #define BNE   0x5
 #define ADDIU 0x9
+#define ANDI  0xC
 #define ORI   0xD
 #define LUI   0xF
 #define FPU   0x11
@@ -85,9 +89,19 @@
 #define REGRA 31
 
 /* flags */
-#define HIDEIND	1
+#define HIDEIND		1
 #define PRINTREGIND	3
-#define JUMPFLAG 30
+#define UNKNOWNFUNC	28
+#define UNKNOWNOP	29
+#define JUMPFLAG	30
+#define SDATA		31
+
+/* special */
+#define MMIO			0xFFFF0000
+#define MMIOREADRDY		0xFFFF0000
+#define MMIOREAD		0xFFFF0004
+#define MMIOWRITERDY	0xFFFF0008
+#define MMIOWRITE		0xFFFF000C
 
 
 #endif
