@@ -626,7 +626,6 @@ int main (int argc, char* argv[]) {
 	unsigned char *input;
 	unsigned int *memory;
 	unsigned char *srOut;
-	unsigned char *srIn;
 	unsigned int operation;	// 実行中命令
 
 	unsigned int reg[REGSIZE];	// 32 register
@@ -670,11 +669,6 @@ int main (int argc, char* argv[]) {
 	srOut = (unsigned char *) calloc( MEMORYSIZE, sizeof(unsigned char) );
 	if(srOut == NULL) {
 		perror("memory allocation error (srOut)\n");
-		return -1;
-	}
-	srIn = (unsigned char *) calloc( MEMORYSIZE, sizeof(unsigned char) );
-	if(srIn == NULL) {
-		perror("memory allocation error (srIn)\n");
 		return -1;
 	}
 
@@ -922,8 +916,10 @@ int main (int argc, char* argv[]) {
 	memory = NULL;
 	free(srOut);
 	srOut = NULL;
-	free(srIn);
-	srIn = NULL;
+	free(opBuff);
+	opBuff = NULL;
+	free(input);
+	input = NULL;
 
 	if(flag[8] == 1) {
 		fclose(soFile);
