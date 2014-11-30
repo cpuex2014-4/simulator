@@ -591,7 +591,7 @@ Memory-Mapped I/Oを採用しました。
 }
 
 int main (int argc, char* argv[]) {
-	unsigned int opBuff[BUFF];	// ファイルから読み込む命令列
+	unsigned int* opBuff;	// ファイルから読み込む命令列
 //	int srRead=0;
 	int fd1 = 0, fd2 = 0;
 	unsigned int maxpc;
@@ -622,12 +622,17 @@ int main (int argc, char* argv[]) {
 //	int orderNum;
 	/* flag[0]:help flag[HIDEIND]:hide flag[5]:sequential  */
 	for(count=0;count<BUFF;count++) {
-		opBuff[count]=0;
+//		opBuff[count]=0;
 		labelRec[count]=0;
 	}
 	
 	count=0;
 //	printf("\n\t====== Initialize ======\n");
+	opBuff = (unsigned int *) calloc( FILESIZE, sizeof(unsigned int) );
+	if(opBuff == NULL) {
+		perror("memory allocation error (opBuff)\n");
+		return -1;
+	}
 	input = (unsigned char *) calloc( FILESIZE, sizeof(unsigned char) );
 	if(input == NULL) {
 		perror("memory allocation error (input)\n");
@@ -747,7 +752,7 @@ int main (int argc, char* argv[]) {
 		if (opBuff[count] == 0xFFFFFFFF) {
 			flag[SDATA] = 1;
 			maxpc=(count+1)*4;
-			printf("[ DEBUG ]\tprogram has finished at %u.\n", count);
+			fprintf(stderr, "[ DEBUG ]\tprogram has finished at %u.\n", count);
 			break;
 		}
 		if ( (opBuff[count] != 0) && (flag[SDATA] == 0) ) {
@@ -765,6 +770,20 @@ int main (int argc, char* argv[]) {
 	for(i=0; i<32; i++) {
 		memory[4*count+i+PCINIT] = 0x0;
 	}
+	srCount=0;
+	while(count*4 < FILESIZE && count < BUFF) {
+		input[4*srCount] = opBuff[count] & 0xFF;
+		input[4*srCount+1] = (opBuff[count] >> 8) & 0xFF;
+		input[4*srCount+2] = (opBuff[count] >> 16) & 0xFF;
+		input[4*srCount+3] = opBuff[count] >> 24;
+
+		srCount++;
+		count++;
+	}
+	/* デバッグ用ループ ここから */
+	
+	/* デバッグ用ループ ここまで */
+
 	pc=0;
 	/* 初期化ここまで */
 
