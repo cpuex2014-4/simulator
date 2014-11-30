@@ -378,7 +378,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 	return pc;
 }
 /* デコーダ */
-unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* srIn, unsigned char* srOut, unsigned long long breakCount, int* flag, unsigned int* reg, unsigned int* fpreg, unsigned int* opNum, unsigned int* fpuNum, unsigned int* labelRec) {
+unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* input, unsigned char* srOut, unsigned long long breakCount, int* flag, unsigned int* reg, unsigned int* fpreg, unsigned int* opNum, unsigned int* fpuNum, unsigned int* labelRec, FILE* soFile) {
 	unsigned int opcode=0;
 	unsigned int rt=0;
 	unsigned int rs=0;
@@ -388,6 +388,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	unsigned int address=0;
 	unsigned int alutemp=0;
 	static unsigned char srInCount = 0;
+	unsigned int writeCond;
 
 	opcode = instruction >> 26;	// opcode: 6bitの整数
 	rs = (instruction >> 21) & 0x1F;
@@ -465,7 +466,6 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		opNum[BNE]++;
 	} else if (opcode == LW) {	// 0x47: lw r1, 0xaaaa(r2) : r2+0xaaaaのアドレスにr1を32ビットでロード
 		opNum[LW]++;
-		if(flag[HIDEIND] != 1) { printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n", address, memory[address]); }
 /*
 Memory-Mapped I/Oを採用しました。
 
@@ -488,66 +488,91 @@ Memory-Mapped I/Oを採用しました。
 */
 		/* Memory mapped I/O対応 */
 		if( (reg[rs] & MMIO) > 0) {
-			if(reg[rs] == MMIOREADRDY) {
-				reg[rt] = 1;
-				if(flag[HIDEIND] != 1) { printf("\tMMIOREAD_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
-			} else if (reg[rs] == 0xFFFF000C) {
-//				reg[rt] = input;
-			}
-		}
-
-		if( im >= 0x8000 ) {	//imは16bit
-			im = im & 0x00007FFF;
-			if(flag[HIDEIND] != 1) { printf("(im:0x%X)", im); }
-			address = (reg[rs] + MEMORYSIZE - im);
-		} else {
-			address = (reg[rs]+im);
-		}
-		if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
-			fprintf(stderr, "[ INFO ] Memory overflow\n");
-		}
-
-//		address = address % MEMORYSIZE;
-		reg[rt] = lw(address, memory);
-		if(flag[HIDEIND] != 1) { printf("\t\treg[rt(%u)] = 0x%X\n", rt, reg[rt]); }
-	} else if (opcode == SW) {
-		// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm番地に書き込む
-		opNum[SW]++;
-		/* Memory mapped I/O対応 */
-		if( (reg[rs] & 0xFFFF0000) > 0) {
-
-
-
-		}
-
-
-		if(reg[rs] > MEMORYSIZE) {	/* <残>メモリの仕様変更を反映させる 現状だと確実にバグ */
-			if(flag[HIDEIND] != 1) { printf("(im:0x%X)/(reg[rs]:0x%X)\n", im, reg[rs]); }
-			if( im >= 0x8000 ) {	//符号拡張
-				im = im & 0x00007FFF;
-				address = (reg[rs]%MEMORYSIZE - im);
-			} else {
-				address = (reg[rs]%MEMORYSIZE + im);
-			}
-		} else {
-			if( im >= 0x8000 ) {	//符号拡張
-				im = im & 0x00007FFF;
+			if( im >= 0x8000 ) {	//imは16bit
+				if(flag[HIDEIND] != 1) { printf("(im:0x%X)", im); }
 				address = (reg[rs] - im);
 			} else {
 				address = (reg[rs] + im);
 			}
+			if(address == MMIOREADRDY) {
+				reg[rt] = 1;
+				if(flag[HIDEIND] != 1) { printf("\tMMIOREAD_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
+			} else if (address == MMIOREAD) {
+				reg[rt] = input[srInCount];
+/*				reg[rt] = reg[rt] | input[srInCount+1] << 8;
+				reg[rt] = reg[rt] | input[srInCount+2] << 16;
+				reg[rt] = reg[rt] | input[srInCount+3] << 24;
+*/				srInCount++;
+				if(flag[HIDEIND] != 1) { printf("\tMMIOREAD(%2u) :\t [$%2u] <- 0x%X\n", srInCount, rt, reg[rt]); }
+			} else if (address == 0xFFFF0008) {
+				reg[rt] = 1;
+				if(flag[HIDEIND] != 1) { printf("\tMMIOWRITE_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
+			} else { fprintf(stderr, "[ ERROR ]\tirregular code(0x%X).\n", address); }
+		} else {
+
+			if( im >= 0x8000 ) {	//imは16bit
+				im = im & 0x00007FFF;
+				if(flag[HIDEIND] != 1) { printf("(im:0x%X)", im); }
+				address = (reg[rs] + MEMORYSIZE - im);
+			} else {
+				address = (reg[rs]+im);
+			}
+			if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
+				fprintf(stderr, "[ ERROR ] Memory overflow\n");
+			}
+			if(flag[HIDEIND] != 1) { printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n", address, memory[address]); }
+	
+//			address = address % MEMORYSIZE;
+			reg[rt] = lw(address, memory);
+			if(flag[HIDEIND] != 1) { printf("\t\treg[rt(%u)] = 0x%X\n", rt, reg[rt]); }
 		}
-		if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
-			fprintf(stderr, "[ INFO ] Memory overflow\n");
+	} else if (opcode == SW) {
+		// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm番地に書き込む
+		opNum[SW]++;
+
+		/* Memory mapped I/O対応 */
+		if( (reg[rs] & 0xFFFF0000) != 0) {
+			if(flag[HIDEIND] != 1) { printf("\t(im:0x%X)/(reg[%2u]:0x%X)/(reg[%2u]:0x%X)\n", im, rs, reg[rs], rt, reg[rt]); }
+			if( im >= 0x8000 ) {	//符号拡張
+				address = (reg[rs] - im);
+			} else {
+				address = (reg[rs] + im);
+			}
+			writeCond = fwrite(&reg[rt], sizeof(unsigned char), 1, soFile);
+			if(writeCond == 0) { fprintf(stderr, "failed to fwrite at \n"); }
+			if(flag[HIDEIND] != 1) {
+				printf("\tMMIOWRITE:\twrite to serialport (%u).\n", reg[rt]);
+			}
+			im = writeCond;
+		} else {
+			if(reg[rs] > MEMORYSIZE) {	/* <残>メモリの仕様変更を反映させる 現状だと確実にバグ */
+				if(flag[HIDEIND] != 1) { printf("\t(im:0x%X)/(reg[rs]:0x%X)\n", im, reg[rs]); }
+				if( im >= 0x8000 ) {	//符号拡張
+					im = im & 0x00007FFF;
+					address = (reg[rs]%MEMORYSIZE - im);
+				} else {
+					address = (reg[rs]%MEMORYSIZE + im);
+				}
+			} else {
+				if( im >= 0x8000 ) {	//符号拡張
+					im = im & 0x00007FFF;
+					address = (reg[rs] - im);
+				} else {
+					address = (reg[rs] + im);
+				}
+			}
+			if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
+				fprintf(stderr, "[ ERROR ] Memory overflow\n");
+			}
+//			address = address % MEMORYSIZE;
+			if(flag[HIDEIND] != 1) { printf("\tSW :\t[address: 0x%04X-0x%04X] <- [$%2u(rt): 0x%2X]\n", address, address+3, rt, reg[rt]); }
+			if(address > MEMORYSIZE) {
+				fprintf(stderr, "[ ERROR ]\tMemory overflow\n");
+				exit(1);
+			}
+			sw(reg[rt], address, memory, rs);
+			if(flag[HIDEIND] != 1) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
 		}
-//		address = address % MEMORYSIZE;
-		if(flag[HIDEIND] != 1) { printf("\tSW :\t[address: 0x%04X-0x%04X] <- [$%2u(rt): 0x%2X]\n", address, address+3, rt, reg[rt]); }
-		if(address > MEMORYSIZE) {
-			fprintf(stderr, "[ ERROR ]\tMemory overflow\n");
-			exit(1);
-		}
-		sw(reg[rt], address, memory, rs);
-		if(flag[HIDEIND] != 1) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
 	} else if (opcode == LUI) {
 		/* 
 			Description: The immediate value is shifted left 16 bits and stored in the register. The lower 16 bits are zeroes.
@@ -617,7 +642,6 @@ int main (int argc, char* argv[]) {
 	unsigned int labelRec[BUFF];
 	char sequentialBuff[BUFF];
 	FILE* soFile;
-
 
 //	int orderNum;
 	/* flag[0]:help flag[HIDEIND]:hide flag[5]:sequential  */
@@ -731,7 +755,7 @@ int main (int argc, char* argv[]) {
 		if((flag[8] == 0) && (argc > (i+1))) {
 			flag[8] = 1;
 			printf("SERIALOUT(\"%s\"), ", argv[i+1]);
-			soFile = fopen(argv[i+1], "w");
+			soFile = fopen(argv[i+1], "wb");
 			if(soFile == NULL) {
 				fprintf(stderr, "[ ERROR ]\tCannot make \"%s\".\n", argv[i+1]);
 				exit(1);
@@ -740,7 +764,6 @@ int main (int argc, char* argv[]) {
 		i++;
 	}
 	i=0;
-
 	count=0;
 	/*	初期化:0xFFFFFFFFが来るまでプログラムを読み込む(具体的にはmemory[count]にコピー)。
 		NOP(0x0)を32個書き込む
@@ -753,6 +776,7 @@ int main (int argc, char* argv[]) {
 			flag[SDATA] = 1;
 			maxpc=(count+1)*4;
 			fprintf(stderr, "[ DEBUG ]\tprogram has finished at %u.\n", count);
+			count++;
 			break;
 		}
 		if ( (opBuff[count] != 0) && (flag[SDATA] == 0) ) {
@@ -780,11 +804,7 @@ int main (int argc, char* argv[]) {
 		srCount++;
 		count++;
 	}
-	/* デバッグ用ループ ここから */
-	
-	/* デバッグ用ループ ここまで */
 
-	pc=0;
 	/* 初期化ここまで */
 
 	srCount=0;
@@ -811,7 +831,7 @@ int main (int argc, char* argv[]) {
 		if(flag[HIDEIND] != 1) { printf("\n====== next: %u ======\n", ((pc-PCINIT)/4)); }
 		reg[0] = 0;
 		operation = memory[pc] | memory[pc+1] << 8 | memory[pc+2] << 16 | memory[pc+3] << 24;
-		pc = decoder(pc, operation, memory, srIn, srOut, breakCount, flag, reg, fpreg, opNum, fpuNum, labelRec);
+		pc = decoder(pc, operation, memory, input, srOut, breakCount, flag, reg, fpreg, opNum, fpuNum, labelRec, soFile);
 		if(operation != 0 && flag[3] != 0 && (flag[HIDEIND] != 1)) {
 			printRegister(reg);	// 命令実行後のレジスタを表示する
 		}
@@ -844,7 +864,7 @@ int main (int argc, char* argv[]) {
 		if ( (memory[snum] != 0 || memory[snum+1] != 0 || memory[snum+2] != 0 || memory[snum+3] != 0) ) {
 			printf("memory[0x%06X] = %02X %02X %02X %02X\n", snum, memory[snum+3], memory[snum+2], memory[snum+1], memory[snum]);
 		}
-		snum = snum + 4;
+		snum += 4;
 	}
 
 	printf("\nレジスタ吐き出し:\n");
