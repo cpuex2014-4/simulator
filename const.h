@@ -6,7 +6,7 @@
 #define REGSIZE		32
 #define FPREGSIZE	32
 #define BUFF		65536
-#define FILESIZE	0xFFFFFFu
+#define FILESIZE	0xFFFFFF
 #define MEMORYSIZE	(1024u*1024u*2u)
 #define DATAOFFSET	0xFFFFFF
 #define OPNUM		256
@@ -70,16 +70,16 @@
 #define ITOF 0x20
 
 /* argument */
-#define BREAKPOINT "--break"
-#define PRINTREG "--reg"
-#define SERIALIN "--serialin"
-#define HELP "--help"
-#define HIDE "--hide"
-#define SEQUENTIAL "--sequential"
-#define PRINTMEM "--memory"
-#define FPUNATIVE "--native"
-#define SERIALOUT "--serialout"
-#define ARGMAX 20
+#define BREAKPOINT 	"--break"
+#define PRINTREG 	"--reg"
+#define SERIALIN 	"--serialin"
+#define HELP 		"--help"
+#define HIDE 		"--hide"
+#define SEQUENTIAL 	"--sequential"
+#define PRINTMEM 	"--memory"
+#define FPUNATIVE 	"--native"
+#define SERIALOUT 	"--serialout"
+#define ARGMAX 30
 
 /* register */
 #define REGAT 1
@@ -91,6 +91,10 @@
 /* flags */
 #define HIDEIND		1
 #define PRINTREGIND	3
+#define OUTPUTSIZE	24
+#define JUMPFLG		25
+#define MAXPC		26
+#define INPUTSIZE	27
 #define UNKNOWNFUNC	28
 #define UNKNOWNOP	29
 #define JUMPFLAG	30

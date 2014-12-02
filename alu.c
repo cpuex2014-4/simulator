@@ -41,7 +41,7 @@ unsigned int slt(unsigned int rs, unsigned int rt) {
 	trs = rs & 0x7FFFFFFF;
 	trt = rt & 0x7FFFFFFF;
 
-	printf("(rs=%X,rt=%X,urs=%X,urt=%X,trs=%X,trt=%X)",rs,rt,urs,urt,trs,trt);
+//	printf("(rs=%X,rt=%X,urs=%X,urt=%X,trs=%X,trt=%X)",rs,rt,urs,urt,trs,trt);
 
 	if(urs == 0 && urt == 0) {
 		if(trs < trt) {
