@@ -25,6 +25,7 @@ void printhelp(void) {
 //	printf("\t--native\t\t\tFPUをx86ネイティブで実行する (未実装)\n");		// 7
 	printf("\t--serialout <ファイル名>\tシリアルポートからの出力先を指定(未指定時:serial.out)\n");	// 8
 //	printf("\t--label\t\t\t\tラベルの飛び先カウント (未実装)\n");	// 9
+//	printf("\t--fast\t\t\t各命令実行時の詳細データを表示せず、Cネイティブ実装の浮動小数点演算を行う\n");	// 10
 }
 
 float printFloat(unsigned int fpreg) {
@@ -121,42 +122,42 @@ void printRegister(unsigned int* reg) {
 void printOpsCount(unsigned int opNum[], unsigned int fpuNum[], unsigned long long breakCount) {
 /* ops & function */
 
-	if(opNum[128+ADDU] != 0) { printf("ADDU	: %6u, %05.2f (%%)\n", opNum[128+ADDU], (double) 100*opNum[128+ADDU]/breakCount); }
-	if(opNum[ADDIU] != 0) { printf("ADDIU	: %6u, %05.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount); }
-	if(opNum[128+SUBU] != 0) { printf("SUBU	: %6u, %05.2f (%%)\n", opNum[128+SUBU], (double) 100*opNum[128+SUBU]/breakCount); }
-	if(opNum[128+AND] != 0) { printf("AND 	: %6u, %05.2f (%%)\n", opNum[128+AND], (double) 100*opNum[128+AND]/breakCount); }
-	if(opNum[ANDI] != 0) { printf("AND 	: %6u, %05.2f (%%)\n", opNum[ANDI], (double) 100*opNum[ANDI]/breakCount); }
-	if(opNum[128+OR] != 0) { printf("OR  	: %6u, %05.2f (%%)\n", opNum[128+OR], (double) 100*opNum[128+OR]/breakCount); }
-	if(opNum[128+SLL] != 0) { printf("SLL 	: %6u, %05.2f (%%)\n", opNum[128+SLL], (double) 100*opNum[128+SLL]/breakCount); }
-	if(opNum[128+SRL] != 0) { printf("SRL 	: %6u, %05.2f (%%)\n", opNum[128+SRL], (double) 100*opNum[128+SRL]/breakCount); }
-	if(opNum[LW] != 0) { printf("LW  	: %6u, %05.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount); }
-	if(opNum[SW] != 0) { printf("SW  	: %6u, %05.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount); }
-	if(opNum[JUMP] != 0) { printf("JUMP	: %6u, %05.2f (%%)\n", opNum[JUMP], (double) 100*opNum[JUMP]/breakCount); }
-	if(opNum[JAL] != 0) { printf("JAL 	: %6u, %05.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount); }
-	if(opNum[128+JR] != 0) { printf("JR  	: %6u, %05.2f (%%)\n", opNum[128+JR], (double) 100*opNum[128+JR]/breakCount); }
-	if(opNum[BEQ] != 0) { printf("BEQ 	: %6u, %05.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount); }
-	if(opNum[BNE] != 0) { printf("BNE 	: %6u, %05.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount); }
-	if(opNum[128+SLT] != 0) { printf("SLT 	: %6u, %05.2f (%%)\n", opNum[128+SLT], (double) 100*opNum[128+SLT]/breakCount); }
-	if(opNum[SRCV] != 0) { printf("RRB 	: %6u, %05.2f (%%)\n", opNum[SRCV], (double) 100*opNum[SRCV]/breakCount); }
-	if(opNum[SSND] != 0) { printf("RSB 	: %6u, %05.2f (%%)\n", opNum[SSND], (double) 100*opNum[SSND]/breakCount); }
+	if(opNum[128+ADDU] != 0) { printf("ADDU	: %9u, %05.2f (%%)\n", opNum[128+ADDU], (double) 100*opNum[128+ADDU]/breakCount); }
+	if(opNum[ADDIU] != 0) { printf("ADDIU	: %9u, %05.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount); }
+	if(opNum[128+SUBU] != 0) { printf("SUBU	: %9u, %05.2f (%%)\n", opNum[128+SUBU], (double) 100*opNum[128+SUBU]/breakCount); }
+	if(opNum[128+AND] != 0) { printf("AND 	: %9u, %05.2f (%%)\n", opNum[128+AND], (double) 100*opNum[128+AND]/breakCount); }
+	if(opNum[ANDI] != 0) { printf("AND 	: %9u, %05.2f (%%)\n", opNum[ANDI], (double) 100*opNum[ANDI]/breakCount); }
+	if(opNum[128+OR] != 0) { printf("OR  	: %9u, %05.2f (%%)\n", opNum[128+OR], (double) 100*opNum[128+OR]/breakCount); }
+	if(opNum[128+SLL] != 0) { printf("SLL 	: %9u, %05.2f (%%)\n", opNum[128+SLL], (double) 100*opNum[128+SLL]/breakCount); }
+	if(opNum[128+SRL] != 0) { printf("SRL 	: %9u, %05.2f (%%)\n", opNum[128+SRL], (double) 100*opNum[128+SRL]/breakCount); }
+	if(opNum[LW] != 0) { printf("LW  	: %9u, %05.2f (%%)\n", opNum[LW], (double) 100*opNum[LW]/breakCount); }
+	if(opNum[SW] != 0) { printf("SW  	: %9u, %05.2f (%%)\n", opNum[SW], (double) 100*opNum[SW]/breakCount); }
+	if(opNum[JUMP] != 0) { printf("JUMP	: %9u, %05.2f (%%)\n", opNum[JUMP], (double) 100*opNum[JUMP]/breakCount); }
+	if(opNum[JAL] != 0) { printf("JAL 	: %9u, %05.2f (%%)\n", opNum[JAL], (double) 100*opNum[JAL]/breakCount); }
+	if(opNum[128+JR] != 0) { printf("JR  	: %9u, %05.2f (%%)\n", opNum[128+JR], (double) 100*opNum[128+JR]/breakCount); }
+	if(opNum[BEQ] != 0) { printf("BEQ 	: %9u, %05.2f (%%)\n", opNum[BEQ], (double) 100*opNum[BEQ]/breakCount); }
+	if(opNum[BNE] != 0) { printf("BNE 	: %9u, %05.2f (%%)\n", opNum[BNE], (double) 100*opNum[BNE]/breakCount); }
+	if(opNum[128+SLT] != 0) { printf("SLT 	: %9u, %05.2f (%%)\n", opNum[128+SLT], (double) 100*opNum[128+SLT]/breakCount); }
+	if(opNum[SRCV] != 0) { printf("RRB 	: %9u, %05.2f (%%)\n", opNum[SRCV], (double) 100*opNum[SRCV]/breakCount); }
+	if(opNum[SSND] != 0) { printf("RSB 	: %9u, %05.2f (%%)\n", opNum[SSND], (double) 100*opNum[SSND]/breakCount); }
 	printf("\n");
 
 /* fpu */
-	if(fpuNum[BC1F] != 0) { printf("BC1F	: %6u, %05.2f (%%)\n", fpuNum[BC1F], (double) 100*fpuNum[BC1F]/breakCount); }
-	if(fpuNum[BC1T] != 0) { printf("BC1T	: %6u, %05.2f (%%)\n", fpuNum[BC1T], (double) 100*fpuNum[BC1T]/breakCount); }
-	if(fpuNum[FMFC] != 0) { printf("FMFC	: %6u, %05.2f (%%)\n", fpuNum[FMFC], (double) 100*fpuNum[FMFC]/breakCount); }
-	if(fpuNum[FMTC] != 0) { printf("FMTC	: %6u, %05.2f (%%)\n", fpuNum[FMTC], (double) 100*fpuNum[FMTC]/breakCount); }
-	if(fpuNum[MOVSF] != 0) { printf("MOVSF	: %6u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount); }
-	if(fpuNum[FADDS] != 0) { printf("FADD.S	: %6u, %05.2f (%%)\n", fpuNum[FADDS], (double) 100*fpuNum[FADDS]/breakCount); }
-	if(fpuNum[FSUBS] != 0) { printf("FSUB.S	: %6u, %05.2f (%%)\n", fpuNum[FSUBS], (double) 100*fpuNum[FSUBS]/breakCount); }
-	if(fpuNum[FMULS] != 0) { printf("FMUL.S	: %6u, %05.2f (%%)\n", fpuNum[FMULS], (double) 100*fpuNum[FMULS]/breakCount); }
-	if(fpuNum[FDIVS] != 0) { printf("FDIV.S	: %6u, %05.2f (%%)\n", fpuNum[FDIVS], (double) 100*fpuNum[FDIVS]/breakCount); }
-	if(fpuNum[CEQ] != 0) { printf("CEQ 	: %6u, %05.2f (%%)\n", fpuNum[CEQ], (double) 100*fpuNum[CEQ]/breakCount); }
-	if(fpuNum[COLT] != 0) { printf("COLT	: %6u, %05.2f (%%)\n", fpuNum[COLT], (double) 100*fpuNum[COLT]/breakCount); }
-	if(fpuNum[COLE] != 0) { printf("COLE	: %6u, %05.2f (%%)\n", fpuNum[COLE], (double) 100*fpuNum[COLE]/breakCount); }
-	if(fpuNum[FTOI] != 0) { printf("FTOI	: %6u, %05.2f (%%)\n", fpuNum[FTOIF], (double) 100*fpuNum[FTOIF]/breakCount); }
-	if(fpuNum[ITOF] != 0) { printf("ITOF	: %6u, %05.2f (%%)\n", fpuNum[ITOF], (double) 100*fpuNum[ITOF]/breakCount); }
-	if(fpuNum[SQRT] != 0) { printf("FSQRT	: %6u, %05.2f (%%)\n", fpuNum[SQRT], (double) 100*fpuNum[SQRT]/breakCount); }
+	if(fpuNum[BC1F] != 0) { printf("BC1F	: %9u, %05.2f (%%)\n", fpuNum[BC1F], (double) 100*fpuNum[BC1F]/breakCount); }
+	if(fpuNum[BC1T] != 0) { printf("BC1T	: %9u, %05.2f (%%)\n", fpuNum[BC1T], (double) 100*fpuNum[BC1T]/breakCount); }
+	if(fpuNum[FMFC] != 0) { printf("FMFC	: %9u, %05.2f (%%)\n", fpuNum[FMFC], (double) 100*fpuNum[FMFC]/breakCount); }
+	if(fpuNum[FMTC] != 0) { printf("FMTC	: %9u, %05.2f (%%)\n", fpuNum[FMTC], (double) 100*fpuNum[FMTC]/breakCount); }
+	if(fpuNum[MOVSF] != 0) { printf("MOVSF	: %9u, %05.2f (%%)\n", fpuNum[MOVSF], (double) 100*fpuNum[MOVSF]/breakCount); }
+	if(fpuNum[FADDS] != 0) { printf("FADD.S	: %9u, %05.2f (%%)\n", fpuNum[FADDS], (double) 100*fpuNum[FADDS]/breakCount); }
+	if(fpuNum[FSUBS] != 0) { printf("FSUB.S	: %9u, %05.2f (%%)\n", fpuNum[FSUBS], (double) 100*fpuNum[FSUBS]/breakCount); }
+	if(fpuNum[FMULS] != 0) { printf("FMUL.S	: %9u, %05.2f (%%)\n", fpuNum[FMULS], (double) 100*fpuNum[FMULS]/breakCount); }
+	if(fpuNum[FDIVS] != 0) { printf("FDIV.S	: %9u, %05.2f (%%)\n", fpuNum[FDIVS], (double) 100*fpuNum[FDIVS]/breakCount); }
+	if(fpuNum[CEQ] != 0) { printf("CEQ 	: %9u, %05.2f (%%)\n", fpuNum[CEQ], (double) 100*fpuNum[CEQ]/breakCount); }
+	if(fpuNum[COLT] != 0) { printf("COLT	: %9u, %05.2f (%%)\n", fpuNum[COLT], (double) 100*fpuNum[COLT]/breakCount); }
+	if(fpuNum[COLE] != 0) { printf("COLE	: %9u, %05.2f (%%)\n", fpuNum[COLE], (double) 100*fpuNum[COLE]/breakCount); }
+	if(fpuNum[FTOI] != 0) { printf("FTOI	: %9u, %05.2f (%%)\n", fpuNum[FTOIF], (double) 100*fpuNum[FTOIF]/breakCount); }
+	if(fpuNum[ITOF] != 0) { printf("ITOF	: %9u, %05.2f (%%)\n", fpuNum[ITOF], (double) 100*fpuNum[ITOF]/breakCount); }
+	if(fpuNum[SQRT] != 0) { printf("FSQRT	: %9u, %05.2f (%%)\n", fpuNum[SQRT], (double) 100*fpuNum[SQRT]/breakCount); }
 
 }
 

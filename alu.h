@@ -1,6 +1,10 @@
 #ifndef ALU_H
 #define ALU_H
 
+unsigned int signExt(unsigned int argument);
+unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned int* fpuNum, unsigned int* labelRec);
+unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned int* fpuNum, unsigned int* labelRec);
+
 unsigned int sll(unsigned int rs, unsigned int shamt);
 unsigned int srl(unsigned int rs, unsigned int shamt);
 unsigned int slt(unsigned int rs, unsigned int rt);
