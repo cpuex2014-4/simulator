@@ -14,16 +14,13 @@ unsigned int signExt(unsigned int argument) {
 	return argument;
 }
 
-unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned int* fpuNum, unsigned int* labelRec) {
+unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, unsigned int* fpuNum, unsigned int* labelRec) {
 	unsigned int fpfunction;
 	unsigned int fmt, ft, rt, fs, fd, fputemp;
+
 	fmt = (instruction >> 21) & 0x1F;
 	ft  = (instruction >> 16) & 0x1F;
-	rt  = (instruction >> 16) & 0x1F;
-	fs  = (instruction >> 11 ) & 0x1F;
-	fd  = (instruction >> 6 ) & 0x1F;
 
-	fpfunction = instruction & 0x3F;
 	if (fmt == BC1) {
 		unsigned int target = instruction & 0xFFFF;
 		if (ft == 0) {		// falseで分岐
@@ -31,23 +28,26 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 			if(fputemp == 0) {
 				pc = pc + 4 + signExt(target)*4;
 				labelRec[pc]++;
-				flag[JUMPFLG] = 1;
-			}
+			} else { pc = pc + 4; }
 			fpuNum[BC1F]++;
 		} else if(ft == 1) {	// Trueで分岐
 			fputemp = fpreg[23] & 0x800000;
 			if(fputemp == 0x800000) {
 				pc = pc + 4 + signExt(target)*4;
 				labelRec[pc]++;
-				flag[JUMPFLG] = 1;
-			}
+			} else { pc = pc + 4; }
 			fpuNum[BC1T]++;
 		} else {
 			fprintf(stderr, "\t[ ERROR ]\tUnknown BC1 option(fmt == 0 && (ft != 0 || ft != 1))\n");
+			pc = pc + 4;
 		}		
 	} else {
+		fpfunction = instruction & 0x3F;
+		fs  = (instruction >> 11 ) & 0x1F;
+		fd  = (instruction >> 6 ) & 0x1F;
 		switch (fpfunction) {
 			case (0) :
+				rt  = (instruction >> 16) & 0x1F;
 				if(fmt == MFC1M) {
 					reg[rt] = fpreg[fs];
 					fpuNum[FMFC]++;
@@ -57,6 +57,8 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 				} else if (fmt == 0x10) {
 					fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
 					fpuNum[FADDS]++;
+					pc = pc + 4;
+					return pc;
 				} else {
 					fprintf(stderr, "Unknown fmt(function '0').\n");
 				}
@@ -68,6 +70,7 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 				}
 				break;
 			case (SQRT) :
+				rt  = (instruction >> 16) & 0x1F;
 				if(fmt == 0x10) { 
 					fpreg[fd] = fsqrt(fpreg[fs]);
 					fpuNum[SQRT]++;
@@ -88,6 +91,8 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 				if(fmt == 0x10) { 
 					fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
 					fpuNum[FMULS]++;
+					pc = pc + 4;
+					return pc;
 				}
 				break;
 			case (FDIVS) :	
@@ -146,6 +151,7 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 			default :
 				printf("Unknown FPswitch has selected.\n");
 		}
+		pc = pc + 4;
 	}
 	return pc;
 }
@@ -419,8 +425,6 @@ unsigned int mult(unsigned int rs, unsigned int rt) {
 	unsigned int rd=0;
 	if(rs||rt) { ; }
 
-
-
 	return rd;
 }
 
@@ -563,8 +567,6 @@ unsigned int ori(unsigned int rs, unsigned int im) {
 	unsigned int rt;
 
 	rt = rs | im;
-
-
 	return rt;
 }
 
