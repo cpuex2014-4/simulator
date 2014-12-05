@@ -7,7 +7,7 @@
 #define FPREGSIZE	32
 #define BUFF		65536
 #define FILESIZE	0xFFFFFF
-#define MEMORYSIZE	(1024u*1024u*2u)
+#define MEMORYSIZE	(1024u*1024u*4u)
 #define DATAOFFSET	0xFFFFFF
 #define OPNUM		256
 #define FLAGSIZAE	32
