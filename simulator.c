@@ -118,7 +118,7 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 			break;
 		case (SLL) :
 			pc = pc + 4;
-			if(rs == 0 && shamt == 0) {
+			if(rd == 0) {
 				opNum[128+NOP]++;
 				break;
 			}
@@ -127,7 +127,7 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 			break;
 		case (SRL) :
 			pc = pc + 4;
-			if(rs == 0 && shamt == 0) {
+			if(rd == 0) {
 				opNum[128+NOP]++;
 				break;
 			}
@@ -210,7 +210,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 			opNum[128+SLT]++;
 			break;
 		case (SLL) :
-			if(rs == 0 && shamt == 0) {
+			if(rd == 0) {
 				if(flag[HIDEIND] != 1) { printf("\tNOP\n"); }
 				opNum[128+NOP]++;
 				break;
@@ -220,7 +220,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 			opNum[128+SLL]++;
 			break;
 		case (SRL) :
-			if(rs == 0 && shamt == 0) {
+			if(rd == 0) {
 				if(flag[HIDEIND] != 1) { printf("\tNOP\n"); }
 				opNum[128+NOP]++;
 				break;
