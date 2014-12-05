@@ -304,7 +304,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 			opNum[LW]++;
 	
 			// Memory mapped I/O対応
-			if( (reg[rs] & MMIO) > 0) {
+			if( (reg[rs] & MMIO) == MMIO) {
 				if( im >= 0x8000 ) {	//imは16bit
 					address = (reg[rs] - im);
 				} else {
@@ -330,7 +330,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 				} else {
 					address = (reg[rs]+im);
 				}
-				if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
+				if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 					fprintf(stderr, "[ ERROR ] Memory overflow\n");
 				}
 				reg[rt] = lw(address, memory);
@@ -338,7 +338,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 			break;
 		case(SW) :
 			opNum[SW]++;
-			if( (reg[rs] & 0xFFFF0000) != 0) {
+			if( (reg[rs] & MMIO) == MMIO) {
 				if( im >= 0x8000 ) {	//符号拡張
 					address = (reg[rs] - im);
 				} else {
@@ -368,7 +368,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 						address = (reg[rs] + im);
 					}
 				}
-				if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
+				if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 					fprintf(stderr, "[ ERROR ]\tMemory overflow\n");
 					exit(1);
 				}
@@ -506,7 +506,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		opNum[LW]++;
 
 		/* Memory mapped I/O対応 */
-		if( (reg[rs] & MMIO) > 0) {
+		if( (reg[rs] & MMIO) == MMIO) {
 			if( im >= 0x8000 ) {	//imは16bit
 				if(flag[HIDEIND] != 1) { printf("(im:0x%X)", im); }
 				address = (reg[rs] - im);
@@ -538,7 +538,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			} else {
 				address = (reg[rs]+im);
 			}
-			if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
+			if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 				fprintf(stderr, "[ ERROR ] Memory overflow\n");
 			}
 			if(flag[HIDEIND] != 1) { printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n", address, memory[address]); }
@@ -552,7 +552,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		opNum[SW]++;
 
 		/* Memory mapped I/O対応 */
-		if( (reg[rs] & 0xFFFF0000) != 0) {
+		if( (reg[rs] & MMIO) == MMIO) {
 			if(flag[HIDEIND] != 1) { printf("\t(im:0x%X)/(reg[%2u]:0x%X)/(reg[%2u]:0x%X)\n", im, rs, reg[rs], rt, reg[rt]); }
 			if( im >= 0x8000 ) {	//符号拡張
 				address = (reg[rs] - im);
@@ -587,7 +587,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 					address = (reg[rs] + im);
 				}
 			}
-			if(address > MEMORYSIZE && (address & 0xFFFF0000) == 0) {
+			if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 				fprintf(stderr, "[ ERROR ] Memory overflow\n");
 			}
 //			address = address % MEMORYSIZE;
