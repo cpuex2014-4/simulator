@@ -35,7 +35,7 @@
 #define SRL   0x2
 #define JR    0x8
 #define ADDU  0x21
-#define SUBU  0x22
+#define SUBU  0x23
 #define AND   0x24
 #define OR    0x25
 #define SLT   0x2A
