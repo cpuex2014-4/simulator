@@ -322,7 +322,10 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 					srInCount++;
 				} else if (address == 0xFFFF0008) {
 					reg[rt] = 1;
-				} else { fprintf(stderr, "[ ERROR ]\tirregular code(0x%X).\n", address); }
+				} else {
+					fprintf(stderr, "[ ERROR ]\tirregular code(0x%X).\n", address);
+					exit(1);
+				}
 			} else {
 				if( im >= 0x8000 ) {	//imは16bit
 					im = im & 0x00007FFF;
@@ -332,6 +335,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 				}
 				if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 					fprintf(stderr, "[ ERROR ] Memory overflow\n");
+					exit(1);
 				}
 				reg[rt] = lw(address, memory);
 			}
@@ -528,7 +532,10 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			} else if (address == 0xFFFF0008) {
 				reg[rt] = 1;
 				if(flag[HIDEIND] != 1) { printf("\tMMIOWRITE_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
-			} else { fprintf(stderr, "[ ERROR ]\tirregular code(0x%X).\n", address); }
+			} else {
+				fprintf(stderr, "[ ERROR ]\tirregular code(0x%X).\n", address);
+				exit(1);
+			}
 		} else {
 
 			if( im >= 0x8000 ) {	//imは16bit
@@ -540,6 +547,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			}
 			if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 				fprintf(stderr, "[ ERROR ] Memory overflow\n");
+				exit(1);
 			}
 			if(flag[HIDEIND] != 1) { printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n", address, memory[address]); }
 	
@@ -589,6 +597,7 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			}
 			if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 				fprintf(stderr, "[ ERROR ] Memory overflow\n");
+				exit(1);
 			}
 //			address = address % MEMORYSIZE;
 			if(flag[HIDEIND] != 1) { printf("\tSW :\t[address: 0x%04X-0x%04X] <- [$%2u(rt): 0x%2X]\n", address, address+3, rt, reg[rt]); }
@@ -973,10 +982,12 @@ int main (int argc, char* argv[]) {
 	if(flag[UNKNOWNOP] != 0) {
 		fprintf(stderr, "[ ERROR ]\tUnknown opcode existed! (%u)\n", flag[UNKNOWNOP]);
 		printf("[ ERROR ]\tUnknown opcode existed!\n");
+		exit(1);
 	}
 	if(flag[UNKNOWNFUNC] != 0) {
 		fprintf(stderr, "[ ERROR ]\tUnknown function code existed! (%u)\n", flag[UNKNOWNFUNC]);
 		printf("[ ERROR ]\tUnknown function code existed!\n");
+		exit(1);
 	}
 	i=0;
 	count = 0;
