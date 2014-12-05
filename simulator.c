@@ -302,14 +302,14 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 			break;
 		case(LW) :	// 0x47: lw r1, 0xaaaa(r2) : r2+0xaaaaのアドレスにr1を32ビットでロード
 			opNum[LW]++;
+
+			if( im >= 0x8000 ) {	//imは16bit
+				im = im | 0xFFFF0000;
+			}
+			address = (reg[rs] + im);
 	
 			// Memory mapped I/O対応
-			if( (reg[rs] & MMIO) == MMIO) {
-				if( im >= 0x8000 ) {	//imは16bit
-					address = (reg[rs] - im);
-				} else {
-					address = (reg[rs] + im);
-				}
+			if( (address & MMIO) == MMIO) {
 				if(address == MMIOREADRDY) {
 					if (flag[INPUTSIZE] > srInCount) {
 						reg[rt] = 1;
@@ -327,12 +327,6 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 					exit(1);
 				}
 			} else {
-				if( im >= 0x8000 ) {	//imは16bit
-					im = im & 0x00007FFF;
-					address = (reg[rs] + MEMORYSIZE - im);
-				} else {
-					address = (reg[rs]+im);
-				}
 				if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 					fprintf(stderr, "[ ERROR ] Memory overflow\n");
 					exit(1);
@@ -342,12 +336,13 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 			break;
 		case(SW) :
 			opNum[SW]++;
-			if( (reg[rs] & MMIO) == MMIO) {
-				if( im >= 0x8000 ) {	//符号拡張
-					address = (reg[rs] - im);
-				} else {
-					address = (reg[rs] + im);
-				}
+
+			if( im >= 0x8000 ) {	//imは16bit
+				im = im | 0xFFFF0000;
+			}
+			address = (reg[rs] + im);
+
+			if( (address & MMIO) == MMIO) {
 				unsigned int writeCond;
 				writeCond = fwrite(&reg[rt], sizeof(unsigned char), 1, soFile);
 				if(srOutCount < FILESIZE) {
@@ -357,21 +352,6 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 				}
 				if(writeCond == 0) { fprintf(stderr, "failed to fwrite at \n"); }
 			} else {
-				if(reg[rs] > MEMORYSIZE) {
-					if( im >= 0x8000 ) {	//符号拡張
-						im = im & 0x00007FFF;
-						address = (reg[rs]%MEMORYSIZE - im);
-					} else {
-						address = (reg[rs]%MEMORYSIZE + im);
-					}
-				} else {
-					if( im >= 0x8000 ) {	//符号拡張
-						im = im & 0x00007FFF;
-						address = (reg[rs] - im);
-					} else {
-						address = (reg[rs] + im);
-					}
-				}
 				if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 					fprintf(stderr, "[ ERROR ]\tMemory overflow\n");
 					exit(1);
@@ -509,14 +489,13 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 	} else if (opcode == LW) {	// 0x47: lw r1, 0xaaaa(r2) : r2+0xaaaaのアドレスにr1を32ビットでロード
 		opNum[LW]++;
 
+		if( im >= 0x8000 ) {	//imは16bit
+			im = im | 0xFFFF0000;
+		}
+		address = (reg[rs]+im);
+
 		/* Memory mapped I/O対応 */
-		if( (reg[rs] & MMIO) == MMIO) {
-			if( im >= 0x8000 ) {	//imは16bit
-				if(flag[HIDEIND] != 1) { printf("(im:0x%X)", im); }
-				address = (reg[rs] - im);
-			} else {
-				address = (reg[rs] + im);
-			}
+		if( (address & MMIO) == MMIO) {
 			if(address == MMIOREADRDY) {
 				if (flag[INPUTSIZE] > srInCount) {
 					reg[rt] = 1;
@@ -537,14 +516,6 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 				exit(1);
 			}
 		} else {
-
-			if( im >= 0x8000 ) {	//imは16bit
-				im = im & 0x00007FFF;
-				if(flag[HIDEIND] != 1) { printf("(im:0x%X)", im); }
-				address = (reg[rs] + MEMORYSIZE - im);
-			} else {
-				address = (reg[rs]+im);
-			}
 			if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 				fprintf(stderr, "[ ERROR ] Memory overflow\n");
 				exit(1);
@@ -559,14 +530,14 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 		// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm番地に書き込む
 		opNum[SW]++;
 
+		if( im >= 0x8000 ) {	//imは16bit
+			im = im | 0xFFFF0000;
+		}
+		address = (reg[rs]+im);
+
 		/* Memory mapped I/O対応 */
-		if( (reg[rs] & MMIO) == MMIO) {
+		if( (address & MMIO) == MMIO) {
 			if(flag[HIDEIND] != 1) { printf("\t(im:0x%X)/(reg[%2u]:0x%X)/(reg[%2u]:0x%X)\n", im, rs, reg[rs], rt, reg[rt]); }
-			if( im >= 0x8000 ) {	//符号拡張
-				address = (reg[rs] - im);
-			} else {
-				address = (reg[rs] + im);
-			}
 			writeCond = fwrite(&reg[rt], sizeof(unsigned char), 1, soFile);
 			if(srOutCount < FILESIZE) {
 				srOut[srOutCount] = reg[rt] & 0xFF;
@@ -579,22 +550,6 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 			}
 //			im = writeCond;
 		} else {
-			if(reg[rs] > MEMORYSIZE) {	/* <残>メモリの仕様変更を反映させる 現状だと確実にバグ */
-				if(flag[HIDEIND] != 1) { printf("\t(im:0x%X)/(reg[rs]:0x%X)\n", im, reg[rs]); }
-				if( im >= 0x8000 ) {	//符号拡張
-					im = im & 0x00007FFF;
-					address = (reg[rs]%MEMORYSIZE - im);
-				} else {
-					address = (reg[rs]%MEMORYSIZE + im);
-				}
-			} else {
-				if( im >= 0x8000 ) {	//符号拡張
-					im = im & 0x00007FFF;
-					address = (reg[rs] - im);
-				} else {
-					address = (reg[rs] + im);
-				}
-			}
 			if(address > MEMORYSIZE && (address & MMIO) != MMIO) {
 				fprintf(stderr, "[ ERROR ] Memory overflow\n");
 				exit(1);
