@@ -505,40 +505,7 @@ unsigned int subu (unsigned int rs, unsigned int rt) {
 }
 
 unsigned int addiu(unsigned int rs, unsigned int Imm, unsigned int stackPointer) {
-	unsigned int rd=0;
-	unsigned int bit=0;
-	unsigned int c=0;
-	unsigned int bitA, bitB;
-	unsigned int bitQ;
-
-	if (stackPointer == 29) {
-		while (bit < 32) {
-			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-			bitB = ((Imm << (31-bit)) >> (31-bit)) >> bit;
-	
-			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-	
-			rd = rd | (bitQ << bit);
-			bit++;
-		}
-		rd = rd % MEMORYSIZE;
-	} else {
-		/* 各ビットごとにOR演算、キャリーがあればフラグ建て */
-		while (bit < 32) {
-			bitA = ((rs << (31-bit)) >> (31-bit)) >> bit;
-			bitB = ((Imm << (31-bit)) >> (31-bit)) >> bit;
-	
-			bitQ = (bitA&bitB&c) | (bitA&~bitB&~c) | (~bitA&bitB&~c) | (~bitA&~bitB&c);
-			c = (bitA&bitB) | (bitB&c) | (bitA&c);
-	
-			rd = rd | (bitQ << bit);
-			bit++;
-		}
-//		rCarry = c;
-	}
-
-	return rd;
+	return rs + Imm;
 }
 
 unsigned int addu(unsigned int adduA, unsigned int adduB){
