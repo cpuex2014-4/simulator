@@ -145,7 +145,7 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 			opNum[128+OR]++;
 			break;
 		default :
-			fprintf(stderr, "Unknown switch has selected.\n");
+			fprintf(stderr, "[ ERROR ]\tUnknown switch has selected.(function: 0x%X)\n", function);
 			pc = pc + 4;
 			flag[UNKNOWNFUNC]++;
 	}
@@ -240,20 +240,21 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 			opNum[128+OR]++;
 			break;
 		default :
-			printf("Unknown switch has selected.\n");
+			fprintf(stderr, "[ ERROR ]\tUnknown switch has selected.(%X)\n", function);
 			flag[UNKNOWNFUNC]++;
 	}
 	return pc;
 }
 
 /* --hide フラグセット時のデコーダ */
-unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned int* memory,unsigned char* input, unsigned char* srOut, int* flag, unsigned int* reg, unsigned int* opNum, unsigned int* labelRec, FILE* soFile) {
+unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned int* memory, unsigned int* memInit,unsigned char* input, unsigned char* srOut, int* flag, unsigned int* reg, unsigned int* opNum, unsigned int* labelRec, FILE* soFile) {
 	unsigned int opcode, rt, rs, address;
 	int im;			// <- 何で符号付きint？
 	unsigned int jump;
 	static long srInCount = 0;
 	static long srOutCount = 0;
 	int temp, diff;
+	unsigned int writeCond;
 
 	opcode = instruction >> 26;	// opcode: 6bitの整数
 	rs = (instruction >> 21) & 0x1F;
@@ -331,12 +332,14 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 					fprintf(stderr, "[ ERROR ] Memory overflow\n");
 					exit(1);
 				}
+				if (memInit[address] == 0) {
+					fprintf(stderr, "[ ERROR ]\tAccess to uninitialized address: %08X", address);
+				}
 				reg[rt] = lw(address, memory);
 			}
 			break;
 		case(SW) :
 			opNum[SW]++;
-
 			if( im >= 0x8000 ) {	//imは16bit
 				im = im | 0xFFFF0000;
 			}
@@ -344,6 +347,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 
 			if( (address & MMIO) == MMIO) {
 				unsigned int writeCond;
+
 				writeCond = fwrite(&reg[rt], sizeof(unsigned char), 1, soFile);
 				if(srOutCount < FILESIZE) {
 					srOut[srOutCount] = reg[rt] & 0xFF;
@@ -362,6 +366,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 					exit(1);
 				}
 */				sw(reg[rt], address, memory);
+				memInit[address] = 1;
 			}
 			break;
 		case(LUI) :
@@ -385,7 +390,7 @@ unsigned int decoderHide (unsigned int pc, unsigned int instruction, unsigned in
 			reg[rt] = reg[rs] & im;
 			break;
 		default :
-			fprintf(stderr, "\t[Unknown OPCODE]\n");
+			fprintf(stderr, "[ ERROR ]\tUnknown switch has selected.(opcode: %X)\n", opcode);
 			flag[UNKNOWNOP]++;
 	}
 	return pc;
@@ -624,6 +629,7 @@ int main (int argc, char* argv[]) {
 	unsigned char *input;
 	unsigned char *srOut;
 	unsigned int *memory;
+	unsigned int *memInit;
 
 	unsigned int reg[REGSIZE], fpreg[REGSIZE];	// 32 register
 	int i = 0;
@@ -662,6 +668,11 @@ int main (int argc, char* argv[]) {
 	memory = (unsigned int *) calloc( MEMORYSIZE, sizeof(unsigned int) );
 	if(memory == NULL) {
 		perror("memory allocation error (memory)\n");
+		return -1;
+	}
+	memInit = (unsigned int *) calloc( MEMORYSIZE, sizeof(unsigned int) );
+	if(memInit == NULL) {
+		perror("memory allocation error (memInit)\n");
 		return -1;
 	}
 	srOut = (unsigned char *) calloc( MEMORYSIZE, sizeof(unsigned char) );
@@ -850,11 +861,11 @@ int main (int argc, char* argv[]) {
 					pc = functHide(pc, operation, flag, reg, opNum, labelRec);
 					break;
 				default :
-					pc = decoderHide(pc, operation, memory, input, srOut, flag, reg, opNum, labelRec, soFile);
+					pc = decoderHide(pc, operation, memory, memInit, input, srOut, flag, reg, opNum, labelRec, soFile);
 					break;	
 			}
 			breakCount++;
-			if( (breakCount << 39) == 0) { 
+			if( (breakCount << 36) == 0) { 
 				fprintf(stderr, "[ INFO ]\tprocessing instructions... @ %10llX <Fast mode>\n", breakCount);
 				i_time++;
 				timebuff[i_time] = getProcTime();
@@ -955,6 +966,8 @@ int main (int argc, char* argv[]) {
 	opBuff = NULL;
 	free(input);
 	input = NULL;
+	free(memInit);
+	memInit = NULL;
 	i_time++;
 	timebuff[i_time] = getProcTime();
 	fprintf(stderr, "time[%2d] = %.8f\n", i_time, (timebuff[i_time] - timebuff[i_time-1]) );

@@ -8,15 +8,15 @@
 *.o
 .git*
 temp
-sum.c
-ops/t2b ops/h2b ops/b2t ops/dec addu subu multu dec addiu sll ssum sim printFloat b2t t2b
-serial.in
-serial.out
+*t2b *h2b *b2t *dec addu subu multu dec addiu sll ssum sim
+t2b multu dec addiu sll ssum printFloat b2t
+serial*
 *.py
 sim
-qkasm-master
-simulator_oldendian.c
-
+simulator_oldendian.c *dmp.c
+*.ppm
+*.out
+qk*/
 
 
 
