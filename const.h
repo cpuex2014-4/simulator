@@ -11,7 +11,7 @@
 #define DATAOFFSET	0xFFFFFF
 #define OPNUM		256
 #define FLAGSIZAE	32
-#define BLOCKRAM	0x00007FFF
+#define BLOCKRAM	0x1FFFC
 #define LINE		512
 
 /* opcode */
@@ -33,6 +33,7 @@
 /* function */
 #define SLL   0x0
 #define SRL   0x2
+#define SRA   0x3
 #define JR    0x8
 #define ADDU  0x21
 #define SUBU  0x23
@@ -42,14 +43,14 @@
 #define NOP   0x7F
 
 /* fpfunction */
-#define FADDS 0x0	// Function
-#define FSUBS 0x1	// Function
-#define FMULS 0x2	// Function
-#define FDIVS 0x3	// Function
-#define SQRT  0x4	// Function
-#define MOVSF 0x6	// Function
-#define FTOIF 0x24	// Function
-#define ITOFF 0x20	// Function
+#define FADDS 	0x0	// Function
+#define FSUBS 	0x1	// Function
+#define FMULS 	0x2	// Function
+#define FDIVS 	0x3	// Function
+#define SQRT  	0x4	// Function
+#define MOVSF 	0x6	// Function
+#define FTOIF 	0x24	// Function
+#define ITOFF 	0x20	// Function
 #define CEQ		0x32
 #define COLT	0x34
 #define COLE	0x36

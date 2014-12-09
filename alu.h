@@ -7,14 +7,14 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 
 unsigned int sll(unsigned int rs, unsigned int shamt);
 unsigned int srl(unsigned int rs, unsigned int shamt);
+unsigned int sra(unsigned int rs, unsigned int shamt);
 unsigned int slt(unsigned int rs, unsigned int rt);
-unsigned int mult(unsigned int rs, unsigned int rt);
 unsigned int or(unsigned int rs, unsigned int rt);
 unsigned int nor(unsigned int rs, unsigned int rt);
 unsigned int ori(unsigned int rs, unsigned int im);
 unsigned int and(unsigned int rs, unsigned int rt);
 unsigned int subu (unsigned int rs, unsigned int rt);
-unsigned int addiu(unsigned int rs, unsigned int Imm, unsigned int stackPointer);
+unsigned int addiu(unsigned int rs, unsigned int Imm);
 unsigned int addu(unsigned int adduA, unsigned int adduB);
 
 #endif

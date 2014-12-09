@@ -13,7 +13,7 @@ t2b multu dec addiu sll ssum printFloat b2t
 serial*
 *.py
 sim
-simulator_oldendian.c *dmp.c
+simulator_*.c *dmp.c
 *.ppm
 *.out
 qk*/

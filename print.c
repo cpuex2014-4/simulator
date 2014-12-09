@@ -18,9 +18,9 @@ void printhelp(void) {
 	printf("使用法: sim [入力ファイル] [オプション1] <num> [オプション2] <num1> <num2>...\n");
 	printf("\t--help\t\t\t\tヘルプを表示する\n");	// 0
 	printf("\t--hide\t\t\t\t各命令実行時の詳細データを表示しない\n");	// 1
-	printf("\t--break <num>\t\t\tブレイクポイントを指定\n");		// 2
-	printf("\t--reg <num>\t\t\tレジスタ表示を有効化\n");			// 3
-	printf("\t--sequential\t\t\t逐次実行 (未実装)\n");		// 5
+	printf("\t%s <num>\t\t\tブレイクポイントを指定\n", BREAKPOINT);		// 2
+	printf("\t%s <num>\t\t\tレジスタ表示を有効化\n", PRINTREG);			// 3
+	printf("\t%s\t\t\t逐次実行 (未実装)\n", SEQUENTIAL);		// 5
 	printf("\t--memory <num1> <num2>\t\t<num1>番地から<num2>番地までのメモリ内容を最後に表示(未指定時:全領域出力)\n");		// 6
 //	printf("\t--native\t\t\tFPUをx86ネイティブで実行する (未実装)\n");		// 7
 	printf("\t--serialout <ファイル名>\tシリアルポートからの出力先を指定(未指定時:serial.out)\n");	// 8
