@@ -16,6 +16,42 @@ unsigned int signExt(unsigned int argument) {
 	return argument;
 }
 
+
+/* store word */
+// sw rs,rt,Imm => M[ R(rs)+Imm ] <- R(rt)	rtの内容をメモリのR(rs)+Imm(符号拡張)番地に書き込む ☆sw()呼び出し時点で拡張済み
+/* リトルエンディアン */
+unsigned int sw(unsigned int rt, unsigned int address, unsigned int* memory) {
+	unsigned int addr0;
+	unsigned int addr1;
+	unsigned int addr2;
+	unsigned int addr3;
+
+
+	addr3 = (rt & 0xFF000000) >> 24;
+	addr2 = (rt & 0x00FF0000) >> 16;
+	addr1 = (rt & 0x0000FF00) >>  8;
+	addr0 = rt & 0x000000FF;
+
+	memory[address+3] = addr3;
+	memory[address+2] = addr2;
+	memory[address+1] = addr1;
+	memory[address] = addr0;
+
+	if(rt != ( memory[address] | memory[address+1] << 8 | memory[address+2] << 16 | memory[address+3] << 24 )) {
+		fprintf(stderr, "\n[ ERROR ]\tFailed to SW\n");
+		exit(1);
+	}
+	return 0;
+}
+/* load word */
+// lw rs,rt,Imm => R(rt) <- M[ R(rs)+Imm ]	メモリのR(rs)+Imm番地の内容をrtに書き込む
+unsigned int lw(unsigned int address, unsigned int* memory) {
+	unsigned rt = 0;
+	rt = memory[address] | memory[address+1] << 8 | memory[address+2] << 16 | memory[address+3] << 24;
+	return rt;
+}
+
+
 unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, unsigned int* fpuNum, unsigned int* labelRec) {
 	unsigned int fpfunction;
 	unsigned int fmt, ft, rt, fs, fd, fpregtemp;

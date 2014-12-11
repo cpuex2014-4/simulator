@@ -16,8 +16,8 @@ sim
 simulator_*.c *dmp.c
 *.ppm
 *.out
-qk*/
-
+qk*
+old*
 
 
 

@@ -2,6 +2,9 @@
 #define ALU_H
 
 unsigned int signExt(unsigned int argument);
+unsigned int sw(unsigned int rt, unsigned int address, unsigned int* memory);
+unsigned int lw(unsigned int address, unsigned int* memory);
+
 unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, unsigned int* fpuNum, unsigned int* labelRec);
 unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned int* fpuNum, unsigned int* labelRec);
 
