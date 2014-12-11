@@ -421,20 +421,13 @@ int main (int argc, char* argv[]) {
 
 	char sequentialBuff[BUFF];
 	FILE* soFile;
+	FILE* labelFile;
 	unsigned int fSize;
 	int comp;
 	double timebuff[BUFF];
 	int i_time = 0;
 	
-
 	timebuff[i_time] = getProcTime();
-//	fprintf(stderr, "time[%2d] = %f\n", i_time, timebuff[i_time]);
-/*
-	for(count=0;count<BUFF;count++) {
-		labelRec[count]=0;
-	}
-*/
-
 
 	count=0;
 	opBuff = (unsigned int *) calloc( FILESIZE, sizeof(unsigned int) );
@@ -485,6 +478,11 @@ int main (int argc, char* argv[]) {
 		fprintf(stderr, "[ ERROR ]\tCannot make \"serial.out\".\n");
 		exit(1);
 	}
+	labelFile = fopen("label.log", "wb");
+	if(labelFile == NULL) {
+		fprintf(stderr, "[ ERROR ]\tCannot make \"label.log\".\n");
+		exit(1);
+	}
 
 	printf("Commandline Option: ");
 	/* 引数の処理 */
@@ -523,7 +521,7 @@ int main (int argc, char* argv[]) {
 			flag[5] = 1;
 			printf("SEQUENTIAL, ");
 		}
-		/* print_mem */
+		/* print_mem or hide_mem */
 		comp = strcmp(argv[i],PRINTMEM);
 		if((comp == 0) && (argc > (i+2))) { 
 			flag[6] = 1;
@@ -531,6 +529,13 @@ int main (int argc, char* argv[]) {
 			mfinish = (unsigned int) atoi(argv[i+2]);
 			printf("PRINTMEM, ");
 			i = i + 2;
+		}
+		comp = strcmp(argv[i],HIDEMEM);
+		if((comp == 0) && (argc > (i+2))) { 
+			flag[HIDEMEMIND] = 1;
+			mstart = 0;
+			mfinish = 0;
+			printf("HIDEMEM, ");
 		}
 		/* native */
 		comp = strcmp(argv[i],FPUNATIVE);
@@ -690,15 +695,17 @@ int main (int argc, char* argv[]) {
 			snum++;
 		}
 	}
-	while((snum < MEMORYSIZE-3) && (snum < mfinish)) {
-		if(snum < maxpc+PCINIT) {
-			snum = snum + 4;
-			continue;
+	if(flag[HIDEMEMIND] == 0) {
+		while((snum < MEMORYSIZE-3) && (snum < mfinish)) {
+			if(snum < maxpc+PCINIT) {
+				snum = snum + 4;
+				continue;
+			}
+			if ( (memory[snum] != 0 || memory[snum+1] != 0 || memory[snum+2] != 0 || memory[snum+3] != 0) ) {
+				printf("memory[0x%06X] = %02X %02X %02X %02X\n", snum, memory[snum+3], memory[snum+2], memory[snum+1], memory[snum]);
+			}
+			snum += 4;
 		}
-		if ( (memory[snum] != 0 || memory[snum+1] != 0 || memory[snum+2] != 0 || memory[snum+3] != 0) ) {
-			printf("memory[0x%06X] = %02X %02X %02X %02X\n", snum, memory[snum+3], memory[snum+2], memory[snum+1], memory[snum]);
-		}
-		snum += 4;
 	}
 
 	printf("\nレジスタ吐き出し:\n");
@@ -709,12 +716,11 @@ int main (int argc, char* argv[]) {
 	printf("\n(OP)\t: \t(Num), \t(Ratio)\n");
 	if(opNum[128+NOP] != 0) { printf("NOP 	: %6u, %05.2f (%%)\n", opNum[128+NOP], (double) 100*opNum[128+NOP]/breakCount); }
 	printOpsCount(opNum, fpuNum, breakCount);
-	printf("\nラベル呼び出し先:\n\t");
 	snum = 0;
 	count = 0;
 	while(snum < maxpc+PCINIT) {
 		if (labelRec[snum] != 0) {
-			printf("Line: %6u -> %12u (回)\n\t",(snum-PCINIT)/4,labelRec[snum]);
+			fprintf(labelFile, "\tLine: %6u -> %12u (回)\n",(snum-PCINIT)/4,labelRec[snum]);
 			count++;
 		}
 		snum++;

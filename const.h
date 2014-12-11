@@ -78,6 +78,7 @@
 #define HIDE 		"--hide"
 #define SEQUENTIAL 	"--sequential"
 #define PRINTMEM 	"--memory"
+#define HIDEMEM 	"--hidememory"
 #define FPUNATIVE 	"--native"
 #define SERIALOUT 	"--serialout"
 #define ARGMAX 30
@@ -92,6 +93,7 @@
 /* flags */
 #define HIDEIND		1
 #define PRINTREGIND	3
+#define HIDEMEMIND		21
 #define OUTPUTSIZE	24
 #define JUMPFLG		25
 #define MAXPC		26
