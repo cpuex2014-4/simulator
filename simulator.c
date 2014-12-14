@@ -497,7 +497,7 @@ int main (int argc, char* argv[]) {
 				pc = functHide(pc, operation, flag, reg, opNum, labelRec);
 				break;
 			default :
-				pc = decoder(pc, operation, memory, memInit, input, srOut, breakCount, flag, reg, opNum, labelRec, soFile, opcode);
+				pc = decoder(pc, operation, memory, memInit, input, srOut, breakCount, flag, reg, fpreg, opNum, labelRec, soFile, opcode);
 				break;
 		}
 		breakCount++;

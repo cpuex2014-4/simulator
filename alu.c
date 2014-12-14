@@ -37,11 +37,11 @@ unsigned int sw(unsigned int rt, unsigned int address, unsigned int* memory) {
 	memory[address+1] = addr1;
 	memory[address] = addr0;
 
-	if(rt != ( memory[address] | memory[address+1] << 8 | memory[address+2] << 16 | memory[address+3] << 24 )) {
+/*	if(rt != ( memory[address] | memory[address+1] << 8 | memory[address+2] << 16 | memory[address+3] << 24 )) {
 		fprintf(stderr, "\n[ ERROR ]\tFailed to SW\n");
 		exit(1);
 	}
-	return 0;
+*/	return 0;
 }
 /* load word */
 // lw rs,rt,Imm => R(rt) <- M[ R(rs)+Imm ]	メモリのR(rs)+Imm番地の内容をrtに書き込む

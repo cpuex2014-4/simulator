@@ -26,6 +26,8 @@
 #define FPU   0x11
 #define LW    0x23
 #define SW    0x2B
+#define LWC1  0x31
+#define SWC1  0x39
 #define INOUT 0x3F
 #define SRCV  0x1C
 #define SSND  0x1D

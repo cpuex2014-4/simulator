@@ -7,8 +7,23 @@
 #include "fpu/C/fpu.h"
 #include "decoder.h"
 
-/* --hide フラグセット時のデコーダ */
-unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* memory, unsigned int* memInit,unsigned char* input, unsigned char* srOut, unsigned long long breakCount, int* flag, unsigned int* reg, unsigned int* opNum, unsigned int* labelRec, FILE* soFile, unsigned int opcode) {
+
+unsigned int decoder (
+	unsigned int pc, 
+	unsigned int instruction, 
+	unsigned int* memory, 
+	unsigned int* memInit,
+	unsigned char* input, 
+	unsigned char* srOut, 
+	unsigned long long breakCount, 
+	int* flag, 
+	unsigned int* reg, 
+	unsigned int* fpreg,
+	unsigned int* opNum, 
+	unsigned int* labelRec, 
+	FILE* soFile, 
+	unsigned int opcode
+) {
 	unsigned int rt, rs, address, im, rs_original;
 	unsigned int jump;
 	static long srInCount = 0;
@@ -95,16 +110,38 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 					exit(1);
 				}
 				if (memInit[address] == 0) {
-					fprintf(stderr, "[ ERROR ]\tAccessed to uninitialized address: %08X\n", address);
+					fprintf(stderr, "[ ERROR ]\tInstruction(0x%X) accessed to uninitialized address: %08X@%llu\n", instruction, address, breakCount);
+//					exit(1);
 				}
 				reg[rt] = lw(address, memory);
 				if(flag[HIDEIND] != 1) { printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n\t\treg[rt(%u)] = 0x%X\n", address, memory[address], rt, reg[rt]); }
 			}
 			break;
+		case(LWC1) :
+			// LWC1 ft, offset(base) ; ft->rt , base -> rs, offset -> im
+			//	-> fpreg[rt] = memory[reg[base]+offset]
+			/* 	vAddr ¬ sign_extend(offset) + GPR[base]
+				if vAddr[1..0] != 0^2 then
+					SignalException(AddressError)
+				endif 
+				(pAddr, CCA) <- AddressTranslation (vAddr, DATA, LOAD)
+				memword <- LoadMemory(CCA, WORD, pAddr, vAddr, DATA)
+				StoreFPR(ft, UNINTERPRETED_WORD, memword)
+			*/
+			address = signExt(im) + reg[rs];
+			if (address > MEMORYSIZE) {
+				fprintf(stderr, "[ ERROR ]\tMEMORY OVERFLOW (pc:0x%X, instruction:0x%X, address:0x%Xcount:%llu)", pc, instruction, address, breakCount);
+				exit(1);
+			}
+			if (memInit[address] == 0) {
+				fprintf(stderr, "[ ERROR ]\tInstruction(0x%X) accessed to uninitialized address: %08X@%llu\n", instruction, address, breakCount);
+//				exit(1);
+			}
+			fpreg[rt] = lw(address, memory);
+			break;
 		case(SW) :
 			opNum[SW]++;
-			im = signExt(im);
-			address = (reg[rs] + im);
+			address = reg[rs] + signExt(im);
 
 			if( (address & MMIO) == MMIO) {
 				if((fwrite(&reg[rt], sizeof(unsigned char), 1, soFile)) == 0) { fprintf(stderr, "failed to fwrite at \n"); }
@@ -124,14 +161,25 @@ unsigned int decoder (unsigned int pc, unsigned int instruction, unsigned int* m
 					fprintf(stderr, "[ ERROR ]\tMemory overflow\n");
 					exit(1);
 				}
-				if(address > MEMORYSIZE) {
-					fprintf(stderr, "[ ERROR ]\tMemory overflow\n");
+				if (address > MEMORYSIZE) {
+					fprintf(stderr, "[ ERROR ]\tMEMORY OVERFLOW (pc:0x%X, instruction:0x%X, address:0x%Xcount:%llu)", pc, instruction, address, breakCount);
 					exit(1);
 				}
 				sw(reg[rt], address, memory);
 				if(flag[HIDEIND] != 1) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
 				memInit[address] = 1;
 			}
+			break;
+		case(SWC1) :
+			// SWC1 ft, offset(base)
+			address = reg[rs] + signExt(im);
+			if (address > MEMORYSIZE) {
+				fprintf(stderr, "[ ERROR ]\tMEMORY OVERFLOW (pc:0x%X, instruction:0x%X, address:0x%Xcount:%llu)", pc, instruction, address, breakCount);
+				exit(1);
+			}
+			sw(fpreg[rt], address, memory);
+			if(flag[HIDEIND] != 1) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
+			memInit[address] = 1;
 			break;
 		case(LUI) :
 			reg[rt] = im << 16;
