@@ -18,7 +18,8 @@ simulator_*.c *dmp.c
 *.out
 qk*
 old*
-
+memo
+*.log
 
 
 
