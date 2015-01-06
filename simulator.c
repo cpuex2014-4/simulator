@@ -50,17 +50,16 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 		printf("\t[function:%2X]\n", function); 
 		printf("\t[OPERAND] rs:%08X rt:%08X rd:%08X shamt:%08X \n", rs,rt,rd,shamt);
 	}
+
+	pc = pc + 4;
 	switch (function) {
 		case (JR) :
 			pc = reg[rs];
 			labelRec[pc]++;
-//			flag[JUMPFLG] = 1;
 			opNum[128+JR]++;
 			break;
 		case(JALR) :
-			if (rd == 0) {			// rdが$zeroならrd = 31
-				rd = 31;
-			} 
+			if (rd == 0) { rd = 31; } 		// rdが$zeroならrd = 31
 			pc = reg[rs];
 			reg[rd] = pc;
 			opNum[JALR]++;
@@ -68,73 +67,64 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 //			printf("\t\tlabelRec(%04X):%u\n", (pc-PCINIT)/4, labelRec[pc]);
 			break;
 		case (ADDU) :	// rd=rs+rt
-			pc = pc + 4;
 			reg[rd] = addu(reg[rs], reg[rt]);
 			opNum[128+ADDU]++;
 			break;
 		case (SUBU) :	// rd=rs-rt
-			pc = pc + 4;
 			reg[rd] = subu(reg[rs], reg[rt]);
 			opNum[128+SUBU]++;
 			break;
 		case (SLT) :
-			pc = pc + 4;
 			reg[rd] = slt(reg[rs], reg[rt]);
 			opNum[128+SLT]++;
 			break;
 		case (SLL) :
-			pc = pc + 4;
-/*			if(rd == 0) {
-				opNum[128+NOP]++;
-				break;
-			}
-*/			reg[rd] = sll(reg[rt], shamt);
+			reg[rd] = sll(reg[rt], shamt);
 			opNum[128+SLL]++;
 			break;
 		case (SRL) :
-			pc = pc + 4;
-/*			if(rd == 0) {
-				opNum[128+NOP]++;
-				break;
-			}
-*/			reg[rd] = srl(reg[rt], shamt);
+			reg[rd] = srl(reg[rt], shamt);
 			opNum[128+SRL]++;
 			break;
 		case (SRA) :
-			pc = pc + 4;
 			reg[rd] = sra(reg[rt], shamt);
 			opNum[128+SRA]++;
 			break;
 		case (AND) :
 			reg[rd] = and(reg[rs], reg[rt]);
-			pc = pc + 4;
 			opNum[128+AND]++;
 			break;
 		case (OR) :
 			reg[rd] = or(reg[rs], reg[rt]);
-			pc = pc + 4;
 			opNum[128+OR]++;
+			break;
+		case (XOR) :
+			reg[rd] = xor(reg[rs], reg[rt]);
+			opNum[128+XOR]++;
+			break;
+		case (NOR) :
+			reg[rd] = nor(reg[rs], reg[rt]);
+			opNum[128+NOR]++;
 			break;
 		default :
 			fprintf(stderr, "[ ERROR ]\tUnknown switch has selected.(function: 0x%X / pc: 0x%X)\n", function, pc);
-			pc = pc + 4;
 			flag[UNKNOWNFUNC]++;
+			break;
 	}
 	return pc;
 }
 
-/* opcodeが0の時の操作を、末尾6ビットによって決める */
+/*
 unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsigned int* reg, unsigned long long* opNum, unsigned int* labelRec) {
 	unsigned int function, rs, rs_original, rt, rd, shamt;
 
-	/* [op] [rs] [rt] [rd] [shamt] [funct] */
-	/* 先頭&末尾6bitは0であることが保証済み */
+	// [op] [rs] [rt] [rd] [shamt] [funct]
+	// 先頭&末尾6bitは0であることが保証済み
 	rs = (instruction >> 21) & 0x1F;
 	rt = (instruction >> 16) & 0x1F;
 	rd = (instruction >> 11 ) & 0x1F;
 	shamt = (instruction >> 6 ) & 0x1F;
 
-	
 	function = instruction & 0x3F;
 	if(flag[HIDEIND] == 1) { 
 		printf("\t[function:%2X]\n", function); 
@@ -219,6 +209,8 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 	return pc;
 }
 
+*/
+
 int main (int argc, char* argv[]) {
 	int flag[FLAGSIZE] = { 0 };
 	int fd1 = 0;
@@ -288,7 +280,6 @@ int main (int argc, char* argv[]) {
 	if (argc < 2) {
 		printhelp();
 		return -1;
-		printf("please input file.\n");
 	}
 	/* ファイルから実行命令列を読み込む */
 	printf("%s\n", argv[1]);
@@ -510,8 +501,12 @@ int main (int argc, char* argv[]) {
 		} else if ((flag[HIDEIND] == 1) && flag[PRINTREGIND] == 1 && operation != 0) {
 			printRegister(reg);	// 命令実行後のレジスタを表示する
 			printf("\n== next: %u ==\n", ((pc-PCINIT)/4));
-		} else if(flag[5] == 1) { 
+		} else if((flag[5] == 1) && (flag[HIDEIND] == 0)) { 
 			if (fgets(sequentialBuff, sizeof(sequentialBuff) - 1, stdin) == NULL) { ; }
+		} else if((flag[5] == 1) && (flag[HIDEIND] == 1)) { 
+			printRegister(reg);	// 命令実行後のレジスタを表示する
+			if (fgets(sequentialBuff, sizeof(sequentialBuff) - 1, stdin) == NULL) { ; }
+			printf("\n== next: %u ==\n", ((pc-PCINIT)/4));
 		} else if(flag[HIDEIND] == 1) {
 			 printf("\n== next: %u ==\n", ((pc-PCINIT)/4));
 		}
@@ -547,8 +542,7 @@ int main (int argc, char* argv[]) {
 
 	printf("\n\nTotal instructions: \n\t%llu\n", breakCount);
 	printf("Total instructions (except NOP): \n\t%llu\n", (breakCount - opNum[128+NOP]));
-	printf("\n(OP)\t: \t(Num), \t(Ratio)\n");
-	if(opNum[128+NOP] != 0) { printf("NOP 	: %6llu, %05.2f (%%)\n", opNum[128+NOP], (double) 100*opNum[128+NOP]/breakCount); }
+//	if(opNum[128+NOP] != 0) { printf("NOP 	: %6llu, %05.2f (%%)\n", opNum[128+NOP], (double) 100*opNum[128+NOP]/breakCount); }
 	printOpsCount(opNum, fpuNum, breakCount);
 	count2 = 0;
 	count = 0;

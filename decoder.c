@@ -42,45 +42,6 @@ unsigned int decoder (
 		printf("[ops: %06llu, pc: 0x%x, instruction: 0x%2X]\n\t[opcode:%2X]\n", breakCount, pc, instruction, opcode);
 	}
 	switch (opcode) {
-		case(ADDIU) :
-//			return(addiu(reg, instruction, flag, opNum));
-			im = signExt(im);
-			rs_original = reg[rs];
-			reg[rt] = reg[rs] + im;
-			if(flag[HIDEIND] == 1) { printf("\tADDIU :\t[$%2u: 0x%4X] + [im: 0x%8X] => [$%2u: 0x%4X]\n", rs, rs_original, im, rt, reg[rt]); }
-			opNum[ADDIU]++;
-			break;
-		case(JUMP) :
-			jump = instruction & 0x3FFFFFF;
-			pc = jump*4 + PCINIT;	// jumpはpc形式
-			labelRec[pc]++;		
-			opNum[JUMP]++;
-			if(flag[HIDEIND] == 1) { printf("\tJump :\t(jump_to) 0x%04x\n", pc); }
-			break;
-		case(BEQ) : 
-			diff = signExt(im);
-			if(flag[HIDEIND] == 1) { printf("\tBEQ :\t?([$%2u 0x%2X] = [$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
-			if(reg[rs] == reg[rt]) {
-				pc = pc + diff*4;		// pc形式
-				labelRec[pc]++;
-				if(flag[HIDEIND] == 1) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
-			} else if(flag[HIDEIND] == 1) {
-				printf("\t<FALSE & NOP>\n");
-			}
-			opNum[BEQ]++;
-			break;
-		case(BNE) :		// bne I-Type: 000101 rs rt BranchAddr 	等しくないなら分岐 
-			diff = signExt(im);
-			if(flag[HIDEIND] == 1) { printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
-			if(reg[rs] != reg[rt]) {
-				pc = pc + diff*4;		// pc形式
-				labelRec[pc]++;
-				if(flag[HIDEIND] == 1) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
-			} else if(flag[HIDEIND] == 1) {
-				printf("\t<FALSE & NOP>\n");
-			}
-			opNum[BNE]++;
-			break;
 		case(LW) :	// 0x47: lw r1, 0xaaaa(r2) : r2+0xaaaaのアドレスにr1を32ビットでロード
 //			pc = lw(reg, im, rs, rt, rd, mem, address, flag);
 //			return pc;
@@ -180,6 +141,45 @@ unsigned int decoder (
 			sw(fpreg[rt], address, memory);
 			if(flag[HIDEIND] == 1) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
 			memInit[address] = 1;
+			break;
+		case(ADDIU) :
+//			return(addiu(reg, instruction, flag, opNum));
+			im = signExt(im);
+			rs_original = reg[rs];
+			reg[rt] = reg[rs] + im;
+			if(flag[HIDEIND] == 1) { printf("\tADDIU :\t[$%2u: 0x%4X] + [im: 0x%8X] => [$%2u: 0x%4X]\n", rs, rs_original, im, rt, reg[rt]); }
+			opNum[ADDIU]++;
+			break;
+		case(JUMP) :
+			jump = instruction & 0x3FFFFFF;
+			pc = jump*4 + PCINIT;	// jumpはpc形式
+			labelRec[pc]++;		
+			opNum[JUMP]++;
+			if(flag[HIDEIND] == 1) { printf("\tJump :\t(jump_to) 0x%04x\n", pc); }
+			break;
+		case(BEQ) : 
+			diff = signExt(im);
+			if(flag[HIDEIND] == 1) { printf("\tBEQ :\t?([$%2u 0x%2X] = [$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
+			if(reg[rs] == reg[rt]) {
+				pc = pc + diff*4;		// pc形式
+				labelRec[pc]++;
+				if(flag[HIDEIND] == 1) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
+			} else if(flag[HIDEIND] == 1) {
+				printf("\t<FALSE & NOP>\n");
+			}
+			opNum[BEQ]++;
+			break;
+		case(BNE) :		// bne I-Type: 000101 rs rt BranchAddr 	等しくないなら分岐 
+			diff = signExt(im);
+			if(flag[HIDEIND] == 1) { printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
+			if(reg[rs] != reg[rt]) {
+				pc = pc + diff*4;		// pc形式
+				labelRec[pc]++;
+				if(flag[HIDEIND] == 1) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
+			} else if(flag[HIDEIND] == 1) {
+				printf("\t<FALSE & NOP>\n");
+			}
+			opNum[BNE]++;
 			break;
 		case(LUI) :
 			reg[rt] = im << 16;

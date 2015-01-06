@@ -55,21 +55,21 @@ unsigned int lw(unsigned int address, unsigned int* memory) {
 unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, unsigned long long* fpuNum, unsigned int* labelRec) {
 	unsigned int fpfunction;
 	unsigned int fmt, ft, rt, fs, fd, fpregtemp;
+	unsigned int target;
 
 	fmt = (instruction >> 21) & 0x1F;
 	ft  = (instruction >> 16) & 0x1F;
 
 	if (fmt == BC1) {
-		unsigned int target = instruction & 0xFFFF;
+		target = instruction & 0xFFFF;
+		fpregtemp = fpreg[23] & 0x800000;
 		if (ft == 0) {		// falseで分岐
-			fpregtemp = fpreg[23] & 0x800000;
 			if(fpregtemp == 0) {
 				pc = pc + 4 + signExt(target)*4;
 				labelRec[pc]++;
 			} else { pc = pc + 4; }
 			fpuNum[BC1F]++;
 		} else if(ft == 1) {	// Trueで分岐
-			fpregtemp = fpreg[23] & 0x800000;
 			if(fpregtemp == 0x800000) {
 				pc = pc + 4 + signExt(target)*4;
 				labelRec[pc]++;
@@ -86,20 +86,52 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 		switch (fpfunction) {
 			case (0) :
 				rt  = (instruction >> 16) & 0x1F;
-				if(fmt == MFC1M) {
+				switch (fmt) {
+					case (MFC1M) :
+						reg[rt] = fpreg[fs];
+						fpuNum[FMFC]++;
+						break;
+					case (MTC1M) :
+						fpreg[fs] = reg[rt];
+						fpuNum[FMTC]++;
+						break;
+					case (0x10) :
+						// fadd
+						fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
+						fpuNum[FADDS]++;
+						break;
+					default :
+						fprintf(stderr, "Unknown fmt(function '0').\n");
+						break;
+				}
+/*				if(fmt == MFC1M) {
 					reg[rt] = fpreg[fs];
 					fpuNum[FMFC]++;
 				} else if (fmt == MTC1M) {
 					fpreg[fs] = reg[rt];
 					fpuNum[FMTC]++;
 				} else if (fmt == 0x10) {
-					/* fadd */
+					// fadd
 					fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
 					fpuNum[FADDS]++;
-					pc = pc + 4;
-					return pc;
 				} else {
 					fprintf(stderr, "Unknown fmt(function '0').\n");
+				}
+*/				break;
+			case (FMULS) :	
+				if(fmt == 0x10) { 
+					fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
+					fpuNum[FMULS]++;
+				}
+				break;
+			case (COLE) :
+				if(fmt == 0x10) {
+					if(fle (fpreg[fs], fpreg[ft])) {
+						fpreg[23] = fpreg[23] | 0x800000;
+					} else {
+						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
+					}
+					fpuNum[COLE]++;
 				}
 				break;
 			case (MOVSF) :	
@@ -124,12 +156,6 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 					}
 					fpreg[fd]=fsub (fpreg[fs], fpreg[ft]);
 					fpuNum[FSUBS]++;
-				}
-				break;
-			case (FMULS) :	
-				if(fmt == 0x10) { 
-					fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
-					fpuNum[FMULS]++;
 				}
 				break;
 			case (FDIVS) :	
@@ -175,16 +201,6 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 					fpuNum[COLT]++;
 				}
 				break;
-			case (COLE) :
-				if(fmt == 0x10) {
-					if(fle (fpreg[fs], fpreg[ft])) {
-						fpreg[23] = fpreg[23] | 0x800000;
-					} else {
-						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
-					}
-					fpuNum[COLE]++;
-				}
-				break;
 			default :
 				fprintf(stderr, "Unknown FPswitch has selected.\n");
 		}
@@ -194,7 +210,7 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 }
 
 
-
+/*
 unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned long long* fpuNum, unsigned int* labelRec) {
 	unsigned int fpfunction, fmt, ft, rt, fs, fd, itoftemp, ftoitemp, fpregtemp, target;
 	fmt = (instruction >> 21) & 0x1F;
@@ -267,6 +283,24 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					printf("Unknown fmt(function '0').\n");
 				}
 				break;
+			case (FMULS) :	
+				if(fmt == 0x10) { 
+					fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
+					if(flag[HIDEIND] == 1) { printf("\tFMUL : ($FP%02u)%X = ($FP%02u)%X * ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]); }
+					fpuNum[FMULS]++;
+				}
+				break;
+			case (COLE) :
+				if(fmt == 0x10) {
+					if(fle (fpreg[fs], fpreg[ft])) {
+						fpreg[23] = fpreg[23] | 0x800000;
+					} else {
+						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
+					}
+					if(flag[HIDEIND] == 1) { printf("\tC.OLE : ?( ($FP%02u)%X <= ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
+					fpuNum[COLE]++;
+				}
+				break;
 			case (MOVSF) :	
 				if(fmt == 0x10) { 
 					fpreg[fd] = fpreg[fs];
@@ -275,7 +309,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				}
 				break;
 			case (SQRT) :
-				/* fd <- sqrt(fs) 	fsqrt  */
+				// fd <- sqrt(fs) 	fsqrt
 				if(fmt == 0x10) { 
 					fpreg[fd] = fsqrt(fpreg[fs]);
 					if(flag[HIDEIND] == 1) { printf("\tSQRT : ($FP%02u)%X <- SQRT(%02u:%X)\n", fd, fpreg[fd], fs, fpreg[fs]); }
@@ -297,13 +331,6 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 							printf("\tFSUB : ($FP%02u)%X = ($FP%02u)%X - ($FP%02u)%X\n", fd, fpreg[fd], fs, fpreg[fs], ft, fpregtemp);
 					}
 					fpuNum[FSUBS]++;
-				}
-				break;
-			case (FMULS) :	
-				if(fmt == 0x10) { 
-					fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
-					if(flag[HIDEIND] == 1) { printf("\tFMUL : ($FP%02u)%X = ($FP%02u)%X * ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]); }
-					fpuNum[FMULS]++;
 				}
 				break;
 			case (FDIVS) :	
@@ -360,17 +387,6 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					fpuNum[COLT]++;
 				}
 				break;
-			case (COLE) :
-				if(fmt == 0x10) {
-					if(fle (fpreg[fs], fpreg[ft])) {
-						fpreg[23] = fpreg[23] | 0x800000;
-					} else {
-						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
-					}
-					if(flag[HIDEIND] == 1) { printf("\tC.OLE : ?( ($FP%02u)%X <= ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
-					fpuNum[COLE]++;
-				}
-				break;
 			default :
 				fprintf(stderr, "Unknown FPswitch has selected.\n");
 		}
@@ -378,28 +394,24 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 	if(flag[HIDEIND] == 1 && flag[PRINTREGIND] == 1) { printFPRegister(fpreg); }
 	return pc;
 }
-
+*/
 
 unsigned int sll(unsigned int rs, unsigned int shamt) {
-	unsigned int rd;
 	unsigned int i;
 
 	for(i=0;i<shamt;i++) {
 		rs = rs << 1;
 	}
-	rd = rs;
-	return rd;
+	return rs;
 }
 
 unsigned int srl(unsigned int rs, unsigned int shamt) {
-	unsigned int rd;
 	unsigned int i;
 
 	for(i=0;i<shamt;i++) {
 		rs = rs >> 1;
 	}
-	rd = rs;
-	return rd;
+	return rs;
 }
 
 unsigned int sra(unsigned int rs, unsigned int shamt) {
@@ -419,10 +431,20 @@ unsigned int slt(unsigned int rs, unsigned int rt) {
 // R-type
 // rs < rt ならばレジスタ rd に 1 を代入、そうでなければ 0 を代入。 
 // $rsと$rtの値を符号付き整数として比較し、$rs が小さければ $rd に1を、そうでなければ $rd 0を格納
-	unsigned int rd;
+	
+//	unsigned int trs, trt;
+//	unsigned int rd;
+	int srs, srt;
 
-	unsigned int urs, urt;
-	unsigned int trs, trt;
+	srs = (int) rs;
+	srt = (int) rt;
+	if(srs < srt) {
+		return 1;
+	} else {
+		return 0;
+	}
+
+/*	unsigned int urs, urt;
 
 	urs = rs & 0x80000000;
 	urt = rt & 0x80000000;
@@ -431,31 +453,43 @@ unsigned int slt(unsigned int rs, unsigned int rt) {
 
 	if(urs == 0 && urt == 0) {
 		if(trs < trt) {
-			rd = 1;
+			return 1;
 		} else {
-			rd = 0;
+			return 0;
 		}
 	} else if (urs == 0 && urt != 0) {
-		rd = 0;
+		return 0;
 	} else if (urs != 0 && urt == 0) {
-		rd = 1;
+		return 1;
 	} else {
 		if(trs < trt) {
-			rd = 0;
+			return 0;
 		} else {
-			rd = 1;
+			return 1;
 		}
 	}
-
-	return rd;
+*/
 }
 
+unsigned int slti(unsigned int rs, unsigned int im) {
+	int signedIm;
+	int signedRs;
+
+	signedIm = (int) signExt(im);
+	signedRs = (int) rs;
+	if(signedRs < signedIm) {
+		return 1;
+	} else {
+		return 0;
+	}
+	
+}
 
 unsigned int or(unsigned int rs, unsigned int rt) {
 	// R-type
 	// or $rs $rt $rd
 	// rd <- rs or rt
-	unsigned int rd=0;
+	unsigned int rd;
 
 	rd = rs | rt;
 	return rd;
@@ -465,7 +499,7 @@ unsigned int and(unsigned int rs, unsigned int rt) {
 	// R-type
 	// and $rs $rt $rd
 	// rd <- rs & rt
-	unsigned int rd=0;
+	unsigned int rd;
 	rd = rs + rt;
 	return rd;
 }
@@ -474,7 +508,7 @@ unsigned int subu (unsigned int rs, unsigned int rt) {
 	// R-type
 	// subu $rs $rt $rd
 	// rd <- rs - rt
-	unsigned int rd=0;
+	unsigned int rd;
 	rd = rs - rt;
 	return rd;
 }
@@ -484,7 +518,6 @@ unsigned int addiu(unsigned int rs, unsigned int Imm) {
 }
 
 unsigned int addu(unsigned int adduA, unsigned int adduB){
-
 	return (adduA + adduB);
 }
 

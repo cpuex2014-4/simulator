@@ -8,6 +8,7 @@ all: $(TARGET)
 
 $(TARGET): $(FPU) $(SIM)
 	$(CC) -o $(TARGET) $(SIM) $(FPU) $(CFLAGS)
+	rm -f serial.out
 
 clean:
 	rm -f $(SIM) $(FPU) $(TARGET) *.o *~

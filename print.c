@@ -122,6 +122,7 @@ void printRegister(unsigned int* reg) {
 void printOpsCount(unsigned long long opNum[], unsigned long long fpuNum[], unsigned long long breakCount) {
 /* ops & function */
 
+	printf("\n(OP)\t: \t(Num), \t(Ratio)\n");
 	if(opNum[128+ADDU] != 0) { printf("ADDU	: %10llu, %05.2f (%%)\n", opNum[128+ADDU], (double) 100*opNum[128+ADDU]/breakCount); }
 	if(opNum[ADDIU] != 0) { printf("ADDIU	: %10llu, %05.2f (%%)\n", opNum[ADDIU], (double) 100*opNum[ADDIU]/breakCount); }
 	if(opNum[128+SUBU] != 0) { printf("SUBU	: %10llu, %05.2f (%%)\n", opNum[128+SUBU], (double) 100*opNum[128+SUBU]/breakCount); }
@@ -141,8 +142,11 @@ void printOpsCount(unsigned long long opNum[], unsigned long long fpuNum[], unsi
 	if(opNum[SRCV] != 0) { printf("RRB 	: %10llu, %05.2f (%%)\n", opNum[SRCV], (double) 100*opNum[SRCV]/breakCount); }
 	if(opNum[SSND] != 0) { printf("RSB 	: %10llu, %05.2f (%%)\n", opNum[SSND], (double) 100*opNum[SSND]/breakCount); }
 	printf("\n");
+//	printf("\n(Func)\t: \t(Num), \t(Ratio)\n");
+//	printf("\n");
 
 /* fpu */
+	printf("\n(FPU)\t: \t(Num), \t(Ratio)\n");
 	if(fpuNum[BC1F] != 0) { printf("BC1F	: %10llu, %05.2f (%%)\n", fpuNum[BC1F], (double) 100*fpuNum[BC1F]/breakCount); }
 	if(fpuNum[BC1T] != 0) { printf("BC1T	: %10llu, %05.2f (%%)\n", fpuNum[BC1T], (double) 100*fpuNum[BC1T]/breakCount); }
 	if(fpuNum[FMFC] != 0) { printf("FMFC	: %10llu, %05.2f (%%)\n", fpuNum[FMFC], (double) 100*fpuNum[FMFC]/breakCount); }
