@@ -10,9 +10,17 @@
 #define MEMORYSIZE	(1024u*1024u*4u)
 #define DATAOFFSET	0xFFFFFF
 #define OPNUM		256
-#define FLAGSIZAE	32
+#define FLAGSIZE	32
 #define BLOCKRAM	0x1FFFC
 #define LINE		512
+
+
+/* register */
+#define REGAT 1
+#define REGGP 28
+#define REGSP 29
+#define REGFP 30
+#define REGRA 31
 
 /* opcode */
 #define JUMP  0x2
@@ -20,8 +28,11 @@
 #define BEQ   0x4
 #define BNE   0x5
 #define ADDIU 0x9
+#define SLTI  0xA
+#define SLTIU 0xB
 #define ANDI  0xC
 #define ORI   0xD
+#define XORI  0xE
 #define LUI   0xF
 #define FPU   0x11
 #define LW    0x23
@@ -36,13 +47,19 @@
 #define SLL   0x0
 #define SRL   0x2
 #define SRA   0x3
+#define SLLV  0x4
+#define SRLV  0x6
+#define SRAV  0x7
 #define JR    0x8
 #define JALR  0x9
 #define ADDU  0x21
 #define SUBU  0x23
 #define AND   0x24
 #define OR    0x25
+#define XOR   0x26
+#define NOR   0x27
 #define SLT   0x2A
+#define SLTU  0x2B
 #define NOP   0x7F
 
 /* fpfunction */
@@ -73,30 +90,24 @@
 #define FTOI 0x24
 #define ITOF 0x20
 
+
 /* argument */
 #define BREAKPOINT 	"--break"
 #define PRINTREG 	"--reg"
 #define SERIALIN 	"--serialin"
 #define HELP 		"--help"
-#define HIDE 		"--hide"
+#define HIDE 		"--show"
 #define SEQUENTIAL 	"--sequential"
 #define PRINTMEM 	"--memory"
 #define HIDEMEM 	"--hidememory"
 #define FPUNATIVE 	"--native"
-#define SERIALOUT 	"--serialout"
+#define SERIALOUT 	"--output"
 #define ARGMAX 30
-
-/* register */
-#define REGAT 1
-#define REGGP 28
-#define REGSP 29
-#define REGFP 30
-#define REGRA 31
 
 /* flags */
 #define HIDEIND		1
 #define PRINTREGIND	3
-#define HIDEMEMIND		21
+#define HIDEMEMIND  21
 #define OUTPUTSIZE	24
 #define JUMPFLG		25
 #define MAXPC		26
@@ -112,6 +123,7 @@
 #define MMIOREAD		0xFFFF0004
 #define MMIOWRITERDY	0xFFFF0008
 #define MMIOWRITE		0xFFFF000C
+
 
 
 #endif

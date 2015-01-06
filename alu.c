@@ -52,7 +52,7 @@ unsigned int lw(unsigned int address, unsigned int* memory) {
 }
 
 
-unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, unsigned int* fpuNum, unsigned int* labelRec) {
+unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, unsigned long long* fpuNum, unsigned int* labelRec) {
 	unsigned int fpfunction;
 	unsigned int fmt, ft, rt, fs, fd, fpregtemp;
 
@@ -93,6 +93,7 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 					fpreg[fs] = reg[rt];
 					fpuNum[FMTC]++;
 				} else if (fmt == 0x10) {
+					/* fadd */
 					fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
 					fpuNum[FADDS]++;
 					pc = pc + 4;
@@ -194,17 +195,8 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 
 
 
-unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned int* fpuNum, unsigned int* labelRec) {
-	unsigned int fpfunction = 0;
-	unsigned int fmt=0;
-	unsigned int ft=0;
-	unsigned int rt=0;
-	unsigned int fs=0;
-	unsigned int fd=0;
-	unsigned int itoftemp=0;
-	unsigned int ftoitemp=0;
-	unsigned int fpregtemp=0;
-	unsigned int target = 0;
+unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, unsigned int* fpreg, int* flag, unsigned long long* fpuNum, unsigned int* labelRec) {
+	unsigned int fpfunction, fmt, ft, rt, fs, fd, itoftemp, ftoitemp, fpregtemp, target;
 	fmt = (instruction >> 21) & 0x1F;
 	ft  = (instruction >> 16) & 0x1F;
 	rt  = (instruction >> 16) & 0x1F;
@@ -215,17 +207,17 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 	if (fmt == BC1) {
 		target = instruction & 0xFFFF;
 		if (ft == 0) {		// falseで分岐
-			if(flag[HIDEIND] != 1) { printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs); }
+			if(flag[HIDEIND] == 1) { printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs); }
 			if((fpreg[23] & 0x800000) == 0) {
 				pc = pc + 4 + signExt(target)*4;
 				labelRec[pc]++;
 				flag[JUMPFLG] = 1;
-				if(flag[HIDEIND] != 1) {
+				if(flag[HIDEIND] == 1) {
 					printf("\tBC1F : (jump_to) -> 0x%X\n", pc);
 //					printf("\t\tlabelRec(%04X):%u\n", (pc-PCINIT)/4, labelRec[pc]);
 				}
 			} else {
-				if(flag[HIDEIND] != 1) { printf("\tBC1F : <NOP>\n"); }
+				if(flag[HIDEIND] == 1) { printf("\tBC1F : <NOP>\n"); }
 			}
 			fpuNum[BC1F]++;
 		} else if(ft == 1) {	// Trueで分岐
@@ -234,27 +226,27 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				labelRec[pc]++;
 				printf("\t\tlabelRec(%04X):%u\n", (pc-PCINIT)/4, labelRec[pc]);
 				flag[JUMPFLG] = 1;
-				if(flag[HIDEIND] != 1) { printf("\tBC1T : (jump_to) -> 0x%X\n", pc); }
+				if(flag[HIDEIND] == 1) { printf("\tBC1T : (jump_to) -> 0x%X\n", pc); }
 			} else {
-				if(flag[HIDEIND] != 1) { printf("\tBC1T : <NOP>\n"); }
+				if(flag[HIDEIND] == 1) { printf("\tBC1T : <NOP>\n"); }
 			}
 			fpuNum[BC1T]++;
 		} else {
 			fprintf(stderr, "\t[ ERROR ]\tUnknown BC1 option(fmt == 0 && (ft != 0 || ft != 1))\n");
 		}		
 	} else {
-		if(instruction != 0 && flag[HIDEIND] != 1) {
+		if(instruction != 0 && flag[HIDEIND] == 1) {
 			printf("\t[fpfunction:%2X]\n", fpfunction);
 		}
 		switch (fpfunction) {
 			case (0) :
 				if(fmt == MFC1M) {
 					reg[rt] = fpreg[fs];
-					if(flag[HIDEIND] != 1) { printf("\tMFC1 : $%02u <- $FP%02u(%08X)\n", rt, fs, fpreg[fs]); }
+					if(flag[HIDEIND] == 1) { printf("\tMFC1 : $%02u <- $FP%02u(%08X)\n", rt, fs, fpreg[fs]); }
 					fpuNum[FMFC]++;
 				} else if (fmt == MTC1M) {
 					fpreg[fs] = reg[rt];
-					if(flag[HIDEIND] != 1) { printf("\tMTC1 : $FP%02u <- $%02u(%08X)\n", fs, rt, reg[rt]); }
+					if(flag[HIDEIND] == 1) { printf("\tMTC1 : $FP%02u <- $%02u(%08X)\n", fs, rt, reg[rt]); }
 					fpuNum[FMTC]++;
 				} else if (fmt == 0x10) {
 					if (fd == fs) {
@@ -263,7 +255,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 						fpregtemp = fpreg[ft];
 					}
 					fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
-					if(flag[HIDEIND] != 1) {
+					if(flag[HIDEIND] == 1) {
 						if (fd == fs) {
 							printf("\tFADD : ($FP%02u)%X = ($FP%02u)%X + ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpregtemp);
 						} else {
@@ -278,7 +270,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			case (MOVSF) :	
 				if(fmt == 0x10) { 
 					fpreg[fd] = fpreg[fs];
-					if(flag[HIDEIND] != 1) { printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs); }
+					if(flag[HIDEIND] == 1) { printf("\tMOVS : $FP%02u <- $FP%02u\n", fd, fs); }
 					fpuNum[MOVSF]++;
 				}
 				break;
@@ -286,7 +278,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				/* fd <- sqrt(fs) 	fsqrt  */
 				if(fmt == 0x10) { 
 					fpreg[fd] = fsqrt(fpreg[fs]);
-					if(flag[HIDEIND] != 1) { printf("\tSQRT : ($FP%02u)%X <- SQRT(%02u:%X)\n", fd, fpreg[fd], fs, fpreg[fs]); }
+					if(flag[HIDEIND] == 1) { printf("\tSQRT : ($FP%02u)%X <- SQRT(%02u:%X)\n", fd, fpreg[fd], fs, fpreg[fs]); }
 					fpuNum[SQRT]++;
 				}
 				break;
@@ -298,7 +290,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 						fpregtemp = fpreg[ft];
 					}
 					fpreg[fd]=fsub (fpreg[fs], fpreg[ft]);
-					if(flag[HIDEIND] != 1) {
+					if(flag[HIDEIND] == 1) {
 						if (fd == fs)
 							printf("\tFSUB : ($FP%02u)%X = ($FP%02u)%X - ($FP%02u)%X\n", fd, fpreg[fd], fs, fpregtemp, ft, fpreg[ft]);
 						else
@@ -310,7 +302,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 			case (FMULS) :	
 				if(fmt == 0x10) { 
 					fpreg[fd]=fmul (fpreg[fs], fpreg[ft]);
-					if(flag[HIDEIND] != 1) { printf("\tFMUL : ($FP%02u)%X = ($FP%02u)%X * ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]); }
+					if(flag[HIDEIND] == 1) { printf("\tFMUL : ($FP%02u)%X = ($FP%02u)%X * ($FP%02u)%X\n", fd, fpreg[fd], ft, fpreg[ft], fs, fpreg[fs]); }
 					fpuNum[FMULS]++;
 				}
 				break;
@@ -334,7 +326,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				if(fmt == FTOIM) {
 					ftoitemp = fpreg[fs];
 					fpreg[fd]=ftoi (fpreg[fs]);
-					if(flag[HIDEIND] != 1) { printf("\tFTOI :($FP%02u)%X -> ($FP%02u)%X\n", fs, ftoitemp, fd, fpreg[fd]); }
+					if(flag[HIDEIND] == 1) { printf("\tFTOI :($FP%02u)%X -> ($FP%02u)%X\n", fs, ftoitemp, fd, fpreg[fd]); }
 					fpuNum[FTOI]++;
 				}
 				break;
@@ -342,7 +334,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				if(fmt == ITOFM) {
 					itoftemp = fpreg[fs];
 					fpreg[fd]=itof (fpreg[fs]);
-					if(flag[HIDEIND] != 1) { printf("\tITOF : ($FP%02u)%X -> ($FP%02u)%X\n", fs, itoftemp, fd, fpreg[fd]); }
+					if(flag[HIDEIND] == 1) { printf("\tITOF : ($FP%02u)%X -> ($FP%02u)%X\n", fs, itoftemp, fd, fpreg[fd]); }
 					fpuNum[ITOF]++;
 				}
 				break;
@@ -353,7 +345,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					} else {
 						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
 					}
-					if(flag[HIDEIND] != 1) { printf("\tC.EQ : ?( ($FP%02u)%X == ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
+					if(flag[HIDEIND] == 1) { printf("\tC.EQ : ?( ($FP%02u)%X == ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
 					fpuNum[CEQ]++;
 				}
 				break;
@@ -364,7 +356,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					} else {
 						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
 					}
-					if(flag[HIDEIND] != 1) { printf("\tC.OLT : ?( ($FP%02u)%X < ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
+					if(flag[HIDEIND] == 1) { printf("\tC.OLT : ?( ($FP%02u)%X < ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
 					fpuNum[COLT]++;
 				}
 				break;
@@ -375,7 +367,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 					} else {
 						fpreg[23] = fpreg[23] & 0xFF7FFFFF;
 					}
-					if(flag[HIDEIND] != 1) { printf("\tC.OLE : ?( ($FP%02u)%X <= ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
+					if(flag[HIDEIND] == 1) { printf("\tC.OLE : ?( ($FP%02u)%X <= ($FP%02u)%X ) -> (cc0)%X\n", fs, fpreg[fs], ft, fpreg[ft], fpreg[23]); }
 					fpuNum[COLE]++;
 				}
 				break;
@@ -383,7 +375,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 				fprintf(stderr, "Unknown FPswitch has selected.\n");
 		}
 	}
-	if(flag[HIDEIND] != 1 && flag[PRINTREGIND] == 1) { printFPRegister(fpreg); }
+	if(flag[HIDEIND] == 1 && flag[PRINTREGIND] == 1) { printFPRegister(fpreg); }
 	return pc;
 }
 
@@ -501,6 +493,17 @@ unsigned int ori(unsigned int rs, unsigned int im) {
 
 	rt = rs | im;
 	return rt;
+}
+
+unsigned int nor(unsigned int rs, unsigned int rt) {
+	unsigned int rd;
+
+	rd = !rs & !rt;
+	return rd;
+}
+
+unsigned int xor(unsigned int rs, unsigned int rt) {
+	return (rs ^ rt);
 }
 
 

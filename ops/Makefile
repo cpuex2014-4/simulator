@@ -11,5 +11,11 @@ b2t: conv_b2t.c
 dec: conv_dec.c
 	gcc -Wall -o dec conv_dec.c
 
+nor: nor.c
+	gcc -Wall -o dec conv_dec.c
+
+
+
+
 clean:
 	rm -f $(TARGETS) *~

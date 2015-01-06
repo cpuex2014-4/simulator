@@ -37,7 +37,7 @@ unsigned int getFileSize(const char fileName[])
 
 
 
-unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, unsigned int* reg, unsigned int* opNum, unsigned int* labelRec) {
+unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, unsigned int* reg, unsigned long long* opNum, unsigned int* labelRec) {
 	unsigned int function, rs, rt, rd, shamt;
 
 	rs = (instruction >> 21) & 0x1F;
@@ -46,7 +46,7 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 	shamt = (instruction >> 6 ) & 0x1F;
 	
 	function = instruction & 0x3F;
-	if(flag[HIDEIND] == 0) { 
+	if(flag[HIDEIND] == 1) { 
 		printf("\t[function:%2X]\n", function); 
 		printf("\t[OPERAND] rs:%08X rt:%08X rd:%08X shamt:%08X \n", rs,rt,rd,shamt);
 	}
@@ -124,13 +124,8 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 }
 
 /* opcodeが0の時の操作を、末尾6ビットによって決める */
-unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsigned int* reg, unsigned int* opNum, unsigned int* labelRec) {
-	unsigned int function = 0;
-	unsigned int rs=0;
-	unsigned int rs_original;
-	unsigned int rt=0;
-	unsigned int rd=0;
-	unsigned int shamt=0;
+unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsigned int* reg, unsigned long long* opNum, unsigned int* labelRec) {
+	unsigned int function, rs, rs_original, rt, rd, shamt;
 
 	/* [op] [rs] [rt] [rd] [shamt] [funct] */
 	/* 先頭&末尾6bitは0であることが保証済み */
@@ -141,7 +136,7 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 
 	
 	function = instruction & 0x3F;
-	if(flag[HIDEIND] == 0) { 
+	if(flag[HIDEIND] == 1) { 
 		printf("\t[function:%2X]\n", function); 
 		printf("\t[OPERAND] rs:%08X rt:%08X rd:%08X shamt:%08X \n", rs,rt,rd,shamt);
 	}
@@ -225,16 +220,16 @@ unsigned int funct (unsigned int pc, unsigned int instruction, int* flag, unsign
 }
 
 int main (int argc, char* argv[]) {
-	int flag[REGSIZE] = { 0 };
-	unsigned int* opBuff;	// ファイルから読み込む命令列
+	int flag[FLAGSIZE] = { 0 };
 	int fd1 = 0;
+	unsigned int* opBuff;	// ファイルから読み込む命令列
 	unsigned int maxpc;
 	unsigned int pc = 0;
 	unsigned int operation;	// 実行中命令
 	unsigned int opcode;
 	unsigned long long breakCount = 0;
 	unsigned long long breakpoint = 0xFFFFFFFFFFFFFF;
-	unsigned int breakShift = 40;	//  
+	unsigned int breakShift = 38;	//  
 	unsigned char *input;
 	unsigned char *srOut;
 	unsigned int *memory;
@@ -246,8 +241,8 @@ int main (int argc, char* argv[]) {
 	unsigned int count2 = 0;
 	unsigned int srCount=0;
 	unsigned int mstart = 0, mfinish = MEMORYSIZE;
-	unsigned int fpuNum[OPNUM] = { 0 };	//各浮動小数点命令の実行回数 fpuNum[OPCODE]++ の形で使用
-	unsigned int opNum[OPNUM] = { 0 };	//各命令の実行回数 opNum[OPCODE] の形で使用/function系はopNum[FUNCCODE+128]
+	unsigned long long fpuNum[OPNUM] = { 0 };	//各浮動小数点命令の実行回数 fpuNum[OPCODE]++ の形で使用
+	unsigned long long opNum[OPNUM] = { 0 };	//各命令の実行回数 opNum[OPCODE] の形で使用/function系はopNum[FUNCCODE+128]
 	unsigned int labelRec[BUFF] = { 0 };
 //	unsigned long long labelCount = 1;
 
@@ -339,7 +334,7 @@ int main (int argc, char* argv[]) {
 		comp = strcmp(argv[i], HIDE);
 		if(comp == 0) { 
 			flag[HIDEIND] = 1;
-			printf("HIDE, ");
+			printf("SHOW, ");
 		}
 
 		/* printreg */
@@ -482,7 +477,7 @@ int main (int argc, char* argv[]) {
 	i_time++;
 	timebuff[i_time] = getProcTime();
 	fprintf(stderr, "time[%2d] = %.12f (<-<-<- Initialize <-<-<-)\n", i_time, (timebuff[i_time] - timebuff[0]) );
-	if(flag[HIDEIND] == 0) { printf("\n== next: %u ==\n", ((pc-PCINIT)/4)); }
+	if(flag[HIDEIND] == 1) { printf("\n== next: %u ==\n", ((pc-PCINIT)/4)); }
 
 	/* シミュレータ本体 */
 	while(pc < maxpc+PCINIT+1 && breakCount < breakpoint+1) {	// unsigned int
@@ -501,7 +496,7 @@ int main (int argc, char* argv[]) {
 				break;
 		}
 		breakCount++;
-		if( (breakCount << breakShift) == 0) { 
+		if( (breakCount << breakShift) == 0) {
 			fprintf(stderr, "[ INFO ]\tprocessing instructions... @ %10llX\n", breakCount);
 			i_time++;
 			timebuff[i_time] = getProcTime();
@@ -510,14 +505,14 @@ int main (int argc, char* argv[]) {
 				breakShift--;
 			}
 		}
-		if (flag[HIDEIND] == 1) {
+		if (flag[HIDEIND] == 0) {
 			;
-		} else if ((flag[HIDEIND] == 0) && flag[PRINTREGIND] == 1 && operation != 0) {
+		} else if ((flag[HIDEIND] == 1) && flag[PRINTREGIND] == 1 && operation != 0) {
 			printRegister(reg);	// 命令実行後のレジスタを表示する
-			if(flag[HIDEIND] == 0) { printf("\n== next: %u ==\n", ((pc-PCINIT)/4)); }
+			printf("\n== next: %u ==\n", ((pc-PCINIT)/4));
 		} else if(flag[5] == 1) { 
 			if (fgets(sequentialBuff, sizeof(sequentialBuff) - 1, stdin) == NULL) { ; }
-		} else if(flag[HIDEIND] == 0) {
+		} else if(flag[HIDEIND] == 1) {
 			 printf("\n== next: %u ==\n", ((pc-PCINIT)/4));
 		}
 	}
@@ -551,9 +546,9 @@ int main (int argc, char* argv[]) {
 	printRegister(reg);
 
 	printf("\n\nTotal instructions: \n\t%llu\n", breakCount);
-	printf("Total instructions (except NOP): \n\t%llu\n", breakCount - opNum[128+NOP]);
+	printf("Total instructions (except NOP): \n\t%llu\n", (breakCount - opNum[128+NOP]));
 	printf("\n(OP)\t: \t(Num), \t(Ratio)\n");
-	if(opNum[128+NOP] != 0) { printf("NOP 	: %6u, %05.2f (%%)\n", opNum[128+NOP], (double) 100*opNum[128+NOP]/breakCount); }
+	if(opNum[128+NOP] != 0) { printf("NOP 	: %6llu, %05.2f (%%)\n", opNum[128+NOP], (double) 100*opNum[128+NOP]/breakCount); }
 	printOpsCount(opNum, fpuNum, breakCount);
 	count2 = 0;
 	count = 0;
