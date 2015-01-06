@@ -540,6 +540,16 @@ unsigned int slt(unsigned int rs, unsigned int rt) {
 */
 }
 
+unsigned int sltu(unsigned int rs, unsigned int rt) {
+
+	if(rs < rt) {
+		return 1;
+	} else {
+		return 0;
+	}
+	
+}
+
 unsigned int slti(unsigned int rs, unsigned int im) {
 	int signedIm;
 	int signedRs;
@@ -553,6 +563,7 @@ unsigned int slti(unsigned int rs, unsigned int im) {
 	}
 	
 }
+
 unsigned int sltiu(unsigned int rs, unsigned int im) {
 	if(rs < signExt(im)) {
 		return 1;

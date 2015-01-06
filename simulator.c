@@ -78,6 +78,10 @@ unsigned int functHide (unsigned int pc, unsigned int instruction, int* flag, un
 			reg[rd] = slt(reg[rs], reg[rt]);
 			opNum[128+SLT]++;
 			break;
+		case (SLTU) :
+			reg[rd] = sltu(reg[rs], reg[rt]);
+			opNum[128+SLTU]++;
+			break;
 		case (SLL) :
 			reg[rd] = sll(reg[rt], shamt);
 			opNum[128+SLL]++;
