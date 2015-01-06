@@ -11,6 +11,7 @@ unsigned int fpu(unsigned int pc, unsigned int instruction, unsigned int* reg, u
 unsigned int sll(unsigned int rs, unsigned int shamt);
 unsigned int sllv(unsigned int rs, unsigned int rt);
 unsigned int srl(unsigned int rs, unsigned int shamt);
+unsigned int srlv(unsigned int rs, unsigned int rt);
 unsigned int sra(unsigned int rs, unsigned int shamt);
 unsigned int slt(unsigned int rs, unsigned int rt);
 unsigned int slti(unsigned int rs, unsigned int im);

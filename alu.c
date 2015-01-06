@@ -433,6 +433,28 @@ unsigned int srl(unsigned int rs, unsigned int shamt) {
 	}
 	return rs;
 }
+/*
+Format: SRLV rd, rt, rs MIPS32
+Purpose:
+	To execute a logical right-shift of a word by a variable number of bits
+Description: rd ¬ rt >> rs (logical)
+	The contents of the low-order 32-bit word of GPR rt are shifted right, inserting zeros into the emptied bits; the word
+	result is placed in GPR rd. The bit-shift amount is specified by the low-order 5 bits of GPR rs.
+Restrictions:
+	None
+Operation:
+	s ¬ GPR[rs]4..0
+	temp ¬ 0s || GPR[rt]31..s
+	GPR[rd]¬ temp
+*/
+unsigned int srlv(unsigned int rs, unsigned int rt) {
+	unsigned int s, rd;
+
+	s = rs & 0xF;
+	rd = rt >> (31-s);
+	return rd;
+}
+
 
 unsigned int sra(unsigned int rs, unsigned int shamt) {
 	unsigned int rd;
