@@ -528,12 +528,12 @@ unsigned int subu (unsigned int rs, unsigned int rt) {
 	return rd;
 }
 
-unsigned int addiu(unsigned int rs, unsigned int Imm) {
-	return rs + Imm;
+unsigned int addiu(unsigned int rs, unsigned int im) {
+	return rs + im;
 }
 
-unsigned int addu(unsigned int adduA, unsigned int adduB){
-	return (adduA + adduB);
+unsigned int addu(unsigned int rs, unsigned int rt){
+	return (rs + rt);
 }
 
 unsigned int ori(unsigned int rs, unsigned int im) {
@@ -552,6 +552,11 @@ unsigned int nor(unsigned int rs, unsigned int rt) {
 
 unsigned int xor(unsigned int rs, unsigned int rt) {
 	return (rs ^ rt);
+}
+unsigned int xori(unsigned int rs, unsigned int im) {
+	//imはzero_ext
+
+	return (rs ^ im);
 }
 
 
