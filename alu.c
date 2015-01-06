@@ -508,7 +508,14 @@ unsigned int and(unsigned int rs, unsigned int rt) {
 	// and $rs $rt $rd
 	// rd <- rs & rt
 	unsigned int rd;
-	rd = rs + rt;
+	rd = rs & rt;
+	return rd;
+}
+
+unsigned int andi(unsigned int rs, unsigned int im) {
+	// imはzero_ext
+	unsigned int rd;
+	rd = rs & im;
 	return rd;
 }
 

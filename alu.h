@@ -19,6 +19,7 @@ unsigned int nor(unsigned int rs, unsigned int rt);
 unsigned int xor(unsigned int rs, unsigned int rt);
 unsigned int ori(unsigned int rs, unsigned int im);
 unsigned int and(unsigned int rs, unsigned int rt);
+unsigned int andi(unsigned int rs, unsigned int im);
 unsigned int subu (unsigned int rs, unsigned int rt);
 unsigned int addiu(unsigned int rs, unsigned int Imm);
 unsigned int addu(unsigned int adduA, unsigned int adduB);
