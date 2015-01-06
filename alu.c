@@ -404,6 +404,26 @@ unsigned int sll(unsigned int rs, unsigned int shamt) {
 	}
 	return rs;
 }
+/*
+Format: SLLV rd, rt, rs MIPS32
+Purpose: To left-shift a word by a variable number of bits
+Description: rd <- rt << rs
+	The contents of the low-order 32-bit word of GPR rt are shifted left, inserting zeros into the emptied bits; the result
+	word is placed in GPR rd. The bit-shift amount is specified by the low-order 5 bits of GPR rs.
+Restrictions: None
+Operation:
+	s <- GPR[rs]4..0
+	temp <- GPR[rt](31-s)..0 || 0s
+	GPR[rd] <- temp
+*/
+unsigned int sllv(unsigned int rs, unsigned int rt) {
+	unsigned int s,rd;
+
+	s = rs & 0xF;
+	rd = (rt << ( 31 - s ));
+	
+	return rd;
+}
 
 unsigned int srl(unsigned int rs, unsigned int shamt) {
 	unsigned int i;

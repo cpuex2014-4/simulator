@@ -38,7 +38,7 @@ unsigned int decoder (
 
 	pc = pc + 4;
 
-	if(instruction != 0 && flag[HIDEIND] == 1) {
+	if(instruction != 0 && SHOWFLGCHK) {
 		printf("[ops: %06llu, pc: 0x%x, instruction: 0x%2X]\n\t[opcode:%2X]\n", breakCount, pc, instruction, opcode);
 	}
 	switch (opcode) {
@@ -61,14 +61,14 @@ unsigned int decoder (
 					} else {
 						pc = flag[MAXPC];
 					}
-					if(flag[HIDEIND] == 1) { printf("\tMMIOREAD_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
+					if(SHOWFLGCHK) { printf("\tMMIOREAD_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
 				} else if (address == MMIOREAD) {
 					reg[rt] = input[srInCount];
 					srInCount++;
-					if(flag[HIDEIND] == 1) { printf("\tMMIOREAD(%2ld) :\t [$%2u] <- 0x%X\n", srInCount, rt, reg[rt]); }
+					if(SHOWFLGCHK) { printf("\tMMIOREAD(%2ld) :\t [$%2u] <- 0x%X\n", srInCount, rt, reg[rt]); }
 				} else if (address == 0xFFFF0008) {
 					reg[rt] = 1;
-					if(flag[HIDEIND] == 1) { printf("\tMMIOWRITE_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
+					if(SHOWFLGCHK) { printf("\tMMIOWRITE_Ready :\t [$%2u] <- %u\n", rt, reg[rt]); }
 				} else {
 					fprintf(stderr, "[ ERROR ]\tirregular code(0x%X).\n", address);
 					exit(1);
@@ -82,7 +82,7 @@ unsigned int decoder (
 					exit(1);
 				}
 				reg[rt] = lw(address, memory);
-				if(flag[HIDEIND] == 1) { printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n\t\treg[rt(%u)] = 0x%X\n", address, memory[address], rt, reg[rt]); }
+				if(SHOWFLGCHK) { printf("\tLW :\tmemory[address:0x%04X]=0x%4X \n\t\treg[rt(%u)] = 0x%X\n", address, memory[address], rt, reg[rt]); }
 			}
 			break;
 		case(LWC1) :
@@ -113,7 +113,7 @@ unsigned int decoder (
 				} else {
 					fprintf(stderr, "[ ERROR ]\tserial port size is over %d", FILESIZE);
 				}
-				if(flag[HIDEIND] == 1) {
+				if(SHOWFLGCHK) {
 					printf("\t(im:0x%X)/(reg[%2u]:0x%X)/(reg[%2u]:0x%X)\n", im, rs, reg[rs], rt, reg[rt]);
 					printf("\tMMIOWRITE:\twrite to serialport (%X).\n", reg[rt]);
 				}
@@ -127,7 +127,7 @@ unsigned int decoder (
 					exit(1);
 				}
 				sw(reg[rt], address, memory);
-				if(flag[HIDEIND] == 1) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
+				if(SHOWFLGCHK) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
 				memInit[address] = 1;
 			}
 			break;
@@ -139,7 +139,7 @@ unsigned int decoder (
 				exit(1);
 			}
 			sw(fpreg[rt], address, memory);
-			if(flag[HIDEIND] == 1) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
+			if(SHOWFLGCHK) { printf("\tmemory[address: 0x%04X-0x%04X] : %02X %02X %02X %02X\n", address, address+3, memory[address+3], memory[address+2], memory[address+1], memory[address]); }
 			memInit[address] = 1;
 			break;
 		case(ADDIU) :
@@ -147,7 +147,7 @@ unsigned int decoder (
 			im = signExt(im);
 			rs_original = reg[rs];
 			reg[rt] = reg[rs] + im;
-			if(flag[HIDEIND] == 1) { printf("\tADDIU :\t[$%2u: 0x%4X] + [im: 0x%8X] => [$%2u: 0x%4X]\n", rs, rs_original, im, rt, reg[rt]); }
+			if(SHOWFLGCHK) { printf("\tADDIU :\t[$%2u: 0x%4X] + [im: 0x%8X] => [$%2u: 0x%4X]\n", rs, rs_original, im, rt, reg[rt]); }
 			opNum[ADDIU]++;
 			break;
 		case(JUMP) :
@@ -155,35 +155,35 @@ unsigned int decoder (
 			pc = jump*4 + PCINIT;	// jumpはpc形式
 			labelRec[pc]++;		
 			opNum[JUMP]++;
-			if(flag[HIDEIND] == 1) { printf("\tJump :\t(jump_to) 0x%04x\n", pc); }
+			if(SHOWFLGCHK) { printf("\tJump :\t(jump_to) 0x%04x\n", pc); }
 			break;
 		case(BEQ) : 
 			diff = signExt(im);
-			if(flag[HIDEIND] == 1) { printf("\tBEQ :\t?([$%2u 0x%2X] = [$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
+			if(SHOWFLGCHK) { printf("\tBEQ :\t?([$%2u 0x%2X] = [$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
 			if(reg[rs] == reg[rt]) {
 				pc = pc + diff*4;		// pc形式
 				labelRec[pc]++;
-				if(flag[HIDEIND] == 1) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
-			} else if(flag[HIDEIND] == 1) {
+				if(SHOWFLGCHK) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
+			} else if(SHOWFLGCHK) {
 				printf("\t<FALSE & NOP>\n");
 			}
 			opNum[BEQ]++;
 			break;
 		case(BNE) :		// bne I-Type: 000101 rs rt BranchAddr 	等しくないなら分岐 
 			diff = signExt(im);
-			if(flag[HIDEIND] == 1) { printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
+			if(SHOWFLGCHK) { printf("\tBNE :\t?([$%2u 0x%2X]!=[$%2u 0x%2X]) -> branch(from 0x%04x to 0x%04x)\n", rs, reg[rs], rt, reg[rt], pc, pc + 4 + diff*4); }
 			if(reg[rs] != reg[rt]) {
 				pc = pc + diff*4;		// pc形式
 				labelRec[pc]++;
-				if(flag[HIDEIND] == 1) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
-			} else if(flag[HIDEIND] == 1) {
+				if(SHOWFLGCHK) { printf("\t\t<TRUE & JUMP> -> (jump_to) 0x%04x\n", pc); }
+			} else if(SHOWFLGCHK) {
 				printf("\t<FALSE & NOP>\n");
 			}
 			opNum[BNE]++;
 			break;
 		case(LUI) :
 			reg[rt] = im << 16;
-			if(flag[HIDEIND] == 1) { printf("\tLUI :\tReg[$%2u] <- [0x%4X (imm)]\n", rt, im); }
+			if(SHOWFLGCHK) { printf("\tLUI :\tReg[$%2u] <- [0x%4X (imm)]\n", rt, im); }
 			opNum[LUI]++;
 			break;
 		case(JAL) :
@@ -201,13 +201,31 @@ unsigned int decoder (
 			opNum[ORI]++;
 			rs_original = reg[rs];
 			reg[rt] = ori(reg[rs], im);
-			if(flag[HIDEIND] == 1) { printf("\tORI: [reg($%02u):0x%4X] OR? [imm:0x%4X] => [reg($%02u)] 0x%2X\n", rs, rs_original, im, rt, reg[rt]); }
+			if(SHOWFLGCHK) { printf("\tORI: [reg($%02u):0x%4X] OR? [imm:0x%4X] => [reg($%02u)] 0x%2X\n", rs, rs_original, im, rt, reg[rt]); }
 			break;
 		case(ANDI) :
 			opNum[ANDI]++;
 			rs_original = reg[rs];
 			reg[rt] = reg[rs] & im;
-			if(flag[HIDEIND] == 1) { printf("\tANDI: [$%2u:0x%4X] ANDi? [im:0x%4X] => [$%2u] 0x%4X\n", rs, rs_original, im, rt, reg[rt]); }
+			if(SHOWFLGCHK) { printf("\tANDI: [$%2u:0x%4X] ANDi? [im:0x%4X] => [$%2u] 0x%4X\n", rs, rs_original, im, rt, reg[rt]); }
+			break;
+		case(XORI) :
+			opNum[ANDI]++;
+			rs_original = reg[rs];
+			reg[rt] = xori(reg[rs], im);
+			if(SHOWFLGCHK) { printf("\tANDI: [$%2u:0x%4X] ANDi? [im:0x%4X] => [$%2u] 0x%4X\n", rs, rs_original, im, rt, reg[rt]); }
+			break;
+		case(SLTI) :
+			opNum[ANDI]++;
+			rs_original = reg[rs];
+			reg[rt] = slti(reg[rs], im);
+			if(SHOWFLGCHK) { printf("\tANDI: [$%2u:0x%4X] ANDi? [im:0x%4X] => [$%2u] 0x%4X\n", rs, rs_original, im, rt, reg[rt]); }
+			break;
+		case(SLTIU) :
+			opNum[ANDI]++;
+			rs_original = reg[rs];
+			reg[rt] = sltiu(reg[rs], im);
+			if(SHOWFLGCHK) { printf("\tANDI: [$%2u:0x%4X] ANDi? [im:0x%4X] => [$%2u] 0x%4X\n", rs, rs_original, im, rt, reg[rt]); }
 			break;
 		default :
 			fprintf(stderr, "[ ERROR ]\tUnknown switch has selected.(opcode: %X / pc: %X)\n", opcode, pc);
