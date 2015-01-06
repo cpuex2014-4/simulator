@@ -419,7 +419,7 @@ Operation:
 unsigned int sllv(unsigned int rs, unsigned int rt) {
 	unsigned int s,rd;
 
-	s = rs & 0xF;
+	s = rs & 0x1F;
 	rd = (rt << ( 31 - s ));
 	
 	return rd;
@@ -450,7 +450,7 @@ Operation:
 unsigned int srlv(unsigned int rs, unsigned int rt) {
 	unsigned int s, rd;
 
-	s = rs & 0xF;
+	s = rs & 0x1F;
 	rd = rt >> (31-s);
 	return rd;
 }
@@ -459,10 +459,37 @@ unsigned int srlv(unsigned int rs, unsigned int rt) {
 unsigned int sra(unsigned int rs, unsigned int shamt) {
 	unsigned int rd;
 
-	if(rs & 0x8000) {
-		rd = ((rs & 0x7FFFFFFF) >> shamt) | 0x80000000;
+	if(rs & 0x80000000) {
+		rd = ((rs & 0x7FFFFFFF) >> shamt) | ((0xFFFFFFFF >> (32 - shamt)) << (32 - shamt) );
 	} else {
 		rd = rs >> shamt;
+	}
+
+	return rd;
+}
+/*
+Description: rd ¬ rt >> rs (arithmetic)
+The contents of the low-order 32-bit word of GPR rt are shifted right, duplicating the sign-bit (bit 31) in the emptied
+bits; the word result is placed in GPR rd. The bit-shift amount is specified by the low-order 5 bits of GPR rs.
+Restrictions:
+None
+Operation:
+s ¬ GPR[rs]4..0
+temp ¬ (GPR[rt]31)s || GPR[rt]31..s
+GPR[rd]¬ temp
+*/
+unsigned int srav(unsigned int rs, unsigned int rt) {
+	unsigned int rd;
+	unsigned int s;
+	unsigned int sign;
+
+	s = rt & 0x1F;
+	sign = rs & 0x80000000;
+
+	if(sign) {
+		rd = ((rs & 0x7FFFFFFF) >> s) | ((0xFFFFFFFF >> (32 - s)) << (32 - s));
+	} else {
+		rd = rs >> s;
 	}
 
 	return rd;
