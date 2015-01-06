@@ -484,6 +484,14 @@ unsigned int slti(unsigned int rs, unsigned int im) {
 	}
 	
 }
+unsigned int sltiu(unsigned int rs, unsigned int im) {
+	if(rs < signExt(im)) {
+		return 1;
+	} else {
+		return 0;
+	}
+	
+}
 
 unsigned int or(unsigned int rs, unsigned int rt) {
 	// R-type

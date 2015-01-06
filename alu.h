@@ -13,6 +13,7 @@ unsigned int srl(unsigned int rs, unsigned int shamt);
 unsigned int sra(unsigned int rs, unsigned int shamt);
 unsigned int slt(unsigned int rs, unsigned int rt);
 unsigned int slti(unsigned int rs, unsigned int im);
+unsigned int sltiu(unsigned int rs, unsigned int im);
 unsigned int or(unsigned int rs, unsigned int rt);
 unsigned int nor(unsigned int rs, unsigned int rt);
 unsigned int xor(unsigned int rs, unsigned int rt);
