@@ -607,6 +607,9 @@ unsigned int subu (unsigned int rs, unsigned int rt) {
 	rd = rs - rt;
 	return rd;
 }
+unsigned int subu- (unsigned int rs, unsigned int im) {
+	return (rs - im);
+}
 
 unsigned int addiu(unsigned int rs, unsigned int im) {
 	return rs + im;

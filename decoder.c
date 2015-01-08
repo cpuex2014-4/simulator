@@ -38,7 +38,7 @@ unsigned int decoder (
 
 	pc = pc + 4;
 
-	if(instruction != 0 && SHOWFLGCHK) {
+	if(SHOWFLGCHK && instruction != 0) {
 		printf("[ops: %06llu, pc: 0x%x, instruction: 0x%2X]\n\t[opcode:%2X]\n", breakCount, pc, instruction, opcode);
 	}
 	switch (opcode) {
@@ -143,7 +143,6 @@ unsigned int decoder (
 			memInit[address] = 1;
 			break;
 		case(ADDIU) :
-//			return(addiu(reg, instruction, flag, opNum));
 			im = signExt(im);
 			rs_original = reg[rs];
 			reg[rt] = reg[rs] + im;
