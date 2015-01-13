@@ -14,7 +14,6 @@
 #define BLOCKRAM	0x1FFFC
 #define LINE		512
 
-
 /* register */
 #define REGAT 1
 #define REGGP 28
@@ -75,14 +74,17 @@
 #define COLT	0x34
 #define COLE	0x36
 
-/* fpmt */
-#define MFC1M	0x0	// fMt
-#define MTC1M	0x4	// fMt
-#define FTOIM	0x10	// fMt
-#define ITOFM	0x14	// fMt
-#define BC1		0x8	//fMt
+#define FMADDS
 
-/* fpopNum */
+/* fpFormat(fmt) */
+#define MFC1M    0x0	// fMt
+#define MTC1M    0x4	// fMt
+#define FTOIM    0x10	// fMt
+#define ITOFM    0x14	// fMt
+#define BC1	     0x8	//fMt
+#define FADD_FMT 0x10 //fMt
+
+/* fpOpNum */
 #define FMFC 0x80
 #define FMTC 0x81
 #define BC1F 0xFE

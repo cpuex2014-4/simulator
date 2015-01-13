@@ -13,6 +13,7 @@
 #include "print.h"
 #include "alu.h"
 #include "decoder.h"
+#include "fpusub.h"
 
 double getProcTime(void) {
 	struct timeval tv;

@@ -95,7 +95,7 @@ unsigned int fpuHide(unsigned int pc, unsigned int instruction, unsigned int* re
 						fpreg[fs] = reg[rt];
 						fpuNum[FMTC]++;
 						break;
-					case (0x10) :
+					case (FADD_FMT) :
 						// fadd
 						fpreg[fd]=fadd (fpreg[fs], fpreg[ft]);
 						fpuNum[FADDS]++;
@@ -607,10 +607,10 @@ unsigned int subu (unsigned int rs, unsigned int rt) {
 	rd = rs - rt;
 	return rd;
 }
-unsigned int subu- (unsigned int rs, unsigned int im) {
+/*unsigned int subu (unsigned int rs, unsigned int im) {
 	return (rs - im);
 }
-
+*/
 unsigned int addiu(unsigned int rs, unsigned int im) {
 	return rs + im;
 }
