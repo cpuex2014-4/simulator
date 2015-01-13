@@ -14,6 +14,13 @@ uint32_t fneg (uint32_t a) {
   return nega;
 }
 
+uint32_t fabs (uint32_t a) {
+	if(a>>31) {
+		a = (1<<31)^a;
+	}
+	return a;
+}
+
 unsigned int fmadds(unsigned int fr, unsigned int fs, unsigned int ft) {
 	unsigned int fd;
 	/* 積の丸め？ */

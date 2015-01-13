@@ -3,6 +3,7 @@
 
 
 uint32_t fneg (uint32_t a);
+uint32_t fabs (uint32_t a);
 
 unsigned int fmadds(unsigned int fr, unsigned int fs, unsigned int ft);
 unsigned int fmsubs(unsigned int fr, unsigned int fs, unsigned int ft);
